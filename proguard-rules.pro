@@ -1,6 +1,8 @@
 -dontobfuscate
 
 -keep public class network.minter.blockchainapi.** { *; }
+-keep public class network.minter.blockchainapi.MinterBlockChainApi { *; }
+
 
 # Parceler library
 -keep interface org.parceler.Parcel
