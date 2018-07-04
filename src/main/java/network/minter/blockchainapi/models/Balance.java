@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -25,6 +25,8 @@
 
 package network.minter.blockchainapi.models;
 
+import org.parceler.Parcel;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -38,6 +40,7 @@ import network.minter.blockchainapi.models.operational.Transaction;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@Parcel
 public class Balance {
     public Map<String, CoinBalance> coins;
 
@@ -53,43 +56,44 @@ public class Balance {
         return coins.get(coin.toUpperCase()).getBalance();
     }
 
-    public static class CoinBalance {
-        public String coin;
-        public BigInteger balance;
+	@Parcel
+	public static class CoinBalance {
+		public String coin;
+		public BigInteger balance;
 
-        /**
-         * @return Coin name
-         */
-        public String getCoin() {
-            return coin;
-        }
+		/**
+		 * @return Coin name
+		 */
+		public String getCoin() {
+			return coin;
+		}
 
-        /**
-         * @return Current balance in coins for specified address
-         * @throws NumberFormatException
-         */
-        public BigDecimal getBalance() {
-            return new BigDecimal(balance).setScale(18, RoundingMode.UNNECESSARY).divide(Transaction.VALUE_MUL_DEC, BigDecimal.ROUND_UNNECESSARY);
-        }
+		/**
+		 * @return Current balance in coins for specified address
+		 * @throws NumberFormatException
+		 */
+		public BigDecimal getBalance() {
+			return new BigDecimal(balance).setScale(18, RoundingMode.UNNECESSARY).divide(Transaction.VALUE_MUL_DEC, BigDecimal.ROUND_UNNECESSARY);
+		}
 
-        public void setBalance(BigDecimal b) {
-            balance = b.setScale(18, RoundingMode.UNNECESSARY).multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-        }
+		public void setBalance(BigDecimal b) {
+			balance = b.setScale(18, RoundingMode.UNNECESSARY).multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+		}
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(coin, balance);
-        }
+		@Override
+		public int hashCode() {
+			return Objects.hash(coin, balance);
+		}
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            CoinBalance balance1 = (CoinBalance) o;
-            return Objects.equals(coin, balance1.coin) &&
-                    Objects.equals(balance, balance1.balance);
-        }
-    }
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			CoinBalance balance1 = (CoinBalance) o;
+			return Objects.equals(coin, balance1.coin) &&
+					Objects.equals(balance, balance1.balance);
+		}
+	}
 
 
 }

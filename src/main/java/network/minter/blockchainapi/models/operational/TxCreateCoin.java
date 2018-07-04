@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -27,6 +27,8 @@ package network.minter.blockchainapi.models.operational;
 
 import android.support.annotation.NonNull;
 
+import org.parceler.Parcel;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -41,6 +43,7 @@ import static network.minter.mintercore.internal.common.Preconditions.checkArgum
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@Parcel
 public class TxCreateCoin extends Operation {
     String name;
     String symbol;
