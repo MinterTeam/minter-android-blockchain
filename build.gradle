@@ -23,16 +23,56 @@
  * THE SOFTWARE.
  */
 
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.0-beta02'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        google()
+        jcenter()
+        maven { url "https://dl.bintray.com/ethereum/maven/" }
+        maven { url 'https://clojars.org/repo/' }
+        maven { url 'https://jitpack.io' }
+        maven { url "https://maven.edwardstock.com/artifactory/libs-release-local" }
+        maven { url "https://repo1.maven.org/maven2/com/google/zxing/" }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/'}
+    }
+}
+
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+group = 'network.minter.android'
+version = '1.0.0'
+
+
+ext {
+    minterMinSdk = 19
+    minterMaxSdk = 27
+    minterBuildTools = "28.0.0"
+    minterLibSupport = "27.1.1"
+}
+
 
 android {
-    compileSdkVersion 27
-
-
+    compileSdkVersion minterMaxSdk
+    buildToolsVersion minterBuildTools
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 27
+        minSdkVersion minterMinSdk
+        targetSdkVersion minterMaxSdk
+
         versionCode 1
         versionName "1.0"
 
@@ -93,9 +133,18 @@ android {
 
 }
 
+ext {
+    minterCoreVers = "1.0.0"
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api (project(':mintercore')) {
+
+    netTestApi ("network.minter.android:minter-android-core-testnet:${minterCoreVers}@aar") {
+        transitive = true
+    }
+
+    netMainApi ("network.minter.android:minter-android-core:${minterCoreVers}@aar") {
         transitive = true
     }
 
