@@ -129,7 +129,7 @@ android {
         }
         netTest {
             dimension "env"
-            buildConfigField "String", "BASE_NORE_URL", '"http://minter-node-1.testnet.minter.network:8841"'
+            buildConfigField "String", "BASE_NODE_URL", '"http://minter-node-1.testnet.minter.network:8841"'
         }
     }
 

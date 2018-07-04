@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -48,7 +48,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class MinterBlockChainApi {
-    private final static String BASE_NODE_URL = BuildConfig.BASE_NORE_URL;
+	private final static String BASE_NODE_URL = BuildConfig.BASE_NODE_URL;
     private static MinterBlockChainApi INSTANCE;
     private ApiService.Builder mApiService;
     private BlockChainAccountRepository mAccountRepository;
