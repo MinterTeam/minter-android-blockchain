@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -55,7 +55,7 @@ import static network.minter.mintercore.internal.common.Preconditions.checkNotNu
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class BlockChainTransactionRepository extends DataRepository<BlockChainTransactionEndpoint> {
+public class BlockChainTransactionRepository extends DataRepository<BlockChainTransactionEndpoint> implements DataRepository.Configurator {
     public BlockChainTransactionRepository(@NonNull ApiService.Builder apiBuilder) {
         super(apiBuilder);
     }
@@ -68,13 +68,7 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
      * @see TQuery
      */
     public Call<BCResult<List<HistoryTransaction>>> getTransactions(@NonNull TQuery query) {
-        return getService().getTransactions(checkNotNull(query, "Query required").build());
-    }
-
-    @Override
-    protected void configureService(ApiService.Builder apiBuilder) {
-        super.configureService(apiBuilder);
-        apiBuilder.registerTypeAdapter(HistoryTransaction.class, new HistoryTransactionDeserializer());
+	    return getInstantService(this).getTransactions(checkNotNull(query, "Query required").build());
     }
 
     @NonNull
@@ -82,8 +76,12 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
     protected Class<BlockChainTransactionEndpoint> getServiceClass() {
         return BlockChainTransactionEndpoint.class;
     }
+	@Override
+	public void configure(ApiService.Builder api) {
+		api.registerTypeAdapter(HistoryTransaction.class, new HistoryTransactionDeserializer());
+	}
 
-    public static final class HistoryTransactionDeserializer implements JsonDeserializer<HistoryTransaction> {
+	public static final class HistoryTransactionDeserializer implements JsonDeserializer<HistoryTransaction> {
 
         @Override
         public HistoryTransaction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
@@ -101,7 +99,12 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
         }
     }
 
-    public static class TQuery {
+	/**
+	 * Transaction getting query (@TODO documentation)
+	 *
+	 * @link https://github.com/MinterTeam/minter-wiki/wiki/Minter-Node-JSON-API
+	 */
+	public static class TQuery {
         private Map<String, String> mData = new HashMap<>();
 
         public TQuery setFrom(MinterAddress from) {

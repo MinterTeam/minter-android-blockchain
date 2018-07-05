@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -74,7 +74,9 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
      * @return
      */
     public Call<BCResult<Balance>> getBalance(@NonNull String address) {
-        return getService().getBalance(checkNotNull(address, "Address required!"));
+	    return getInstantService(api -> {
+		    api.registerTypeAdapter(Balance.class, new CoinBalanceDeserializer());
+	    }).getBalance(checkNotNull(address, "Address required!"));
     }
 
     public Call<BCResult<BigInteger>> getTransactionCount(@NonNull MinterAddress key) {
@@ -89,7 +91,7 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
      * @return Prepared request with transaction count result
      */
     public Call<BCResult<BigInteger>> getTransactionCount(@NonNull String address) {
-        return getService().getTransactionCount(checkNotNull(address, "Address required!"));
+	    return getInstantService().getTransactionCount(checkNotNull(address, "Address required!"));
     }
 
     /**
@@ -100,15 +102,9 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
      * @see TransactionSendResult
      */
     public Call<BCResult<BytesData>> sendTransaction(@NonNull TransactionSign transactionSign) {
-        return getService().sendTransaction(
+	    return getInstantService().sendTransaction(
                 asMap("transaction", transactionSign.getTxSign())
         );
-    }
-
-    @Override
-    protected void configureService(ApiService.Builder apiBuilder) {
-        super.configureService(apiBuilder);
-        apiBuilder.registerTypeAdapter(Balance.class, new CoinBalanceDeserializer());
     }
 
     @NonNull
@@ -117,7 +113,7 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
         return BlockChainAccountEndpoint.class;
     }
 
-    public static class CoinBalanceDeserializer implements JsonDeserializer<Balance> {
+	public static class CoinBalanceDeserializer implements JsonDeserializer<Balance> {
         @Override
         public Balance deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {

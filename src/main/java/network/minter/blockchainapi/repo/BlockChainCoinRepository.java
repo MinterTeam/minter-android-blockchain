@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -58,7 +58,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @return Full coin info
      */
     public Call<BCResult<Coin>> getCoinInfo(@NonNull String symbol) {
-        return getService().getCoinInformation(checkNotNull(symbol, "Symbol required"));
+	    return getInstantService().getCoinInformation(checkNotNull(symbol, "Symbol required"));
     }
 
     /**
@@ -78,7 +78,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @return
      */
     public Call<BCResult<BigInteger>> getCoinCurrencyConversion(@NonNull String fromCoin, @NonNull String toCoin, BigInteger amount) {
-        return getService().estimateCoinExchangeReturn(asMap(
+	    return getInstantService().getCoinExchangeCurrency(asMap(
                 "from_coin", checkNotNull(fromCoin, "Source coin required").toUpperCase(),
                 "to_coin", checkNotNull(toCoin, "Target coin required").toUpperCase(),
                 "value", amount.toString()

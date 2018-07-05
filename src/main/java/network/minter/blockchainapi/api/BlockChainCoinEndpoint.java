@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -46,6 +46,6 @@ public interface BlockChainCoinEndpoint {
     Call<BCResult<Coin>> getCoinInformation(@Query("symbol") String coin);
 
     @GET("/api/estimateCoinExchangeReturn")
-    Call<BCResult<BigInteger>> estimateCoinExchangeReturn(@QueryMap Map<String, String> data);
+    Call<BCResult<BigInteger>> getCoinExchangeCurrency(@QueryMap Map<String, String> data);
 
 }
