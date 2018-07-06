@@ -44,6 +44,7 @@ import network.minter.blockchainapi.models.BCResult;
 import network.minter.blockchainapi.models.HistoryTransaction;
 import network.minter.mintercore.MinterSDK;
 import network.minter.mintercore.crypto.MinterAddress;
+import network.minter.mintercore.crypto.MinterHash;
 import network.minter.mintercore.internal.api.ApiService;
 import network.minter.mintercore.internal.data.DataRepository;
 import retrofit2.Call;
@@ -51,31 +52,50 @@ import retrofit2.Call;
 import static network.minter.mintercore.internal.common.Preconditions.checkNotNull;
 
 /**
- * MinterCore. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BlockChainTransactionRepository extends DataRepository<BlockChainTransactionEndpoint> implements DataRepository.Configurator {
-    public BlockChainTransactionRepository(@NonNull ApiService.Builder apiBuilder) {
-        super(apiBuilder);
-    }
+	public BlockChainTransactionRepository(@NonNull ApiService.Builder apiBuilder) {
+		super(apiBuilder);
+	}
 
-    /**
-     * Get transactions by query
-     *
-     * @param query
-     * @return
-     * @see TQuery
-     */
-    public Call<BCResult<List<HistoryTransaction>>> getTransactions(@NonNull TQuery query) {
-	    return getInstantService(this).getTransactions(checkNotNull(query, "Query required").build());
-    }
+	/**
+	 * Get transactions by query
+	 *
+	 * @param query
+	 * @return
+	 * @see TQuery
+	 */
+	public Call<BCResult<List<HistoryTransaction>>> getTransactions(@NonNull TQuery query) {
+		return getInstantService(this).getTransactions(checkNotNull(query, "Query required").build());
+	}
 
-    @NonNull
-    @Override
-    protected Class<BlockChainTransactionEndpoint> getServiceClass() {
-        return BlockChainTransactionEndpoint.class;
-    }
+	/**
+	 * @param hash
+	 * @return
+	 * @see #getTransaction(String)
+	 */
+	public Call<BCResult<HistoryTransaction>> getTransaction(MinterHash hash) {
+		return getTransaction(hash.toString());
+	}
+
+	/**
+	 * Get full transaction information
+	 *
+	 * @param txHash
+	 * @return
+	 */
+	public Call<BCResult<HistoryTransaction>> getTransaction(String txHash) {
+		return getInstantService(this).getTransaction(txHash);
+	}
+
+	@NonNull
+	@Override
+	protected Class<BlockChainTransactionEndpoint> getServiceClass() {
+		return BlockChainTransactionEndpoint.class;
+	}
 	@Override
 	public void configure(ApiService.Builder api) {
 		api.registerTypeAdapter(HistoryTransaction.class, new HistoryTransactionDeserializer());
@@ -83,21 +103,21 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
 
 	public static final class HistoryTransactionDeserializer implements JsonDeserializer<HistoryTransaction> {
 
-        @Override
-        public HistoryTransaction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-                throws JsonParseException {
-            if (json.isJsonNull() || !json.isJsonObject()) {
-                return null;
-            }
+		@Override
+		public HistoryTransaction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+				throws JsonParseException {
+			if (json.isJsonNull() || !json.isJsonObject()) {
+				return null;
+			}
 
-            final Gson gson = MinterBlockChainApi.getInstance().getGsonBuilder().create();
+			final Gson gson = MinterBlockChainApi.getInstance().getGsonBuilder().create();
 
-            final HistoryTransaction out = gson.fromJson(json, HistoryTransaction.class);
-            out.data = gson.fromJson(json.getAsJsonObject().get("data").getAsJsonObject(), out.type.getOpClass());
+			final HistoryTransaction out = gson.fromJson(json, HistoryTransaction.class);
+			out.data = gson.fromJson(json.getAsJsonObject().get("data").getAsJsonObject(), out.type.getOpClass());
 
-            return out;
-        }
-    }
+			return out;
+		}
+	}
 
 	/**
 	 * Transaction getting query (@TODO documentation)
@@ -105,49 +125,50 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
 	 * @link https://github.com/MinterTeam/minter-wiki/wiki/Minter-Node-JSON-API
 	 */
 	public static class TQuery {
-        private Map<String, String> mData = new HashMap<>();
+		private Map<String, String> mData = new HashMap<>();
 
-        public TQuery setFrom(MinterAddress from) {
-            return setFrom(from.toString());
-        }
+		public TQuery setFrom(MinterAddress from) {
+			return setFrom(from.toString());
+		}
 
-        public TQuery setTo(MinterAddress to) {
-            return setTo(to.toString());
-        }
+		public TQuery setTo(MinterAddress to) {
+			return setTo(to.toString());
+		}
 
-        public TQuery setTo(String to) {
-            mData.put("tx.to", normalizeAddress(to));
-            return this;
-        }
+		public TQuery setTo(String to) {
+			mData.put("tx.to", normalizeAddress(to));
+			return this;
+		}
 
-        public TQuery setFrom(String from) {
-            mData.put("tx.from", normalizeAddress(from));
-            return this;
-        }
+		public TQuery setFrom(String from) {
+			mData.put("tx.from", normalizeAddress(from));
+			return this;
+		}
 
-        public String build() {
-            StringBuilder out = new StringBuilder();
+		public String build() {
+			StringBuilder out = new StringBuilder();
 
-            int i = 0;
-            for (Map.Entry<String, String> v : mData.entrySet()) {
-                out.append(v.getKey()).append("=").append("'").append(v.getValue()).append("'");
-                if (i + 1 < mData.size()) {
-                    out.append('&');
-                }
-            }
+			int i = 0;
+			for (Map.Entry<String, String> v : mData.entrySet()) {
+				out.append(v.getKey()).append("=").append("'").append(v.getValue()).append("'");
+				if (i + 1 < mData.size()) {
+					out.append('&');
+				}
+			}
 
-            return out.toString();
-        }
+			return out.toString();
+		}
 
-        private String normalizeAddress(String in) {
-            final String prefix = in.substring(0, 2);
-            if (prefix.equals(MinterSDK.PREFIX_ADDRESS) || prefix.equals(MinterSDK.PREFIX_ADDRESS.toLowerCase()) || prefix.equals("0x")) {
-                return in.substring(2);
-            }
+		private String normalizeAddress(String in) {
+			final String prefix = in.substring(0, 2);
+			if (prefix.equals(MinterSDK.PREFIX_ADDRESS) ||
+					prefix.equals(MinterSDK.PREFIX_ADDRESS.toLowerCase()) || prefix.equals("0x")) {
+				return in.substring(2);
+			}
 
-            return in;
-        }
+			return in;
+		}
 
 
-    }
+	}
 }

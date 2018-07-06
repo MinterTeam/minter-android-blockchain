@@ -53,7 +53,7 @@ import static network.minter.mintercore.internal.common.Preconditions.checkNotNu
 import static network.minter.mintercore.internal.helpers.CollectionsHelper.asMap;
 
 /**
- * MinterCore. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

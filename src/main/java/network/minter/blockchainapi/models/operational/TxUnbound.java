@@ -38,7 +38,7 @@ import network.minter.mintercore.util.DecodeResult;
 import network.minter.mintercore.util.RLP;
 
 /**
- * MinterWallet. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

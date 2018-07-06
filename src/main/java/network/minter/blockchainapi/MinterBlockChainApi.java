@@ -43,7 +43,7 @@ import network.minter.mintercore.internal.api.converters.MinterAddressDeserializ
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
- * MinterWallet. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

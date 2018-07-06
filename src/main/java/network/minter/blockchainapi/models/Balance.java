@@ -36,7 +36,7 @@ import java.util.Objects;
 import network.minter.blockchainapi.models.operational.Transaction;
 
 /**
- * MinterCore. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

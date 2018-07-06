@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -30,7 +30,7 @@ import android.support.annotation.NonNull;
 import network.minter.mintercore.util.RLP;
 
 /**
- * MinterWallet. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

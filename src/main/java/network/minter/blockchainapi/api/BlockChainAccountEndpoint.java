@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -38,20 +38,38 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 /**
- * MinterCore. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public interface BlockChainAccountEndpoint {
 
-    @GET("/api/balance/{address}")
-    Call<BCResult<Balance>> getBalance(@Path("address") String address);
+	/**
+	 * Returns current balance of an account
+	 *
+	 * @param address Address of an account
+	 * @return
+	 */
+	@GET("/api/balance/{address}")
+	Call<BCResult<Balance>> getBalance(@Path("address") String address);
 
-    @GET("/api/transactionCount/{address}")
+	/**
+	 * Returns count of outgoing transactions from given account
+	 *
+	 * @param address Address of an account
+	 * @return
+	 */
+	@GET("/api/transactionCount/{address}")
     Call<BCResult<BigInteger>> getTransactionCount(@Path("address") String address);
 
-    @POST("/api/sendTransaction")
-    Call<BCResult<BytesData>> sendTransaction(@Body Map<String, String> data);
+	/**
+	 * Broadcasts transaction onto Minter network
+	 *
+	 * @param data
+	 * @return
+	 */
+	@POST("/api/sendTransaction")
+	Call<BCResult<BytesData>> sendTransaction(@Body Map<String, String> data);
 
 
 }

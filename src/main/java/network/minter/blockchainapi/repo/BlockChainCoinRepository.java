@@ -39,55 +39,54 @@ import network.minter.mintercore.internal.data.DataRepository;
 import retrofit2.Call;
 
 import static network.minter.mintercore.internal.common.Preconditions.checkNotNull;
-import static network.minter.mintercore.internal.helpers.CollectionsHelper.asMap;
 
 /**
- * MinterCore. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpoint> {
-    public BlockChainCoinRepository(@NonNull ApiService.Builder apiBuilder) {
-        super(apiBuilder);
-    }
+	public BlockChainCoinRepository(@NonNull ApiService.Builder apiBuilder) {
+		super(apiBuilder);
+	}
 
-    /**
-     * Returns full coin information
-     *
-     * @param symbol Coin name (for example: MNT)
-     * @return Full coin info
-     */
-    public Call<BCResult<Coin>> getCoinInfo(@NonNull String symbol) {
-	    return getInstantService().getCoinInformation(checkNotNull(symbol, "Symbol required"));
-    }
+	/**
+	 * Returns full coin information
+	 *
+	 * @param symbol Coin name (for example: MNT)
+	 * @return Full coin info
+	 */
+	public Call<BCResult<Coin>> getCoinInfo(@NonNull String symbol) {
+		return getInstantService().getCoinInformation(checkNotNull(symbol, "Symbol required"));
+	}
 
-    /**
-     * @param fromCoin Source coin
-     * @param toCoin   Target coin
-     * @param amount   Amount of exchange (human readable amount like: 1 BIP equals 1.0 in float equivalent)
-     * @return
-     */
-    public Call<BCResult<BigInteger>> getCoinCurrencyConversion(@NonNull String fromCoin, @NonNull String toCoin, BigDecimal amount) {
-        return getCoinCurrencyConversion(fromCoin, toCoin, amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
-    }
+	/**
+	 * @param fromCoin Source coin
+	 * @param toCoin   Target coin
+	 * @param amount   Amount of exchange (human readable amount like: 1 BIP equals 1.0 in float equivalent)
+	 * @return
+	 */
+	public Call<BCResult<BigInteger>> getCoinExchangeCurrency(@NonNull String fromCoin, @NonNull String toCoin, BigDecimal amount) {
+		return getCoinExchangeCurrency(fromCoin, toCoin, amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+	}
 
-    /**
-     * @param fromCoin Source coin
-     * @param toCoin   Target coin
-     * @param amount   Amount of exchange (big integer amount like: 1 BIP equals 1000000000000000000 (18 zeroes) in big integer equivalent)
-     * @return
-     */
-    public Call<BCResult<BigInteger>> getCoinCurrencyConversion(@NonNull String fromCoin, @NonNull String toCoin, BigInteger amount) {
-	    return getInstantService().getCoinExchangeCurrency(asMap(
-                "from_coin", checkNotNull(fromCoin, "Source coin required").toUpperCase(),
-                "to_coin", checkNotNull(toCoin, "Target coin required").toUpperCase(),
-                "value", amount.toString()
-        ));
-    }
+	/**
+	 * @param fromCoin Source coin
+	 * @param toCoin   Target coin
+	 * @param amount   Amount of exchange (big integer amount like: 1 BIP equals 1000000000000000000 (18 zeroes) in big integer equivalent)
+	 * @return
+	 */
+	public Call<BCResult<BigInteger>> getCoinExchangeCurrency(@NonNull String fromCoin, @NonNull String toCoin, BigInteger amount) {
+		return getInstantService().getCoinExchangeCurrency(
+				checkNotNull(fromCoin, "Source coin required").toUpperCase(),
+				checkNotNull(toCoin, "Target coin required").toUpperCase(),
+				amount.toString()
+		);
+	}
 
-    @NonNull
-    @Override
-    protected Class<BlockChainCoinEndpoint> getServiceClass() {
-        return BlockChainCoinEndpoint.class;
-    }
+	@NonNull
+	@Override
+	protected Class<BlockChainCoinEndpoint> getServiceClass() {
+		return BlockChainCoinEndpoint.class;
+	}
 }

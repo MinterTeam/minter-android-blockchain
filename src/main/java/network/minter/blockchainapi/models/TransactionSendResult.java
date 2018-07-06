@@ -28,7 +28,7 @@ package network.minter.blockchainapi.models;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * MinterCore. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

@@ -26,26 +26,42 @@
 package network.minter.blockchainapi.api;
 
 import java.math.BigInteger;
-import java.util.Map;
 
 import network.minter.blockchainapi.models.BCResult;
 import network.minter.blockchainapi.models.Coin;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import retrofit2.http.QueryMap;
 
 /**
- * MinterCore. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public interface BlockChainCoinEndpoint {
 
-    @GET("/api/coinInfo/{symbol}")
-    Call<BCResult<Coin>> getCoinInformation(@Query("symbol") String coin);
+	/**
+	 * Get information about coin
+	 *
+	 * @param coin Coin Symbol (min: 3, max 10 chars)
+	 * @return
+	 */
+	@GET("/api/coinInfo/{symbol}")
+	Call<BCResult<Coin>> getCoinInformation(@Query("symbol") String coin);
 
-    @GET("/api/estimateCoinExchangeReturn")
-    Call<BCResult<BigInteger>> getCoinExchangeCurrency(@QueryMap Map<String, String> data);
+	/**
+	 * Give an estimation about coin exchange
+	 *
+	 * @param fromCoin coin to convert from
+	 * @param toCoin   coin to convert to
+	 * @param value    BigInteger value
+	 * @return
+	 */
+	@GET("/api/estimateCoinExchangeReturn")
+	Call<BCResult<BigInteger>> getCoinExchangeCurrency(
+			@Query("from_coin") String fromCoin,
+			@Query("to_coin") String toCoin,
+			@Query("value") String value
+	);
 
 }

@@ -39,7 +39,7 @@ import network.minter.mintercore.util.RLP;
 import static network.minter.mintercore.internal.common.Preconditions.checkArgument;
 
 /**
- * MinterWallet. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */

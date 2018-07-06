@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 by MinterTeam
+ * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
  *
  * The MIT License
@@ -34,12 +34,28 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 /**
- * MinterCore. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public interface BlockChainTransactionEndpoint {
 
-    @GET("/api/transactions")
-    Call<BCResult<List<HistoryTransaction>>> getTransactions(@Query("query") String urlEncodedQuery);
+	/**
+	 * Get list of transactions filtered by given query
+	 *
+	 * @param urlEncodedQuery
+	 * @return
+	 * @see network.minter.blockchainapi.repo.BlockChainTransactionRepository.TQuery
+	 */
+	@GET("/api/transactions")
+	Call<BCResult<List<HistoryTransaction>>> getTransactions(@Query("query") String urlEncodedQuery);
+
+	/**
+	 * Get full information about transaction
+	 *
+	 * @param txHash Transaction hash (hex bytes with prefix: Mt)
+	 * @return
+	 * @see network.minter.mintercore.MinterSDK#PREFIX_TX
+	 */
+	Call<BCResult<HistoryTransaction>> getTransaction(@Query("hash") String txHash);
 }

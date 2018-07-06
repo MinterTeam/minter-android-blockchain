@@ -28,7 +28,7 @@ package network.minter.blockchainapi.models;
 import org.parceler.Parcel;
 
 /**
- * MinterCore. 2018
+ * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
