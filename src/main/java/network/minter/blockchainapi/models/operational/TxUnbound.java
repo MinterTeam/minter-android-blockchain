@@ -53,12 +53,16 @@ public class TxUnbound extends Operation {
     }
 
     public String getCoin() {
-        return coin;
+	    return coin.replace("\0", "");
     }
 
-    public BigInteger getValue() {
+	public BigInteger getValueBigInteger() {
         return value;
     }
+
+	public BigDecimal getValue() {
+		return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(value));
+	}
 
     @NonNull
     @Override

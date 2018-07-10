@@ -53,12 +53,16 @@ public class TxDelegate extends Operation {
     }
 
     public String getCoin() {
-        return coin;
+	    return coin.replace("\0", "");
     }
 
-    public BigInteger getStake() {
+	public BigInteger getStakeBigInteger() {
         return stake;
     }
+
+	public BigDecimal getStake() {
+		return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(stake));
+	}
 
     @NonNull
     @Override

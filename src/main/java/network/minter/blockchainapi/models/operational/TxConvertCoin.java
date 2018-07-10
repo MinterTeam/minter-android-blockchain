@@ -49,16 +49,20 @@ public class TxConvertCoin extends Operation {
     BigInteger value;
 
     public String getFromCoin() {
-        return fromCoin;
+	    return fromCoin.replace("\0", "");
     }
 
     public String getToCoin() {
-        return toCoin;
+	    return toCoin.replace("\0", "");
     }
 
-    public BigInteger getValue() {
+	public BigInteger getValueBigInteger() {
         return value;
     }
+
+	public BigDecimal getValue() {
+		return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(value));
+	}
 
     @NonNull
     @Override
