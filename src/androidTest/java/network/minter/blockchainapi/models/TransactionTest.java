@@ -36,7 +36,7 @@ import java.math.BigInteger;
 import network.minter.blockchainapi.models.operational.OperationType;
 import network.minter.blockchainapi.models.operational.Transaction;
 import network.minter.blockchainapi.models.operational.TransactionSign;
-import network.minter.blockchainapi.models.operational.TxConvertCoin;
+import network.minter.blockchainapi.models.operational.TxCoinSell;
 import network.minter.blockchainapi.models.operational.TxSendCoin;
 import network.minter.mintercore.MinterSDK;
 import network.minter.mintercore.crypto.BytesData;
@@ -87,10 +87,10 @@ public class TransactionTest {
 		final String toCoin = "SPRTEST";
 		final BigDecimal amount = new BigDecimal(1);
 
-		Transaction<TxConvertCoin> tx = Transaction.newConvertCoinTransaction(new BigInteger("1"))
-				.setFromCoin(fromCoin)
-				.setToCoin(toCoin)
-				.setAmount(amount)
+        Transaction<TxCoinSell> tx = Transaction.newConvertCoinTransaction(new BigInteger("1"))
+                .setCoinToSell(fromCoin)
+                .setCoinToBuy(toCoin)
+                .setValueToSell(amount)
 				.build();
 
 		TransactionSign sign = tx.sign(privateKey);
@@ -100,15 +100,15 @@ public class TransactionTest {
 
 	@Test
 	public void testConvertCoinDecodeTransaction() {
-		Transaction<TxConvertCoin> tx = Transaction.fromEncoded("f869010102a0df8a4d4e54000000000000008a53505254455354000000880de0b6b3a764000080801ba09ea1259e0b94b0e136c54ddf9fe97aefb47c6208a307a692169f4f7c8606d24aa030fee0c7978dde0aa9ab814593ab3c99c1be3d0ce0ceeb607f25a29acf3a958c", TxConvertCoin.class);
+        Transaction<TxCoinSell> tx = Transaction.fromEncoded("f869010102a0df8a4d4e54000000000000008a53505254455354000000880de0b6b3a764000080801ba09ea1259e0b94b0e136c54ddf9fe97aefb47c6208a307a692169f4f7c8606d24aa030fee0c7978dde0aa9ab814593ab3c99c1be3d0ce0ceeb607f25a29acf3a958c", TxCoinSell.class);
 		assertNotNull(tx);
 		assertNotNull(tx.getData());
 
-		assertEquals(OperationType.ConvertCoin, tx.getType());
-		assertEquals("MNT", tx.getData().getFromCoin());
-		assertEquals("SPRTEST", tx.getData().getToCoin());
+        assertEquals(OperationType.SellCoin, tx.getType());
+        assertEquals("MNT", tx.getData().getCoinToSell());
+        assertEquals("SPRTEST", tx.getData().getCoinToBuy());
 		assertEquals(/*just 1*/Transaction.VALUE_MUL, tx.getData().getValueBigInteger());
-		assertEquals(new BigDecimal(1), tx.getData().getValue());
+        assertEquals(new BigDecimal(1), tx.getData().getValueToSell());
 	}
 
 	@Test

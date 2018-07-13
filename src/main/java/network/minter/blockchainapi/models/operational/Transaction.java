@@ -47,7 +47,6 @@ import static network.minter.mintercore.internal.common.Preconditions.checkArgum
 public class Transaction<OperationData extends Operation> {
     public final static BigInteger VALUE_MUL = new BigInteger("1000000000000000000", 10);
     public final static BigDecimal VALUE_MUL_DEC = new BigDecimal("1000000000000000000");
-    public final static BigDecimal PAID_TX_COST = new BigDecimal("0.00000001");
     private BigInteger mNonce = new BigInteger("2");
     private BigInteger mGasPrice = new BigInteger("1");
     private OperationType mType = OperationType.SendCoin;
@@ -92,12 +91,12 @@ public class Transaction<OperationData extends Operation> {
         return transaction;
     }
 
-    public static TxConvertCoin.Builder newConvertCoinTransaction(BigInteger nonce) {
-        Transaction<TxConvertCoin> tx = new Builder<TxConvertCoin>(nonce)
-                .setType(OperationType.ConvertCoin)
+    public static TxCoinSell.Builder newConvertCoinTransaction(BigInteger nonce) {
+        Transaction<TxCoinSell> tx = new Builder<TxCoinSell>(nonce)
+                .setType(OperationType.SellCoin)
                 .build();
 
-        return new TxConvertCoin().new Builder(tx);
+        return new TxCoinSell().new Builder(tx);
     }
 
 

@@ -29,6 +29,7 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -37,31 +38,37 @@ import java.math.BigInteger;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public enum OperationType {
-    @SerializedName("1")
-    SendCoin((byte)0x01, TxSendCoin.class),
-    @SerializedName("2")
-    ConvertCoin((byte)0x02, TxConvertCoin.class),
-    @SerializedName("3")
-    CreateCoin((byte) 0x03, TxCreateCoin.class),
-    @SerializedName("4")
-    DeclareCandidacy((byte) 0x04, TxDeclareCandidacy.class),
-    @SerializedName("5")
-    Delegate((byte) 0x05, TxDelegate.class),
-    @SerializedName("6")
-    Unbound((byte) 0x06, TxUnbound.class),
-    @SerializedName("7")
-    RedeemCheck((byte) 0x07, TxRedeemCheck.class),
-    @SerializedName("8")
-    SetCandidateOnline((byte) 0x08, TxSetCandidateOnline.class),
-    @SerializedName("9")
-    SetCandidateOffline((byte) 0x09, TxSetCandidateOffline.class);
 
+    @SerializedName("1")
+    SendCoin((byte) 0x01, TxSendCoin.class, 10f),
+    @SerializedName("2")
+    SellCoin((byte) 0x02, TxCoinSell.class, 100f),
+    @SerializedName("3")
+    BuyCoin((byte) 0x03, TxCoinSell.class, 100f),
+    @SerializedName("3")
+    CreateCoin((byte) 0x04, TxCreateCoin.class, 1000f),
+    @SerializedName("4")
+    DeclareCandidacy((byte) 0x05, TxDeclareCandidacy.class, 10000f),
+    @SerializedName("5")
+    Delegate((byte) 0x06, TxDelegate.class, 100f),
+    @SerializedName("6")
+    Unbound((byte) 0x07, TxUnbound.class, 100f),
+    @SerializedName("7")
+    RedeemCheck((byte) 0x08, TxRedeemCheck.class, 10f),
+    @SerializedName("8")
+    SetCandidateOnline((byte) 0x09, TxSetCandidateOnline.class, 100f),
+    @SerializedName("9")
+    SetCandidateOffline((byte) 0x0A, TxSetCandidateOffline.class, 100f);
+
+    public final static BigDecimal FEE_BASE = new BigDecimal("0.001");
     BigInteger mValue;
     Class<? extends Operation> mOpClass;
+    BigDecimal mFee;
 
-    OperationType(byte value, Class<? extends Operation> opClass) {
+    OperationType(byte value, Class<? extends Operation> opClass, double fee) {
         mValue = new BigInteger(String.valueOf(value));
         mOpClass = opClass;
+        mFee = getFeeBase().multiply(new BigDecimal(fee));
     }
 
     @Nullable
@@ -83,6 +90,14 @@ public enum OperationType {
         }
 
         return null;
+    }
+
+    public BigDecimal getFeeBase() {
+        return FEE_BASE;
+    }
+
+    public BigDecimal getFee() {
+        return mFee;
     }
 
     public Class<? extends Operation> getOpClass() {

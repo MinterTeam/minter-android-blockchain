@@ -36,6 +36,7 @@ import network.minter.mintercore.internal.helpers.StringHelper;
 import network.minter.mintercore.util.DecodeResult;
 import network.minter.mintercore.util.RLP;
 
+import static network.minter.blockchainapi.models.operational.Transaction.VALUE_MUL_DEC;
 import static network.minter.mintercore.internal.common.Preconditions.checkArgument;
 
 /**
@@ -51,6 +52,41 @@ public class TxCreateCoin extends Operation {
     BigInteger initialReserve;
     // unsigned!!!
     Integer constantReserveRatio;
+
+    public static BigInteger calculateCreatingCostBigInteger(String coin) {
+        checkArgument(coin.length() >= 3 &&
+                coin.length() <= 10, "Coin length must be from 3 to 10 characters");
+        BigInteger out;
+        switch (coin.length()) {
+            case 3:
+                out = Transaction.VALUE_MUL.multiply(new BigInteger("1000000"));
+                break;
+            case 4:
+                out = Transaction.VALUE_MUL.multiply(new BigInteger("100000"));
+                break;
+            case 5:
+                out = Transaction.VALUE_MUL.multiply(new BigInteger("10000"));
+                break;
+            case 6:
+                out = Transaction.VALUE_MUL.multiply(new BigInteger("1000"));
+                break;
+            case 7:
+                out = Transaction.VALUE_MUL.multiply(new BigInteger("100"));
+                break;
+            case 8:
+                out = Transaction.VALUE_MUL.multiply(new BigInteger("10"));
+                break;
+            default:
+                out = OperationType.SellCoin.getFee().multiply(VALUE_MUL_DEC).toBigInteger();
+                break;
+        }
+
+        return out.add(OperationType.CreateCoin.getFee().multiply(VALUE_MUL_DEC).toBigInteger());
+    }
+
+    public static BigDecimal calculateCreatingCost(String coin) {
+        return new BigDecimal(calculateCreatingCostBigInteger(coin)).divide(VALUE_MUL_DEC);
+    }
 
     public String getName() {
         return name;
@@ -126,7 +162,7 @@ public class TxCreateCoin extends Operation {
         }
 
         public Builder setInitialAmount(BigDecimal amount) {
-            return setInitialAmount(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+            return setInitialAmount(amount.multiply(VALUE_MUL_DEC).toBigInteger());
         }
 
         public Builder setInitialReserve(BigInteger amount) {
@@ -139,7 +175,7 @@ public class TxCreateCoin extends Operation {
         }
 
         public Builder setInitialReserve(BigDecimal amount) {
-            return setInitialReserve(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+            return setInitialReserve(amount.multiply(VALUE_MUL_DEC).toBigInteger());
         }
 
         public Builder setConstantReverveRatio(Integer ratio) {

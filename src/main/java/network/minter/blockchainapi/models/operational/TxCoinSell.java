@@ -42,35 +42,35 @@ import network.minter.mintercore.util.RLP;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Parcel
-public class TxConvertCoin extends Operation {
+public class TxCoinSell extends Operation {
 
-    String fromCoin;
-    String toCoin;
-    BigInteger value;
+    String coinToSell;
+    BigInteger valueToSell;
+    String coinToBuy;
 
-    public String getFromCoin() {
-	    return fromCoin.replace("\0", "");
+    public String getCoinToSell() {
+        return coinToSell.replace("\0", "");
     }
 
-    public String getToCoin() {
-	    return toCoin.replace("\0", "");
+    public String getCoinToBuy() {
+        return coinToBuy.replace("\0", "");
     }
 
 	public BigInteger getValueBigInteger() {
-        return value;
+        return valueToSell;
     }
 
-	public BigDecimal getValue() {
-		return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(value));
+    public BigDecimal getValueToSell() {
+        return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(valueToSell));
 	}
 
     @NonNull
     @Override
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
-                fromCoin,
-                toCoin,
-                value
+                coinToSell,
+                valueToSell,
+                coinToBuy
         });
     }
 
@@ -79,45 +79,45 @@ public class TxConvertCoin extends Operation {
         final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-        fromCoin = StringHelper.bytesToString(fromRawRlp(0, decoded));
-        toCoin = StringHelper.bytesToString(fromRawRlp(1, decoded));
-        value = new BigInteger(fromRawRlp(2, decoded));
+        coinToSell = StringHelper.bytesToString(fromRawRlp(0, decoded));
+        valueToSell = new BigInteger(fromRawRlp(2, decoded));
+        coinToBuy = StringHelper.bytesToString(fromRawRlp(1, decoded));
     }
 
     @Override
     protected <T extends Operation, B extends Operation.Builder<T>> B getBuilder(
             Transaction<? extends Operation> rawTx) {
-        return (B) new Builder((Transaction<TxConvertCoin>) rawTx);
+        return (B) new Builder((Transaction<TxCoinSell>) rawTx);
     }
 
 
-    public final class Builder extends Operation.Builder<TxConvertCoin> {
+    public final class Builder extends Operation.Builder<TxCoinSell> {
 
-        Builder(Transaction<TxConvertCoin> op) {
+        Builder(Transaction<TxCoinSell> op) {
             super(op);
         }
 
-        public Builder setFromCoin(String coin) {
-            fromCoin = StringHelper.strrpad(10, coin.toUpperCase());
+        public Builder setCoinToSell(String coin) {
+            coinToSell = StringHelper.strrpad(10, coin.toUpperCase());
             return this;
         }
 
-        public Builder setToCoin(String coin) {
-            toCoin = StringHelper.strrpad(10, coin.toUpperCase());
+        public Builder setCoinToBuy(String coin) {
+            coinToBuy = StringHelper.strrpad(10, coin.toUpperCase());
             return this;
         }
 
-        public Builder setAmount(BigInteger amount) {
-            value = amount;
+        public Builder setValueToSell(BigInteger amount) {
+            valueToSell = amount;
             return this;
         }
 
-        public Builder setAmount(BigDecimal amount) {
-            return setAmount(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+        public Builder setValueToSell(BigDecimal amount) {
+            return setValueToSell(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
         }
 
-        public Transaction<TxConvertCoin> build() {
-            getTx().setData(TxConvertCoin.this);
+        public Transaction<TxCoinSell> build() {
+            getTx().setData(TxCoinSell.this);
             return getTx();
         }
     }
