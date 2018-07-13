@@ -27,11 +27,12 @@ package network.minter.blockchainapi.models.operational;
 
 import android.support.annotation.NonNull;
 
+import com.edwardstock.secp256k1.NativeSecp256k1;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import network.minter.mintercore.crypto.BytesData;
-import network.minter.mintercore.crypto.NativeSecp256k1;
 import network.minter.mintercore.crypto.PrivateKey;
 import network.minter.mintercore.util.DecodeResult;
 import network.minter.mintercore.util.RLP;
