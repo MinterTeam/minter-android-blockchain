@@ -87,7 +87,7 @@ public class TransactionTest {
 		final String toCoin = "SPRTEST";
 		final BigDecimal amount = new BigDecimal(1);
 
-        Transaction<TxCoinSell> tx = Transaction.newConvertCoinTransaction(new BigInteger("1"))
+        Transaction<TxCoinSell> tx = Transaction.newSellCoinTransaction(new BigInteger("1"))
                 .setCoinToSell(fromCoin)
                 .setCoinToBuy(toCoin)
                 .setValueToSell(amount)

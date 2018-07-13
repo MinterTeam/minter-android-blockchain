@@ -92,7 +92,15 @@ public class Transaction<OperationData extends Operation> {
         return transaction;
     }
 
-    public static TxCoinSell.Builder newConvertCoinTransaction(BigInteger nonce) {
+    public static TxCoinSell.Builder newSellCoinTransaction(BigInteger nonce) {
+        Transaction<TxCoinSell> tx = new Builder<TxCoinSell>(nonce)
+                .setType(OperationType.SellCoin)
+                .build();
+
+        return new TxCoinSell().new Builder(tx);
+    }
+
+    public static TxCoinSell.Builder newBuyCoinTransaction(BigInteger nonce) {
         Transaction<TxCoinSell> tx = new Builder<TxCoinSell>(nonce)
                 .setType(OperationType.SellCoin)
                 .build();
