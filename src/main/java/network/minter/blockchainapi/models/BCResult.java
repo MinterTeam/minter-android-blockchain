@@ -46,15 +46,26 @@ public class BCResult<Result> {
         @SerializedName("0") Success(0),
         @SerializedName("1") DecodeError(1),
         @SerializedName("107") InsufficientFundsB(107),
+        @Deprecated
         @SerializedName("2") InsufficientFunds(2),
+        @Deprecated
         @SerializedName("3") UnknownTransactionType(3),
+        @Deprecated
         @SerializedName("4") WrongNonce(4),
+        @Deprecated
         @SerializedName("5") CoinNotExists(5),
+        @Deprecated
         @SerializedName("6") CoinAlreadyExists(6),
+        @SerializedName("301") CoinDoesNotExists(301),
+        @Deprecated
         @SerializedName("7") WrongCrr(7),
+        @Deprecated
         @SerializedName("8") CrossConvert(8),
+        @Deprecated
         @SerializedName("9") CandidateExists(9),
+        @Deprecated
         @SerializedName("10") WrongCommission(10),
+        @Deprecated
         @SerializedName("11") CandidateNotFound(11);
 
         int resVal;
