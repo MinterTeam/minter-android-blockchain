@@ -60,31 +60,53 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
 		return getInstantService().getCoinInformation(checkNotNull(symbol, "Symbol required"));
 	}
 
-	/**
-	 * @param fromCoin Source coin
-	 * @param toCoin   Target coin
-	 * @param amount   Amount of exchange (human readable amount like: 1 BIP equals 1.0 in float equivalent)
-	 * @return
-	 */
-	public Call<BCResult<BigInteger>> getCoinExchangeCurrency(@NonNull String fromCoin, @NonNull String toCoin, BigDecimal amount) {
-		return getCoinExchangeCurrency(fromCoin, toCoin, amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+    /**
+     * @param coinToSell  Selling coin
+     * @param valueToSell Selling amount of exchange (big integer amount like: 1 BIP equals 1000000000000000000 (18 zeroes) in big integer equivalent)
+     * @param coinToBuy   Buying coin coin
+     * @return
+     */
+    public Call<BCResult<BigInteger>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigDecimal valueToSell, @NonNull String coinToBuy) {
+        return getCoinExchangeCurrencyToSell(coinToSell, valueToSell.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
 	}
 
 	/**
-	 * @param fromCoin Source coin
-	 * @param toCoin   Target coin
-	 * @param amount   Amount of exchange (big integer amount like: 1 BIP equals 1000000000000000000 (18 zeroes) in big integer equivalent)
-	 * @return
+     * @param coinToSell Selling coin
+     * @param valueToSell   Selling amount of exchange (big integer amount like: 1 BIP equals 1000000000000000000 (18 zeroes) in big integer equivalent)
+     * @param coinToBuy   Buying coin coin
+     * @return
 	 */
-	public Call<BCResult<BigInteger>> getCoinExchangeCurrency(@NonNull String fromCoin, @NonNull String toCoin, BigInteger amount) {
-		return getInstantService().getCoinExchangeCurrency(
-				checkNotNull(fromCoin, "Source coin required").toUpperCase(),
-				checkNotNull(toCoin, "Target coin required").toUpperCase(),
-				amount.toString()
-		);
-	}
+    public Call<BCResult<BigInteger>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigInteger valueToSell, @NonNull String coinToBuy) {
+        return getInstantService().getCoinExchangeCurrencyToSell(
+                checkNotNull(coinToSell, "Source coin required").toUpperCase(),
+                valueToSell.toString(), checkNotNull(coinToBuy, "Target coin required").toUpperCase()
+        );
+    }
 
-	@NonNull
+    /**
+     * @param coinToSell Selling coin
+     * @param valueToBuy Buying amount of exchange (human readable amount like: 1 BIP equals 1.0 in float equivalent)
+     * @param coinToBuy  Buying coin
+     * @return
+     */
+    public Call<BCResult<BigInteger>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigDecimal valueToBuy, @NonNull String coinToBuy) {
+        return getCoinExchangeCurrencyToBuy(coinToSell, valueToBuy.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
+    }
+
+    /**
+     * @param coinToSell Selling coin
+     * @param valueToBuy Buying amount of exchange (big integer amount like: 1 BIP equals 1000000000000000000 (18 zeroes) in big integer equivalent)
+     * @param coinToBuy  Buying coin
+     * @return
+     */
+    public Call<BCResult<BigInteger>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigInteger valueToBuy, @NonNull String coinToBuy) {
+        return getInstantService().getCoinExchangeCurrencyToBuy(
+                checkNotNull(coinToSell, "Source coin required").toUpperCase(),
+                valueToBuy.toString(), checkNotNull(coinToBuy, "Target coin required").toUpperCase()
+        );
+    }
+
+    @NonNull
 	@Override
 	protected Class<BlockChainCoinEndpoint> getServiceClass() {
 		return BlockChainCoinEndpoint.class;

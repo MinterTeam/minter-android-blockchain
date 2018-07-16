@@ -100,12 +100,12 @@ public class Transaction<OperationData extends Operation> {
         return new TxCoinSell().new Builder(tx);
     }
 
-    public static TxCoinSell.Builder newBuyCoinTransaction(BigInteger nonce) {
-        Transaction<TxCoinSell> tx = new Builder<TxCoinSell>(nonce)
-                .setType(OperationType.SellCoin)
+    public static TxCoinBuy.Builder newBuyCoinTransaction(BigInteger nonce) {
+        Transaction<TxCoinBuy> tx = new Builder<TxCoinBuy>(nonce)
+                .setType(OperationType.BuyCoin)
                 .build();
 
-        return new TxCoinSell().new Builder(tx);
+        return new TxCoinBuy().new Builder(tx);
     }
 
 

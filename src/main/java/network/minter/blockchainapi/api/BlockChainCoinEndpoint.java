@@ -50,18 +50,33 @@ public interface BlockChainCoinEndpoint {
 	Call<BCResult<Coin>> getCoinInformation(@Query("symbol") String coin);
 
 	/**
-	 * Give an estimation about coin exchange
+     * Give an estimation about coin exchange (selling)
 	 *
 	 * @param fromCoin coin to convert from
-	 * @param toCoin   coin to convert to
 	 * @param value    BigInteger value
-	 * @return
+     * @param toCoin   coin to convert to
+     * @return
 	 */
-	@GET("/api/estimateCoinExchangeReturn")
-	Call<BCResult<BigInteger>> getCoinExchangeCurrency(
-			@Query("from_coin") String fromCoin,
-			@Query("to_coin") String toCoin,
-			@Query("value") String value
-	);
+    @GET("/api/estimateCoinSell")
+    Call<BCResult<BigInteger>> getCoinExchangeCurrencyToSell(
+            @Query("coin_to_sell") String coinToSell,
+            @Query("value_to_sell") String valueToSell,
+            @Query("coin_to_bye") String coinToBuy
+    );
+
+    /**
+     * Give an estimation about coin exchange (buying)
+     *
+     * @param fromCoin coin to convert from
+     * @param value    BigInteger value
+     * @param toCoin   coin to convert to
+     * @return
+     */
+    @GET("/api/estimateCoinBuy")
+    Call<BCResult<BigInteger>> getCoinExchangeCurrencyToBuy(
+            @Query("coin_to_sell") String coinToSell,
+            @Query("value_to_buy") String valueToBuy,
+            @Query("coin_to_bye") String coinToBuy
+    );
 
 }
