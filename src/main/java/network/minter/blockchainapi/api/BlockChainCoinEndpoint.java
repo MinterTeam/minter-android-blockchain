@@ -61,7 +61,7 @@ public interface BlockChainCoinEndpoint {
     Call<BCResult<BigInteger>> getCoinExchangeCurrencyToSell(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_sell") String valueToSell,
-            @Query("coin_to_bye") String coinToBuy
+            @Query("coin_to_buy") String coinToBuy
     );
 
     /**
@@ -76,7 +76,7 @@ public interface BlockChainCoinEndpoint {
     Call<BCResult<BigInteger>> getCoinExchangeCurrencyToBuy(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_buy") String valueToBuy,
-            @Query("coin_to_bye") String coinToBuy
+            @Query("coin_to_buy") String coinToBuy
     );
 
 }
