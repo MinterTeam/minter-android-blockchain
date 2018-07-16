@@ -1,9 +1,9 @@
 -dontobfuscate
 
--keep public class network.minter.blockchainapi.** { *; }
--keep public enum network.minter.blockchainapi.** { *; }
+-keep public class network.minter.blockchain.** { *; }
+-keep public enum network.minter.blockchain.** { *; }
 -keepclassmembers enum * { *; }
--keep public class network.minter.blockchainapi.MinterBlockChainApi { *; }
+-keep public class network.minter.blockchain.MinterBlockChainApi { *; }
 
 
 # Parceler library
