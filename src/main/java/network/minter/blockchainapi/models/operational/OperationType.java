@@ -44,7 +44,7 @@ public enum OperationType {
     @SerializedName("2")
     SellCoin((byte) 0x02, TxCoinSell.class, 100f),
     @SerializedName("3")
-    BuyCoin((byte) 0x03, TxCoinSell.class, 100f),
+    BuyCoin((byte) 0x03, TxCoinBuy.class, 100f),
     @SerializedName("3")
     CreateCoin((byte) 0x04, TxCreateCoin.class, 1000f),
     @SerializedName("4")
