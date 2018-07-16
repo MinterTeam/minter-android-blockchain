@@ -60,7 +60,9 @@ public enum OperationType {
     @SerializedName("9")
     SetCandidateOffline((byte) 0x0A, TxSetCandidateOffline.class, 100f);
 
-    public final static BigDecimal FEE_BASE = new BigDecimal("0.001");
+    private final static String FEE_BASE_STRING = "0.001";
+    public final static BigDecimal FEE_BASE = new BigDecimal(FEE_BASE_STRING);
+
     BigInteger mValue;
     Class<? extends Operation> mOpClass;
     BigDecimal mFee;
@@ -93,7 +95,7 @@ public enum OperationType {
     }
 
     public BigDecimal getFeeBase() {
-        return FEE_BASE;
+        return new BigDecimal(FEE_BASE_STRING);
     }
 
     public BigDecimal getFee() {
