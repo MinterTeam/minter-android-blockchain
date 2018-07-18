@@ -55,15 +55,27 @@ public class MinterBlockChainApi {
     private BlockChainCoinRepository mCoinRepository;
     private BlockChainTransactionRepository mTransactionRepository;
 
-    public MinterBlockChainApi() {
+    private MinterBlockChainApi() {
         this(BASE_NODE_URL);
     }
 
-    public MinterBlockChainApi(@NonNull String baseNodeApiUrl) {
+    private MinterBlockChainApi(@NonNull String baseNodeApiUrl) {
         mApiService = new ApiService.Builder(baseNodeApiUrl, getGsonBuilder());
         mApiService.addHeader("Content-Type", "application/json");
         mApiService.addHeader("X-Minter-Client-Name", "MinterAndroid");
         mApiService.addHeader("X-Minter-Client-Version", BuildConfig.VERSION_NAME);
+    }
+
+    public static void initialize(String baseNodeApiUrl, boolean debug) {
+        if (INSTANCE != null) {
+            return;
+        }
+
+        INSTANCE = new MinterBlockChainApi(baseNodeApiUrl);
+        INSTANCE.mApiService.setDebug(debug);
+        if (debug) {
+            INSTANCE.mApiService.setDebugRequestLevel(HttpLoggingInterceptor.Level.BODY);
+        }
     }
 
     public static void initialize(boolean debug) {
