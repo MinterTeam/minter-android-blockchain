@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -25,52 +26,131 @@
 
 package network.minter.blockchain.models.operational;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-
-import org.parceler.Parcel;
+import android.support.annotation.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
+
+import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
+import static network.minter.core.internal.helpers.StringHelper.bytesToString;
+import static network.minter.core.internal.helpers.StringHelper.strrpad;
 
 /**
  * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@Parcel
-public class TxCoinSell extends Operation {
+public final class TxCoinSell extends Operation {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<TxCoinSell> CREATOR = new Parcelable.Creator<TxCoinSell>() {
+        @Override
+        public TxCoinSell createFromParcel(Parcel in) {
+            return new TxCoinSell(in);
+        }
 
-    String coinToSell;
-    BigInteger valueToSell;
-    String coinToBuy;
+        @Override
+        public TxCoinSell[] newArray(int size) {
+            return new TxCoinSell[size];
+        }
+    };
+    private String mCoinToSell;
+    private BigInteger mValueToSell;
+    private String mCoinToBuy;
+
+    public TxCoinSell(Transaction rawTx) {
+        super(rawTx);
+    }
+
+    protected TxCoinSell(Parcel in) {
+        super(in);
+        mCoinToSell = in.readString();
+        mValueToSell = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+        mCoinToBuy = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(mCoinToSell);
+        dest.writeValue(mValueToSell);
+        dest.writeString(mCoinToBuy);
+    }
 
     public String getCoinToSell() {
-        return coinToSell.replace("\0", "");
+        return mCoinToSell.replace("\0", "");
+    }
+
+    public TxCoinSell setCoinToSell(String coin) {
+        mCoinToSell = strrpad(10, coin.toUpperCase());
+        return this;
     }
 
     public String getCoinToBuy() {
-        return coinToBuy.replace("\0", "");
+        return mCoinToBuy.replace("\0", "");
     }
 
-	public BigInteger getValueBigInteger() {
-        return valueToSell;
+    public TxCoinSell setCoinToBuy(String coin) {
+        mCoinToBuy = strrpad(10, coin.toUpperCase());
+        return this;
+    }
+
+    public BigInteger getValueBigInteger() {
+        return mValueToSell;
     }
 
     public BigDecimal getValueToSell() {
-        return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(valueToSell));
-	}
+        return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(mValueToSell));
+    }
+
+    public TxCoinSell setValueToSell(double amount) {
+        return setValueToSell(new BigDecimal(amount));
+    }
+
+    public double getValueToSellDouble() {
+        return getValueToSell().doubleValue();
+    }
+
+    public TxCoinSell setValueToSell(BigInteger amount) {
+        mValueToSell = amount;
+        return this;
+    }
+
+    public TxCoinSell setValueToSell(BigDecimal amount) {
+        return setValueToSell(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+    }
+
+    @Override
+    public OperationType getType() {
+        return OperationType.SellCoin;
+    }
+
+    @Nullable
+    @Override
+    protected FieldsValidationResult validate() {
+        return new FieldsValidationResult()
+                .addResult("mCoinToBuy", mCoinToBuy != null && mCoinToBuy.length() > 2 && mCoinToBuy.length() < 11, "Coin length must be from 3 to 10 chars")
+                .addResult("mCoinToSell", mCoinToSell != null && mCoinToSell.length() > 2 && mCoinToSell.length() < 11, "Coin length must be from 3 to 10 chars")
+                .addResult("mValueToSell", mValueToSell != null, "Value must be set");
+    }
 
     @NonNull
     @Override
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
-                coinToSell,
-                valueToSell,
-                coinToBuy
+                mCoinToSell,
+                mValueToSell,
+                mCoinToBuy
         });
     }
 
@@ -79,46 +159,8 @@ public class TxCoinSell extends Operation {
         final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-        coinToSell = StringHelper.bytesToString(fromRawRlp(0, decoded));
-        valueToSell = new BigInteger(fromRawRlp(2, decoded));
-        coinToBuy = StringHelper.bytesToString(fromRawRlp(1, decoded));
-    }
-
-    @Override
-    protected <T extends Operation, B extends Operation.Builder<T>> B getBuilder(
-            Transaction<? extends Operation> rawTx) {
-        return (B) new Builder((Transaction<TxCoinSell>) rawTx);
-    }
-
-
-    public final class Builder extends Operation.Builder<TxCoinSell> {
-
-        Builder(Transaction<TxCoinSell> op) {
-            super(op);
-        }
-
-        public Builder setCoinToSell(String coin) {
-            coinToSell = StringHelper.strrpad(10, coin.toUpperCase());
-            return this;
-        }
-
-        public Builder setCoinToBuy(String coin) {
-            coinToBuy = StringHelper.strrpad(10, coin.toUpperCase());
-            return this;
-        }
-
-        public Builder setValueToSell(BigInteger amount) {
-            valueToSell = amount;
-            return this;
-        }
-
-        public Builder setValueToSell(BigDecimal amount) {
-            return setValueToSell(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
-        }
-
-        public Transaction<TxCoinSell> build() {
-            getTx().setData(TxCoinSell.this);
-            return getTx();
-        }
+        mCoinToSell = bytesToString(fromRawRlp(0, decoded));
+        mValueToSell = fixBigintSignedByte(fromRawRlp(1, decoded));
+        mCoinToBuy = bytesToString(fromRawRlp(2, decoded));
     }
 }

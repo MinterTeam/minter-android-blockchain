@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -40,25 +41,27 @@ import java.math.BigInteger;
 public enum OperationType {
 
     @SerializedName("1")
-    SendCoin((byte) 0x01, TxSendCoin.class, 10f),
+    SendCoin((byte) 0x01, TxSendCoin.class, 10D),
     @SerializedName("2")
-    SellCoin((byte) 0x02, TxCoinSell.class, 100f),
+    SellCoin((byte) 0x02, TxCoinSell.class, 100D),
     @SerializedName("3")
-    BuyCoin((byte) 0x03, TxCoinBuy.class, 100f),
-    @SerializedName("3")
-    CreateCoin((byte) 0x04, TxCreateCoin.class, 1000f),
+    SellAllCoins((byte) 0x03, TxCoinSellAll.class, 100D),
     @SerializedName("4")
-    DeclareCandidacy((byte) 0x05, TxDeclareCandidacy.class, 10000f),
+    BuyCoin((byte) 0x04, TxCoinBuy.class, 100D),
     @SerializedName("5")
-    Delegate((byte) 0x06, TxDelegate.class, 100f),
+    CreateCoin((byte) 0x05, TxCreateCoin.class, 1000D),
     @SerializedName("6")
-    Unbound((byte) 0x07, TxUnbound.class, 100f),
+    DeclareCandidacy((byte) 0x06, TxDeclareCandidacy.class, 10000D),
     @SerializedName("7")
-    RedeemCheck((byte) 0x08, TxRedeemCheck.class, 10f),
+    Delegate((byte) 0x07, TxDelegate.class, 100D),
     @SerializedName("8")
-    SetCandidateOnline((byte) 0x09, TxSetCandidateOnline.class, 100f),
+    Unbound((byte) 0x08, TxUnbound.class, 100D),
     @SerializedName("9")
-    SetCandidateOffline((byte) 0x0A, TxSetCandidateOffline.class, 100f);
+    RedeemCheck((byte) 0x09, TxRedeemCheck.class, 10D),
+    @SerializedName("10")
+    SetCandidateOnline((byte) 0x0A, TxSetCandidateOnline.class, 100D),
+    @SerializedName("11")
+    SetCandidateOffline((byte) 0x0B, TxSetCandidateOffline.class, 100D);
 
     private final static String FEE_BASE_STRING = "0.001";
     public final static BigDecimal FEE_BASE = new BigDecimal(FEE_BASE_STRING);

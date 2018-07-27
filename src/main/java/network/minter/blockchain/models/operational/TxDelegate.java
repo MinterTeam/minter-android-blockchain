@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -25,9 +26,10 @@
 
 package network.minter.blockchain.models.operational;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-
-import org.parceler.Parcel;
+import android.support.annotation.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -37,40 +39,130 @@ import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
 
+import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
+import static network.minter.core.internal.helpers.StringHelper.bytesToString;
+
 /**
  * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@Parcel
-public class TxDelegate extends Operation {
-    PublicKey pubKey;
-    String coin;
-    BigInteger stake;
+public final class TxDelegate extends Operation {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<TxDelegate> CREATOR = new Parcelable.Creator<TxDelegate>() {
+        @Override
+        public TxDelegate createFromParcel(Parcel in) {
+            return new TxDelegate(in);
+        }
+
+        @Override
+        public TxDelegate[] newArray(int size) {
+            return new TxDelegate[size];
+        }
+    };
+    private PublicKey mPubKey;
+    private String mCoin;
+    private BigInteger mStake;
+
+    public TxDelegate(Transaction rawTx) {
+        super(rawTx);
+    }
+
+    protected TxDelegate(Parcel in) {
+        super(in);
+        mPubKey = (PublicKey) in.readValue(PublicKey.class.getClassLoader());
+        mCoin = in.readString();
+        mStake = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeValue(mPubKey);
+        dest.writeString(mCoin);
+        dest.writeValue(mStake);
+    }
 
     public PublicKey getPublicKey() {
-        return pubKey;
+        return mPubKey;
+    }
+
+    public TxDelegate setPublicKey(PublicKey publicKey) {
+        mPubKey = publicKey;
+        return this;
+    }
+
+    public TxDelegate setPublicKey(String hexPubKey) {
+        mPubKey = new PublicKey(hexPubKey);
+        return this;
+    }
+
+    public TxDelegate setPublicKey(byte[] publicKey) {
+        mPubKey = new PublicKey(publicKey);
+        return this;
     }
 
     public String getCoin() {
-	    return coin.replace("\0", "");
+        return mCoin.replace("\0", "");
     }
 
-	public BigInteger getStakeBigInteger() {
-        return stake;
+    public TxDelegate setCoin(String coinName) {
+        mCoin = StringHelper.strrpad(10, coinName.toUpperCase());
+        return this;
     }
 
-	public BigDecimal getStake() {
-		return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(stake));
-	}
+    public BigInteger getStakeBigInteger() {
+        return mStake;
+    }
+
+    public BigDecimal getStake() {
+        return new BigDecimal(mStake).divide(Transaction.VALUE_MUL_DEC);
+    }
+
+    public TxDelegate setStake(BigInteger stakeBigInteger) {
+        mStake = stakeBigInteger;
+        return this;
+    }
+
+    public double getStakeDouble() {
+        return getStake().doubleValue();
+    }
+
+    public TxDelegate setStake(double stake) {
+        return setStake(new BigDecimal(stake));
+    }
+
+    public TxDelegate setStake(String stakeBigInteger) {
+        mStake = new BigInteger(stakeBigInteger);
+        return this;
+    }
+
+    public TxDelegate setStake(BigDecimal stakeDecimal) {
+        mStake = stakeDecimal.multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+        return this;
+    }
+
+    @Override
+    public OperationType getType() {
+        return OperationType.Delegate;
+    }
+
+    @Nullable
+    @Override
+    protected FieldsValidationResult validate() {
+        return new FieldsValidationResult()
+                .addResult("mPubKey", mPubKey != null, "Node public key must be set")
+                .addResult("mCoin", mCoin != null && mCoin.length() > 2 && mCoin.length() < 11, "Coin symbol length must be from 3 to 10 chars")
+                .addResult("mStake", mStake != null && mStake.compareTo(new BigInteger("0")) > 0, "Stake must be set (more than 0)");
+    }
 
     @NonNull
     @Override
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
-                pubKey.getData(),
-                coin,
-                stake
+                mPubKey.getData(),
+                mCoin,
+                mStake
         });
     }
 
@@ -78,63 +170,9 @@ public class TxDelegate extends Operation {
     protected void decodeRLP(@NonNull byte[] rlpEncodedData) {
         final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        pubKey = new PublicKey(fromRawRlp(0, decoded));
-        coin = StringHelper.bytesToString(fromRawRlp(1, decoded));
-        stake = new BigInteger(fromRawRlp(2, decoded));
-    }
-
-    @Override
-    protected <T extends Operation, B extends Operation.Builder<T>> B getBuilder(Transaction<? extends Operation> rawTx) {
-        return (B) new Builder((Transaction<TxDelegate>) rawTx);
-    }
-
-    public final class Builder extends Operation.Builder<TxDelegate> {
-
-        Builder(Transaction<TxDelegate> op) {
-            super(op);
-        }
-
-        public TxDelegate.Builder setPublicKey(PublicKey publicKey) {
-            pubKey = publicKey;
-            return this;
-        }
-
-        public TxDelegate.Builder setPublicKey(String hexPubKey) {
-            pubKey = new PublicKey(hexPubKey);
-            return this;
-        }
-
-        public TxDelegate.Builder setPublicKey(byte[] publicKey) {
-            pubKey = new PublicKey(publicKey);
-            return this;
-        }
-
-        public TxDelegate.Builder setCoin(String coinName) {
-            coin = StringHelper.strrpad(10, coinName.toUpperCase());
-            return this;
-        }
-
-        public TxDelegate.Builder setStake(BigInteger stakeBigInteger) {
-            stake = stakeBigInteger;
-            return this;
-        }
-
-        public TxDelegate.Builder setStake(String stakeBigInteger) {
-            stake = new BigInteger(stakeBigInteger);
-            return this;
-        }
-
-        public TxDelegate.Builder setStake(BigDecimal stakeDecimal) {
-            stake = stakeDecimal.multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-            return this;
-        }
-
-        public Transaction<TxDelegate> build() {
-            getTx().setData(TxDelegate.this);
-            return getTx();
-        }
-
-
+        mPubKey = new PublicKey(fromRawRlp(0, decoded));
+        mCoin = bytesToString(fromRawRlp(1, decoded));
+        mStake = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 
 

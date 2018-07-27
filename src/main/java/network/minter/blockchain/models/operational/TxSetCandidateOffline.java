@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -25,9 +26,10 @@
 
 package network.minter.blockchain.models.operational;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
-
-import org.parceler.Parcel;
+import android.support.annotation.Nullable;
 
 import network.minter.core.crypto.PublicKey;
 import network.minter.core.util.DecodeResult;
@@ -38,61 +40,80 @@ import network.minter.core.util.RLP;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@Parcel
-public class TxSetCandidateOffline extends Operation {
-    PublicKey pubKey;
+public final class TxSetCandidateOffline extends Operation {
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<TxSetCandidateOffline> CREATOR = new Parcelable.Creator<TxSetCandidateOffline>() {
+        @Override
+        public TxSetCandidateOffline createFromParcel(Parcel in) {
+            return new TxSetCandidateOffline(in);
+        }
+
+        @Override
+        public TxSetCandidateOffline[] newArray(int size) {
+            return new TxSetCandidateOffline[size];
+        }
+    };
+    private PublicKey mPubKey;
+
+    public TxSetCandidateOffline(Transaction rawTx) {
+        super(rawTx);
+    }
+
+    protected TxSetCandidateOffline(Parcel in) {
+        super(in);
+        mPubKey = (PublicKey) in.readValue(PublicKey.class.getClassLoader());
+    }
 
     public PublicKey getPublicKey() {
-        return pubKey;
+        return mPubKey;
+    }
+
+    public TxSetCandidateOffline setPublicKey(byte[] publicKey) {
+        mPubKey = new PublicKey(publicKey);
+        return this;
+    }
+
+    public TxSetCandidateOffline setPublicKey(PublicKey publicKey) {
+        mPubKey = publicKey;
+        return this;
+    }
+
+    public TxSetCandidateOffline setPublicKey(String hexPubKey) {
+        mPubKey = new PublicKey(hexPubKey);
+        return this;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeValue(mPubKey);
+    }
+
+    @Override
+    public OperationType getType() {
+        return OperationType.SetCandidateOffline;
     }
 
     @NonNull
     @Override
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
-                pubKey.getData()
+                mPubKey.getData()
         });
+    }
+
+    @Nullable
+    @Override
+    protected FieldsValidationResult validate() {
+        return new FieldsValidationResult()
+                .addResult("mPubKey", mPubKey != null, "Node public key must be set");
     }
 
     @Override
     protected void decodeRLP(@NonNull byte[] rlpEncodedData) {
         final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        pubKey = new PublicKey(fromRawRlp(0, decoded));
-    }
-
-    @Override
-    protected <T extends Operation, B extends Operation.Builder<T>> B getBuilder(Transaction<? extends Operation> rawTx) {
-        return (B) new Builder((Transaction<TxSetCandidateOffline>) rawTx);
-    }
-
-    public final class Builder extends Operation.Builder<TxSetCandidateOffline> {
-
-        Builder(Transaction<TxSetCandidateOffline> op) {
-            super(op);
-        }
-
-        public TxSetCandidateOffline.Builder setPublicKey(PublicKey publicKey) {
-            pubKey = publicKey;
-            return this;
-        }
-
-        public TxSetCandidateOffline.Builder setPublicKey(String hexPubKey) {
-            pubKey = new PublicKey(hexPubKey);
-            return this;
-        }
-
-        public TxSetCandidateOffline.Builder setPublicKey(byte[] publicKey) {
-            pubKey = new PublicKey(publicKey);
-            return this;
-        }
-
-        public Transaction<TxSetCandidateOffline> build() {
-            getTx().setData(TxSetCandidateOffline.this);
-            return getTx();
-        }
-
-
+        mPubKey = new PublicKey(fromRawRlp(0, decoded));
     }
 
 

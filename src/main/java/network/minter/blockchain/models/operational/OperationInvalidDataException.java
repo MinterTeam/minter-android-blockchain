@@ -24,50 +24,47 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.models;
+package network.minter.blockchain.models.operational;
 
-import com.google.gson.annotations.SerializedName;
+import android.annotation.TargetApi;
+import android.util.Pair;
 
-import java.math.BigInteger;
 import java.util.List;
-
-import network.minter.blockchain.models.operational.Operation;
-import network.minter.blockchain.models.operational.OperationType;
-import network.minter.core.crypto.BytesData;
-import network.minter.core.crypto.MinterAddress;
 
 /**
  * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class HistoryTransaction {
-	public BytesData hash;
-	public int height;
-	public int index;
-	public OperationType type;
-	public MinterAddress from;
-	public BigInteger nonce;
-	public BigInteger gasPrice;
-	@SerializedName("tx_result")
-	public TxResult txResult;
-	public Object data;
-	public String payload;
+public class OperationInvalidDataException extends Exception {
 
-	public <T extends Operation> T getData() {
-		return (T) data;
-	}
+    /**
+     * Contains list of invalid operation fields
+     */
+    private final List<Pair<String, String>> mInvalidFields;
 
-    //@todo: unready
-    public static class TxResult {
-        public BigInteger gasWanted;
-        public BigInteger gasUsed;
-        public List<Tag> tags;
-        public Object fee; //@TODO
+    public OperationInvalidDataException(String message, List<Pair<String, String>> invalidFields) {
+        super(message);
+        mInvalidFields = invalidFields;
     }
 
-	public static class Tag {
-		public String key;
-		public String value;
-	}
+    public OperationInvalidDataException(String message, List<Pair<String, String>> invalidFields, Throwable cause) {
+        super(message, cause);
+        mInvalidFields = invalidFields;
+    }
+
+    public OperationInvalidDataException(List<Pair<String, String>> invalidFields, Throwable cause) {
+        super(cause);
+        mInvalidFields = invalidFields;
+    }
+
+    @TargetApi(24)
+    public OperationInvalidDataException(String message, List<Pair<String, String>> invalidFields, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+        mInvalidFields = invalidFields;
+    }
+
+    public List<Pair<String, String>> getInvalidFields() {
+        return mInvalidFields;
+    }
 }

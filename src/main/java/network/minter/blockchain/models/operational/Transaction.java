@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -25,54 +26,97 @@
 
 package network.minter.blockchain.models.operational;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.edwardstock.secp256k1.NativeSecp256k1;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.PrivateKey;
+import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
 import timber.log.Timber;
 
 import static network.minter.core.internal.common.Preconditions.checkArgument;
+import static network.minter.core.internal.common.Preconditions.checkNotNull;
+import static network.minter.core.internal.helpers.StringHelper.strrpad;
 
 /**
  * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class Transaction<OperationData extends Operation> {
+public class Transaction implements Parcelable {
     public final static BigInteger VALUE_MUL = new BigInteger("1000000000000000000", 10);
     public final static BigDecimal VALUE_MUL_DEC = new BigDecimal("1000000000000000000");
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Transaction> CREATOR = new Parcelable.Creator<Transaction>() {
+        @Override
+        public Transaction createFromParcel(Parcel in) {
+            return new Transaction(in);
+        }
+
+        @Override
+        public Transaction[] newArray(int size) {
+            return new Transaction[size];
+        }
+    };
     private BigInteger mNonce = new BigInteger("2");
     private BigInteger mGasPrice = new BigInteger("1");
+    private String mGasCoin = MinterSDK.DEFAULT_COIN;
     private OperationType mType = OperationType.SendCoin;
-    private OperationData mOperationData;
+    private Operation mOperationData;
     private BigInteger mV = new BigInteger("1");
     private BigInteger mR = new BigInteger("0");
     private BigInteger mS = new BigInteger("0");
+    // max - 128 bytes
     private BytesData mPayload = new BytesData(new byte[0]);
     private BytesData mServiceData = new BytesData(new byte[0]);
 
-    private Transaction(BigInteger nonce) {
+    protected Transaction(BigInteger nonce) {
         mNonce = nonce;
     }
 
-    private Transaction() {
+    protected Transaction() {
     }
 
-    public static <T extends Operation> Transaction<T> fromEncoded(String hexEncoded, Class<T> type) {
-        checkArgument(hexEncoded != null && hexEncoded.length() > 0, "Encoded transaction is empty");
-        checkArgument(type != null, "Class of transaction type must be set");
+    protected Transaction(Parcel in) {
+        mNonce = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+        mGasPrice = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+        mGasCoin = in.readString();
+        mType = (OperationType) in.readValue(OperationType.class.getClassLoader());
+        mOperationData = (Operation) in.readValue(Operation.class.getClassLoader());
+        mV = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+        mR = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+        mS = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+        mPayload = (BytesData) in.readValue(BytesData.class.getClassLoader());
+        mServiceData = (BytesData) in.readValue(BytesData.class.getClassLoader());
+    }
+
+    /**
+     * Decodes raw hex-encoded transaction
+     *
+     * @param hexEncoded transaction in hex string
+     * @param type       Operation class
+     * @param <Op>       Operation type
+     * @return Valid transaction with operation data
+     */
+    public static <Op extends Operation> Transaction fromEncoded(@NonNull String hexEncoded, @NonNull Class<Op> type) {
+        checkNotNull(type, "Class of transaction type must be set");
+        checkNotNull(hexEncoded, "hexEncoded data can't be null");
+        checkArgument(hexEncoded.length() > 0, "Encoded transaction is empty");
         final BytesData bd = new BytesData(hexEncoded);
         final DecodeResult rlp = RLP.decode(bd.getData(), 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-        Transaction<T> transaction = new Transaction<>();
+        Transaction transaction = new Transaction();
         transaction.decodeRLP(decoded);
 
         checkArgument(transaction.mType.getOpClass().equals(type),
@@ -81,40 +125,26 @@ public class Transaction<OperationData extends Operation> {
                 transaction.mType.getOpClass().getName()
         );
 
+        Throwable t = null;
         try {
-            transaction.mOperationData = (T) transaction.mType.getOpClass().newInstance();
-            transaction.mOperationData.decodeRLP(transaction.fromRawRlp(3, decoded));
-        } catch (InstantiationException | IllegalAccessException e) {
-            Timber.e(e, "Unable to decode transaction");
+            transaction.mOperationData = transaction.mType.getOpClass().getDeclaredConstructor(Transaction.class).newInstance(transaction);
+            transaction.mOperationData.decodeRLP(transaction.fromRawRlp(4, decoded));
+        } catch (InstantiationException e) {
+            t = e;
+        } catch (IllegalAccessException e) {
+            t = e;
+        } catch (NoSuchMethodException e) {
+            t = e;
+        } catch (InvocationTargetException e) {
+            t = e;
+        }
+
+        if (t != null) {
+            Timber.e(t, "Unable to decode transaction");
             return null;
         }
 
         return transaction;
-    }
-
-    public static TxCoinSell.Builder newSellCoinTransaction(BigInteger nonce) {
-        Transaction<TxCoinSell> tx = new Builder<TxCoinSell>(nonce)
-                .setType(OperationType.SellCoin)
-                .build();
-
-        return new TxCoinSell().new Builder(tx);
-    }
-
-    public static TxCoinBuy.Builder newBuyCoinTransaction(BigInteger nonce) {
-        Transaction<TxCoinBuy> tx = new Builder<TxCoinBuy>(nonce)
-                .setType(OperationType.BuyCoin)
-                .build();
-
-        return new TxCoinBuy().new Builder(tx);
-    }
-
-
-    public static TxSendCoin.Builder newSendTransaction(BigInteger nonce) {
-        Transaction<TxSendCoin> tx = new Builder<TxSendCoin>(nonce)
-                .setType(OperationType.SendCoin)
-                .build();
-
-        return new TxSendCoin().new Builder(tx);
     }
 
     public BigInteger getNonce() {
@@ -154,13 +184,36 @@ public class Transaction<OperationData extends Operation> {
         return new TransactionSign(new BytesData(encode(false)).toHexString());
     }
 
-    public OperationData getData() {
-        return mOperationData;
+    public <Op extends Operation> Op getData() {
+        return (Op) mOperationData;
     }
 
-    Transaction<OperationData> setData(OperationData operationData) {
+    <Op extends Operation> Transaction setData(Op operationData) {
         mOperationData = operationData;
         return this;
+    }
+
+    public String getGasCoin() {
+        return mGasCoin.replace("\0", "");
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(mNonce);
+        dest.writeValue(mGasPrice);
+        dest.writeString(mGasCoin);
+        dest.writeValue(mType);
+        dest.writeValue(mOperationData);
+        dest.writeValue(mV);
+        dest.writeValue(mR);
+        dest.writeValue(mS);
+        dest.writeValue(mPayload);
+        dest.writeValue(mServiceData);
     }
 
     byte[] fromRawRlp(int idx, Object[] raw) {
@@ -171,26 +224,30 @@ public class Transaction<OperationData extends Operation> {
     }
 
     /**
-     * Object[] contains exact 7 byte[]
+     * Object[] contains exact 10 elements
      *
-     * @param raw
+     * @param raw rlp encoded bytes array
      */
     void decodeRLP(Object[] raw) {
         mNonce = new BigInteger(fromRawRlp(0, raw));
         mGasPrice = new BigInteger(fromRawRlp(1, raw));
-        mType = OperationType.findByValue(new BigInteger(fromRawRlp(2, raw)));
-        mPayload = new BytesData(fromRawRlp(4, raw));
-        mServiceData = new BytesData(fromRawRlp(5, raw));
-        mV = new BigInteger(fromRawRlp(6, raw));
-        mR = new BigInteger(fromRawRlp(7, raw));
-        mS = new BigInteger(fromRawRlp(8, raw));
+        mGasCoin = StringHelper.bytesToString(fromRawRlp(2, raw), 10);
+        mType = OperationType.findByValue(new BigInteger(fromRawRlp(3, raw)));
+        /**
+         * ha, where is the 4th index? see {@link #fromEncoded(java.lang.String, java.lang.Class) }
+         */
+        mPayload = new BytesData(fromRawRlp(5, raw));
+        mServiceData = new BytesData(fromRawRlp(6, raw));
+        mV = new BigInteger(fromRawRlp(7, raw));
+        mR = new BigInteger(fromRawRlp(8, raw));
+        mS = new BigInteger(fromRawRlp(9, raw));
     }
 
     byte[] encode(boolean forSignature) {
         final byte[] data = mOperationData.encodeRLP();
         if (forSignature) {
             return RLP.encode(new Object[]{
-                    mNonce, mGasPrice, mType.getValue(),
+                    mNonce, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
                     data,
                     mPayload.getData(),
                     mServiceData.getData()
@@ -198,7 +255,7 @@ public class Transaction<OperationData extends Operation> {
         }
 
         return RLP.encode(new Object[]{
-                mNonce, mGasPrice, mType.getValue(),
+                mNonce, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
                 data,
                 mPayload.getData(),
                 mServiceData.getData(),
@@ -206,33 +263,88 @@ public class Transaction<OperationData extends Operation> {
         });
     }
 
-    public static class Builder<Op extends Operation> {
-        private final Transaction<Op> mTx;
+    FieldsValidationResult validate() {
+        return new FieldsValidationResult("Invalid transaction data")
+                .addResult("nonce", mNonce != null, "Nonce must be set")
+                .addResult("gasPrice", mGasCoin != null, "Gas coin must be set")
+                .addResult("operationData", mOperationData !=
+                        null, "Operation data does not set! Check your operation model.");
+    }
+
+    public static class Builder {
+        private final Transaction mTx;
 
         public Builder(BigInteger nonce) {
-            mTx = new Transaction<>(nonce);
+            mTx = new Transaction(nonce);
         }
 
-        public Builder<Op> setNonce(BigInteger nonce) {
+        public Builder setGasCoin(String coin) {
+            mTx.mGasCoin = strrpad(10, coin);
+            return this;
+        }
+
+        public Builder setNonce(BigInteger nonce) {
             mTx.mNonce = nonce;
             return this;
         }
 
-        public Builder<Op> setGasPrice(BigInteger gasPrice) {
-            mTx.mGasPrice = gasPrice;
-            return this;
+        public <Op extends Operation> Op create(Class<Op> operationClass) {
+            try {
+                return operationClass.getDeclaredConstructor(Transaction.class).newInstance(mTx);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        Builder<Op> setType(OperationType type) {
-            mTx.mType = type;
-            return this;
+        public TxCoinBuy buyCoin() {
+            return new TxCoinBuy(mTx);
         }
 
-        Transaction<Op> build() {
-            return mTx;
+        public TxCoinSell sellCoin() {
+            return new TxCoinSell(mTx);
         }
 
+        public TxCoinSellAll sellAllCoins() {
+            return new TxCoinSellAll(mTx);
+        }
 
+        public TxCreateCoin createCoin() {
+            return new TxCreateCoin(mTx);
+        }
+
+        public TxDeclareCandidacy declareCandidacy() {
+            return new TxDeclareCandidacy(mTx);
+        }
+
+        public TxDelegate delegate() {
+            return new TxDelegate(mTx);
+        }
+
+        public TxRedeemCheck redeemCheck() {
+            return new TxRedeemCheck(mTx);
+        }
+
+        public TxSendCoin sendCoin() {
+            return new TxSendCoin(mTx);
+        }
+
+        public TxSetCandidateOffline setCandidateOffline() {
+            return new TxSetCandidateOffline(mTx);
+        }
+
+        public TxSetCandidateOnline setCandidateOnline() {
+            return new TxSetCandidateOnline(mTx);
+        }
+
+        public TxUnbound unbound() {
+            return new TxUnbound(mTx);
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -27,7 +28,12 @@ package network.minter.blockchain;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
 import network.minter.blockchain.models.operational.OperationType;
+import network.minter.blockchain.models.operational.TxCreateCoin;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -47,6 +53,28 @@ public class OperationTypeTest {
         assertNotNull(t.getFeeBase());
         assertNotNull(t.getValue());
         assertNotNull(t.getOpClass());
+    }
 
+    @Test
+    public void calculateCreateCoinFee() {
+        final Map<String, Double> coinCosts = new HashMap<String, Double>() {{
+            put("AAA", 1000000D);
+            put("BBBB", 100000D);
+            put("CCCCC", 10000D);
+            put("DDDDDD", 1000D);
+            put("EEEEEEE", 100D);
+            put("FFFFFFFF", 10D);
+            put("GGGGGGGGG", 0D);
+            put("HHHHHHHHHH", 0D);
+        }};
+
+        for (Map.Entry<String, Double> entry : coinCosts.entrySet()) {
+            final BigDecimal res = new BigDecimal(entry.getValue()).add(OperationType.CreateCoin.getFee());
+            BigDecimal result = TxCreateCoin.calculateCreatingCost(entry.getKey());
+            if (res.setScale(4).equals(result.setScale(4)) == false) {
+                System.err.println("Invalid fee in coin name: " + entry.getKey());
+            }
+            assertEquals(res.setScale(4), result.setScale(4));
+        }
     }
 }

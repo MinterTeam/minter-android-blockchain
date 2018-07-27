@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -32,7 +33,7 @@ import com.google.gson.GsonBuilder;
 
 import org.junit.Before;
 
-import network.minter.mintercore.MinterSDK;
+import network.minter.core.MinterSDK;
 import timber.log.Timber;
 
 /**

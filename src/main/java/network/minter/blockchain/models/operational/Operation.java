@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
  * @link https://github.com/MinterTeam
+ * @link https://github.com/edwardstock
  *
  * The MIT License
  *
@@ -25,46 +26,92 @@
 
 package network.minter.blockchain.models.operational;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import network.minter.core.util.RLP;
+
+import static network.minter.core.internal.common.Preconditions.checkNotNull;
+import static network.minter.core.internal.common.Preconditions.firstNonNull;
 
 /**
  * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public abstract class Operation {
+public abstract class Operation implements Parcelable {
+    private final Transaction mTx;
+
+    public Operation(@NonNull Transaction rawTx) {
+        mTx = checkNotNull(rawTx, "Transaction must be set");
+    }
+
+    protected Operation(Parcel in) {
+        mTx = (Transaction) in.readValue(Transaction.class.getClassLoader());
+    }
+
+    public Transaction build() throws OperationInvalidDataException {
+        final Transaction tx = mTx.setData(this);
+        FieldsValidationResult validated = validate();
+        if (validated == null) {
+            validated = tx.validate();
+        } else {
+            validated.addResult(tx.validate());
+        }
+
+        // check tx common model and operation has valid data
+        if (validated != null && !validated.isValid()) {
+            // if not, trigger error
+            final String title = firstNonNull(validated.getTitle(), String.format("Invalid %s operation data", getType().name()));
+            final String body = validated.getInvalidFieldsMessages();
+
+            throw new OperationInvalidDataException(
+                    String.format("%s\nInvalid fields:\n%s", title, body),
+                    validated.getFieldMessageMap()
+            );
+        }
+
+        // everything is fine, return tx
+        return tx;
+    }
+
+    public abstract OperationType getType();
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @CallSuper
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(mTx);
+    }
+
+    protected abstract void decodeRLP(@NonNull byte[] rlpEncodedData);
+
+    protected byte[] fromRawRlp(int idx, Object[] raw) {
+        return (byte[]) raw[idx];
+    }
+
+    @Nullable
+    protected abstract FieldsValidationResult validate();
+
+    protected Transaction getTx() {
+        return mTx;
+    }
+
     /**
-     * Encodes all operation fields via RLP
+     * Encodes all create fields via RLP
      *
      * @return encoded byte[]
      * @see RLP
      */
     @NonNull
     protected abstract byte[] encodeRLP();
-    protected abstract void decodeRLP(@NonNull byte[] rlpEncodedData);
 
 
-    protected byte[] fromRawRlp(int idx, Object[] raw) {
-        return (byte[]) raw[idx];
-    }
-
-    protected abstract <T extends Operation, B extends Builder<T>> B getBuilder(Transaction<? extends Operation> rawTx);
-
-    public abstract static class Builder<Op extends Operation> {
-        private Transaction<Op> mTx;
-
-        Builder(Transaction<Op> op) {
-            mTx = op;
-        }
-
-        public Transaction<Op> save() {
-            return mTx;
-        }
-
-        protected Transaction<Op> getTx() {
-            return mTx;
-        }
-    }
 }
