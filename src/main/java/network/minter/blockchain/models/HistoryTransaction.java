@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -42,21 +42,21 @@ import network.minter.core.crypto.MinterAddress;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class HistoryTransaction {
-	public BytesData hash;
-	public int height;
-	public int index;
-	public OperationType type;
-	public MinterAddress from;
-	public BigInteger nonce;
-	public BigInteger gasPrice;
-	@SerializedName("tx_result")
-	public TxResult txResult;
-	public Object data;
-	public String payload;
+    public BytesData hash;
+    public int height;
+    public int index;
+    public OperationType type;
+    public MinterAddress from;
+    public BigInteger nonce;
+    public BigInteger gasPrice;
+    @SerializedName("tx_result")
+    public TxResult txResult;
+    public Object data;
+    public String payload;
 
-	public <T extends Operation> T getData() {
-		return (T) data;
-	}
+    public <T extends Operation> T getData() {
+        return (T) data;
+    }
 
     //@todo: unready
     public static class TxResult {
@@ -66,8 +66,8 @@ public class HistoryTransaction {
         public Object fee; //@TODO
     }
 
-	public static class Tag {
-		public String key;
-		public String value;
-	}
+    public static class Tag {
+        public String key;
+        public String value;
+    }
 }

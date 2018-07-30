@@ -28,12 +28,34 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import network.minter.blockchain.models.operational.Transaction;
+
 /**
  * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @link <a href="https://github.com/edwardstock">Github</a>
  */
-public class TransactionSendResult extends BCResult<Void> {
-    @SerializedName("tx_hash")
-    public String txHash;
+@Parcel
+public class ExchangeValue {
+    @SerializedName("will_get")
+    public BigInteger willGet;
+    public BigInteger commission;
+
+    public BigDecimal getAmount() {
+        return new BigDecimal(willGet).divide(Transaction.VALUE_MUL_DEC);
+    }
+
+    public BigDecimal getCommission() {
+        return new BigDecimal(commission).divide(Transaction.VALUE_MUL_DEC);
+    }
+
+    public BigDecimal getAmountWithCommission() {
+        return getAmount().subtract(getCommission());
+    }
 }

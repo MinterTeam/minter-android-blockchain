@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -25,10 +26,9 @@
 
 package network.minter.blockchain.api;
 
-import java.math.BigInteger;
-
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Coin;
+import network.minter.blockchain.models.ExchangeValue;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -40,25 +40,25 @@ import retrofit2.http.Query;
  */
 public interface BlockChainCoinEndpoint {
 
-	/**
-	 * Get information about coin
-	 *
-	 * @param coin Coin Symbol (min: 3, max 10 chars)
-	 * @return
-	 */
-	@GET("/api/coinInfo/{symbol}")
-	Call<BCResult<Coin>> getCoinInformation(@Query("symbol") String coin);
+    /**
+     * Get information about coin
+     *
+     * @param coin Coin Symbol (min: 3, max 10 chars)
+     * @return Coin information pojo
+     */
+    @GET("/api/coinInfo/{symbol}")
+    Call<BCResult<Coin>> getCoinInformation(@Query("symbol") String coin);
 
-	/**
+    /**
      * Give an estimation about coin exchange (selling)
-	 *
-	 * @param coinToSell coin to convert from
-	 * @param valueToSell    BigInteger value
+     *
+     * @param coinToSell  coin to convert from
+     * @param valueToSell BigInteger string value
      * @param coinToBuy   coin to convert to
      * @return
-	 */
+     */
     @GET("/api/estimateCoinSell")
-    Call<BCResult<BigInteger>> getCoinExchangeCurrencyToSell(
+    Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToSell(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_sell") String valueToSell,
             @Query("coin_to_buy") String coinToBuy
@@ -68,12 +68,12 @@ public interface BlockChainCoinEndpoint {
      * Give an estimation about coin exchange (buying)
      *
      * @param coinToSell coin to convert from
-     * @param valueToBuy    BigInteger value
-     * @param coinToBuy   coin to convert to
+     * @param valueToBuy BigInteger string value
+     * @param coinToBuy  coin to convert to
      * @return
      */
     @GET("/api/estimateCoinBuy")
-    Call<BCResult<BigInteger>> getCoinExchangeCurrencyToBuy(
+    Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToBuy(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_buy") String valueToBuy,
             @Query("coin_to_buy") String coinToBuy

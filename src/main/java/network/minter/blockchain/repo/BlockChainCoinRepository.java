@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -33,6 +34,7 @@ import java.math.BigInteger;
 import network.minter.blockchain.api.BlockChainCoinEndpoint;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Coin;
+import network.minter.blockchain.models.ExchangeValue;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.data.DataRepository;
@@ -46,37 +48,39 @@ import static network.minter.core.internal.common.Preconditions.checkNotNull;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpoint> {
-	public BlockChainCoinRepository(@NonNull ApiService.Builder apiBuilder) {
-		super(apiBuilder);
-	}
+    public BlockChainCoinRepository(@NonNull ApiService.Builder apiBuilder) {
+        super(apiBuilder);
+    }
 
-	/**
-	 * Returns full coin information
-	 *
-	 * @param symbol Coin name (for example: MNT)
-	 * @return Full coin info
-	 */
-	public Call<BCResult<Coin>> getCoinInfo(@NonNull String symbol) {
-		return getInstantService().getCoinInformation(checkNotNull(symbol, "Symbol required"));
-	}
+    /**
+     * Returns all about coin
+     *
+     * @param symbol Coin name (for example: MNT)
+     * @return Full info about coin
+     */
+    public Call<BCResult<Coin>> getCoinInfo(@NonNull String symbol) {
+        return getInstantService().getCoinInformation(checkNotNull(symbol, "Symbol required"));
+    }
 
     /**
      * @param coinToSell  Selling coin
-     * @param valueToSell Selling amount of exchange (big integer amount like: 1 BIP equals 1000000000000000000 (18 zeroes) in big integer equivalent)
+     * @param valueToSell Selling amount of exchange (big integer amount like: 1 BIP equals
+     *                    1000000000000000000 (18 zeroes) in big integer equivalent)
      * @param coinToBuy   Buying coin coin
-     * @return
+     * @return Exchange calculation
      */
-    public Call<BCResult<BigInteger>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigDecimal valueToSell, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigDecimal valueToSell, @NonNull String coinToBuy) {
         return getCoinExchangeCurrencyToSell(coinToSell, valueToSell.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
-	}
+    }
 
-	/**
-     * @param coinToSell Selling coin
-     * @param valueToSell   Selling amount of exchange (big integer amount like: 1 BIP equals 1000000000000000000 (18 zeroes) in big integer equivalent)
+    /**
+     * @param coinToSell  Selling coin
+     * @param valueToSell Selling amount of exchange (big integer amount like: 1 BIP equals
+     *                    1000000000000000000 (18 zeroes) in big integer equivalent)
      * @param coinToBuy   Buying coin coin
-     * @return
-	 */
-    public Call<BCResult<BigInteger>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigInteger valueToSell, @NonNull String coinToBuy) {
+     * @return Exchange calculation
+     */
+    public Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigInteger valueToSell, @NonNull String coinToBuy) {
         return getInstantService().getCoinExchangeCurrencyToSell(
                 checkNotNull(coinToSell, "Source coin required").toUpperCase(),
                 valueToSell.toString(), checkNotNull(coinToBuy, "Target coin required").toUpperCase()
@@ -85,21 +89,23 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
 
     /**
      * @param coinToSell Selling coin
-     * @param valueToBuy Buying amount of exchange (human readable amount like: 1 BIP equals 1.0 in float equivalent)
+     * @param valueToBuy Buying amount of exchange (human readable amount like: 1 BIP equals 1.0 in
+     *                   float equivalent)
      * @param coinToBuy  Buying coin
-     * @return
+     * @return Exchange calculation
      */
-    public Call<BCResult<BigInteger>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigDecimal valueToBuy, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigDecimal valueToBuy, @NonNull String coinToBuy) {
         return getCoinExchangeCurrencyToBuy(coinToSell, valueToBuy.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
     }
 
     /**
      * @param coinToSell Selling coin
-     * @param valueToBuy Buying amount of exchange (big integer amount like: 1 BIP equals 1000000000000000000 (18 zeroes) in big integer equivalent)
+     * @param valueToBuy Buying amount of exchange (big integer amount like: 1 BIP equals
+     *                   1000000000000000000 (18 zeroes) in big integer equivalent)
      * @param coinToBuy  Buying coin
-     * @return
+     * @return Exchange calculation
      */
-    public Call<BCResult<BigInteger>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigInteger valueToBuy, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigInteger valueToBuy, @NonNull String coinToBuy) {
         return getInstantService().getCoinExchangeCurrencyToBuy(
                 checkNotNull(coinToSell, "Source coin required").toUpperCase(),
                 valueToBuy.toString(), checkNotNull(coinToBuy, "Target coin required").toUpperCase()
@@ -107,8 +113,8 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
     }
 
     @NonNull
-	@Override
-	protected Class<BlockChainCoinEndpoint> getServiceClass() {
-		return BlockChainCoinEndpoint.class;
-	}
+    @Override
+    protected Class<BlockChainCoinEndpoint> getServiceClass() {
+        return BlockChainCoinEndpoint.class;
+    }
 }
