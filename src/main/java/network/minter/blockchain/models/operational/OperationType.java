@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -66,7 +66,7 @@ public enum OperationType {
     private final static String FEE_BASE_STRING = "0.001";
     public final static BigDecimal FEE_BASE = new BigDecimal(FEE_BASE_STRING);
 
-    BigInteger mValue;
+    final BigInteger mValue;
     Class<? extends Operation> mOpClass;
     BigDecimal mFee;
 

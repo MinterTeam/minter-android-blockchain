@@ -54,6 +54,7 @@ public class HistoryTransaction {
     public Object data;
     public String payload;
 
+    @SuppressWarnings("unchecked")
     public <T extends Operation> T getData() {
         return (T) data;
     }

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
- * @link https://github.com/edwardstock
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -71,10 +71,10 @@ public class OperationTypeTest {
         for (Map.Entry<String, Double> entry : coinCosts.entrySet()) {
             final BigDecimal res = new BigDecimal(entry.getValue()).add(OperationType.CreateCoin.getFee());
             BigDecimal result = TxCreateCoin.calculateCreatingCost(entry.getKey());
-            if (res.setScale(4).equals(result.setScale(4)) == false) {
+            if (!res.setScale(4, BigDecimal.ROUND_DOWN).equals(result.setScale(4, BigDecimal.ROUND_DOWN))) {
                 System.err.println("Invalid fee in coin name: " + entry.getKey());
             }
-            assertEquals(res.setScale(4), result.setScale(4));
+            assertEquals(res.setScale(4, BigDecimal.ROUND_DOWN), result.setScale(4, BigDecimal.ROUND_DOWN));
         }
     }
 }

@@ -42,6 +42,7 @@ import java.util.Map;
 import network.minter.blockchain.api.BlockChainAccountEndpoint;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Balance;
+import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.crypto.BytesData;
@@ -55,7 +56,6 @@ import static network.minter.core.internal.helpers.CollectionsHelper.asMap;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BlockChainAccountRepository extends DataRepository<BlockChainAccountEndpoint> {
@@ -70,34 +70,30 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
 
     /**
      * Returns balance result data for specified address
-     *
      * @param address
      * @return
      */
     public Call<BCResult<Balance>> getBalance(@NonNull String address) {
-        return getInstantService(api -> {
-            api.registerTypeAdapter(Balance.class, new CoinBalanceDeserializer());
-        }).getBalance(checkNotNull(address, "Address required!"));
+        return getInstantService(api -> api.registerTypeAdapter(Balance.class, new CoinBalanceDeserializer()))
+                .getBalance(checkNotNull(address, "Address required!"));
     }
 
-    public Call<BCResult<BigInteger>> getTransactionCount(@NonNull MinterAddress key) {
+    public Call<BCResult<CountableData>> getTransactionCount(@NonNull MinterAddress key) {
         checkNotNull(key, "Public key required!");
         return getTransactionCount(key.toString());
     }
 
     /**
      * Returns the number of transactions sent from an address
-     *
      * @param address fq address
      * @return Prepared request with transaction count result
      */
-    public Call<BCResult<BigInteger>> getTransactionCount(@NonNull String address) {
+    public Call<BCResult<CountableData>> getTransactionCount(@NonNull String address) {
         return getInstantService().getTransactionCount(checkNotNull(address, "Address required!"));
     }
 
     /**
      * SendCoin transaction
-     *
      * @param transactionSign Raw signed TX
      * @return Prepared request
      * @see TransactionSendResult

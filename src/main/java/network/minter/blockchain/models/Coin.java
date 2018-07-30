@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -25,7 +26,15 @@
 
 package network.minter.blockchain.models;
 
+import com.google.gson.annotations.SerializedName;
+
 import org.parceler.Parcel;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import network.minter.blockchain.models.operational.Transaction;
+import network.minter.core.crypto.MinterAddress;
 
 /**
  * minter-android-blockchain. 2018
@@ -36,9 +45,21 @@ import org.parceler.Parcel;
 public class Coin {
     public String name;
     public String symbol;
-    public String volume;
-    public double crr;
-    public String reserveCoin;
-    public int reserveBalance;
-    public String creator;
+    public BigInteger volume;
+    public int crr;
+    @SerializedName("reserve_balance")
+    public BigInteger reserveBalance;
+    public MinterAddress creator;
+
+    public String getSymbol() {
+        return symbol.toUpperCase();
+    }
+
+    public BigDecimal getReserveBalance() {
+        return new BigDecimal(reserveBalance).divide(Transaction.VALUE_MUL_DEC);
+    }
+
+    public double getReserveBalanceDouble() {
+        return getReserveBalance().doubleValue();
+    }
 }

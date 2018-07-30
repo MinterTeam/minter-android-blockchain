@@ -24,49 +24,14 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.api;
+package network.minter.blockchain.models;
 
-import java.util.Map;
-
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.Balance;
-import network.minter.blockchain.models.CountableData;
-import network.minter.core.crypto.BytesData;
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
+import java.math.BigInteger;
 
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public interface BlockChainAccountEndpoint {
-
-    /**
-     * Returns current balance of an account
-     * @param address Address of an account
-     * @return
-     */
-    @GET("/api/balance/{address}")
-    Call<BCResult<Balance>> getBalance(@Path("address") String address);
-
-    /**
-     * Returns count of outgoing transactions from given account
-     * @param address Address of an account
-     * @return
-     */
-    @GET("/api/transactionCount/{address}")
-    Call<BCResult<CountableData>> getTransactionCount(@Path("address") String address);
-
-    /**
-     * Broadcasts transaction onto Minter network
-     * @param data
-     * @return
-     */
-    @POST("/api/sendTransaction")
-    Call<BCResult<BytesData>> sendTransaction(@Body Map<String, String> data);
-
-
+public class CountableData {
+    public BigInteger count;
 }

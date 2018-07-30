@@ -51,7 +51,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 public class MinterBlockChainApi {
 	private final static String BASE_NODE_URL = BuildConfig.BASE_NODE_URL;
     private static MinterBlockChainApi INSTANCE;
-    private ApiService.Builder mApiService;
+    private final ApiService.Builder mApiService;
     private BlockChainAccountRepository mAccountRepository;
     private BlockChainCoinRepository mCoinRepository;
     private BlockChainTransactionRepository mTransactionRepository;

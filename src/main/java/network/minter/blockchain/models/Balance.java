@@ -26,19 +26,19 @@
 
 package network.minter.blockchain.models;
 
+import android.support.v4.util.ObjectsCompat;
+
 import org.parceler.Parcel;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Map;
-import java.util.Objects;
 
 import network.minter.blockchain.models.operational.Transaction;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Parcel
@@ -77,13 +77,9 @@ public class Balance {
             return new BigDecimal(balance).setScale(18, RoundingMode.UNNECESSARY).divide(Transaction.VALUE_MUL_DEC, BigDecimal.ROUND_UNNECESSARY);
         }
 
-        public void setBalance(BigDecimal b) {
-            balance = b.setScale(18, RoundingMode.UNNECESSARY).multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-        }
-
         @Override
         public int hashCode() {
-            return Objects.hash(coin, balance);
+            return ObjectsCompat.hash(coin, balance);
         }
 
         @Override
@@ -91,8 +87,8 @@ public class Balance {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             CoinBalance balance1 = (CoinBalance) o;
-            return Objects.equals(coin, balance1.coin) &&
-                    Objects.equals(balance, balance1.balance);
+            return ObjectsCompat.equals(coin, balance1.coin) &&
+                    ObjectsCompat.equals(balance, balance1.balance);
         }
     }
 

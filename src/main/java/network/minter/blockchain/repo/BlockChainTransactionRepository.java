@@ -127,7 +127,7 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
      * @link https://github.com/MinterTeam/minter-wiki/wiki/Minter-Node-JSON-API
      */
     public static class TQuery {
-        private Map<String, String> mData = new HashMap<>();
+        private final Map<String, String> mData = new HashMap<>();
 
         public TQuery setFrom(MinterAddress from) {
             return setFrom(from.toString());

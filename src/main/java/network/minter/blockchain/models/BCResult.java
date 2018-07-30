@@ -1,6 +1,7 @@
 /*
  * Copyright (C) by MinterTeam. 2018
- * @link https://github.com/MinterTeam
+ * @link <a href="https://github.com/MinterTeam">Org Github</a>
+ * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
  * The MIT License
  *
@@ -68,7 +69,7 @@ public class BCResult<Result> {
         @Deprecated
         @SerializedName("11") CandidateNotFound(11);
 
-        int resVal;
+        final int resVal;
 
         ResultCode(int v) {
             resVal = v;
