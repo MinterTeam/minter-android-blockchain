@@ -34,6 +34,6 @@ import com.google.gson.annotations.SerializedName;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class TransactionSendResult extends BCResult<Void> {
-    @SerializedName("tx_hash")
+    @SerializedName("hash")
     public String txHash;
 }
