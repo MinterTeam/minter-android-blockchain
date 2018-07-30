@@ -28,7 +28,8 @@ package network.minter.blockchain.api;
 
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Coin;
-import network.minter.blockchain.models.ExchangeValue;
+import network.minter.blockchain.models.ExchangeBuyValue;
+import network.minter.blockchain.models.ExchangeSellValue;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -58,7 +59,7 @@ public interface BlockChainCoinEndpoint {
      * @return
      */
     @GET("/api/estimateCoinSell")
-    Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToSell(
+    Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_sell") String valueToSell,
             @Query("coin_to_buy") String coinToBuy
@@ -73,7 +74,7 @@ public interface BlockChainCoinEndpoint {
      * @return
      */
     @GET("/api/estimateCoinBuy")
-    Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToBuy(
+    Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_buy") String valueToBuy,
             @Query("coin_to_buy") String coinToBuy

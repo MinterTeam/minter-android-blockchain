@@ -42,7 +42,7 @@ import network.minter.blockchain.models.operational.Transaction;
  * @link <a href="https://github.com/edwardstock">Github</a>
  */
 @Parcel
-public class ExchangeValue {
+public class ExchangeSellValue {
     @SerializedName("will_get")
     public BigInteger willGet;
     public BigInteger commission;

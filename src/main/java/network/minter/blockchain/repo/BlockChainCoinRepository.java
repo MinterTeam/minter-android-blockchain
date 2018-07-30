@@ -34,7 +34,8 @@ import java.math.BigInteger;
 import network.minter.blockchain.api.BlockChainCoinEndpoint;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Coin;
-import network.minter.blockchain.models.ExchangeValue;
+import network.minter.blockchain.models.ExchangeBuyValue;
+import network.minter.blockchain.models.ExchangeSellValue;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.data.DataRepository;
@@ -69,7 +70,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @param coinToBuy   Buying coin coin
      * @return Exchange calculation
      */
-    public Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigDecimal valueToSell, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigDecimal valueToSell, @NonNull String coinToBuy) {
         return getCoinExchangeCurrencyToSell(coinToSell, valueToSell.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
     }
 
@@ -80,7 +81,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @param coinToBuy   Buying coin coin
      * @return Exchange calculation
      */
-    public Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigInteger valueToSell, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigInteger valueToSell, @NonNull String coinToBuy) {
         return getInstantService().getCoinExchangeCurrencyToSell(
                 checkNotNull(coinToSell, "Source coin required").toUpperCase(),
                 valueToSell.toString(), checkNotNull(coinToBuy, "Target coin required").toUpperCase()
@@ -94,7 +95,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @param coinToBuy  Buying coin
      * @return Exchange calculation
      */
-    public Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigDecimal valueToBuy, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigDecimal valueToBuy, @NonNull String coinToBuy) {
         return getCoinExchangeCurrencyToBuy(coinToSell, valueToBuy.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
     }
 
@@ -105,7 +106,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @param coinToBuy  Buying coin
      * @return Exchange calculation
      */
-    public Call<BCResult<ExchangeValue>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigInteger valueToBuy, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigInteger valueToBuy, @NonNull String coinToBuy) {
         return getInstantService().getCoinExchangeCurrencyToBuy(
                 checkNotNull(coinToSell, "Source coin required").toUpperCase(),
                 valueToBuy.toString(), checkNotNull(coinToBuy, "Target coin required").toUpperCase()
