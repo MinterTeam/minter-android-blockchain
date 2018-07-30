@@ -56,6 +56,6 @@ public class ExchangeValue {
     }
 
     public BigDecimal getAmountWithCommission() {
-        return getAmount().subtract(getCommission());
+        return getAmount().add(getCommission());
     }
 }
