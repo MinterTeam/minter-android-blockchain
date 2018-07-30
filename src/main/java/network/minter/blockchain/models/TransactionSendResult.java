@@ -28,6 +28,8 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import network.minter.core.crypto.MinterHash;
+
 /**
  * minter-android-blockchain. 2018
  *
@@ -35,5 +37,5 @@ import com.google.gson.annotations.SerializedName;
  */
 public class TransactionSendResult extends BCResult<Void> {
     @SerializedName("hash")
-    public String txHash;
+    public MinterHash txHash;
 }
