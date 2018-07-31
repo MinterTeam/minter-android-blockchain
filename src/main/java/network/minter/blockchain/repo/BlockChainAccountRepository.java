@@ -45,7 +45,6 @@ import network.minter.blockchain.models.Balance;
 import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.data.DataRepository;
@@ -98,7 +97,7 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
      * @return Prepared request
      * @see TransactionSendResult
      */
-    public Call<BCResult<BytesData>> sendTransaction(@NonNull TransactionSign transactionSign) {
+    public Call<BCResult<TransactionSendResult>> sendTransaction(@NonNull TransactionSign transactionSign) {
         return getInstantService().sendTransaction(
                 asMap("transaction", transactionSign.getTxSign())
         );

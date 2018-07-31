@@ -31,7 +31,7 @@ import java.util.Map;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Balance;
 import network.minter.blockchain.models.CountableData;
-import network.minter.core.crypto.BytesData;
+import network.minter.blockchain.models.TransactionSendResult;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -66,7 +66,7 @@ public interface BlockChainAccountEndpoint {
      * @return
      */
     @POST("/api/sendTransaction")
-    Call<BCResult<BytesData>> sendTransaction(@Body Map<String, String> data);
+    Call<BCResult<TransactionSendResult>> sendTransaction(@Body Map<String, String> data);
 
 
 }

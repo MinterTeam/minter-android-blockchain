@@ -37,10 +37,12 @@ import network.minter.blockchain.repo.BlockChainCoinRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterHash;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.api.converters.BigIntegerDeserializer;
 import network.minter.core.internal.api.converters.BytesDataDeserializer;
 import network.minter.core.internal.api.converters.MinterAddressDeserializer;
+import network.minter.core.internal.api.converters.MinterHashDeserializer;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
@@ -98,6 +100,7 @@ public class MinterBlockChainApi {
     public GsonBuilder getGsonBuilder() {
         GsonBuilder out = new GsonBuilder();
         out.registerTypeAdapter(MinterAddress.class, new MinterAddressDeserializer());
+        out.registerTypeAdapter(MinterHash.class, new MinterHashDeserializer());
         out.registerTypeAdapter(BigInteger.class, new BigIntegerDeserializer());
         out.registerTypeAdapter(BytesData.class, new BytesDataDeserializer());
 
