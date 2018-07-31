@@ -31,8 +31,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0-alpha03'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath 'com.android.tools.build:gradle:3.2.0-beta05'
     }
 }
 
@@ -152,6 +151,8 @@ dependencies {
     netTestImplementation "network.minter.android:minter-android-core-testnet:${minterCoreVers}"
     netMainImplementation "network.minter.android:minter-android-core:${minterCoreVers}"
 
+
+    implementation 'com.android.support:support-core-utils:27.1.1'
     // network
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'

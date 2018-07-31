@@ -191,6 +191,7 @@ public class Transaction implements Parcelable {
 
     <Op extends Operation> Transaction setData(Op operationData) {
         mOperationData = operationData;
+        mType = operationData.getType();
         return this;
     }
 
