@@ -32,6 +32,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.0-beta05'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
     }
 }
 
@@ -53,17 +54,18 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
+apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '1.0.0'
+version = '0.1.0'
 
 ext {
     minterMinSdk = 16
     minterMaxSdk = 27
     minterBuildTools = "28.0.0"
     minterLibSupport = "27.1.1"
-    minterCoreVers = "1.0.0"
+    minterCoreVers = "0.1.0"
     pomDescription = "Minter Android Blockchain API SDK"
 }
 
