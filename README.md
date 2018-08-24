@@ -1,2 +1,48 @@
-# minter-android-blockchain
-Android Minter Blockchain API SDK
+Minter Android Blockchain API SDK
+=================================
+[ ![Download](https://api.bintray.com/packages/minterteam/android/minter-android-blockchain-testnet/images/download.svg?version=0.1.0) ](https://bintray.com/minterteam/android/minter-android-blockchain-testnet/0.1.0/link)
+
+
+Minter blockchain sdk library
+-----------------------------------------------------------------
+
+## Setup
+
+Gradle
+root build.gradle
+```groovy
+allprojects {
+    repositories {
+       // ... some repos
+        maven { url "https://dl.bintray.com/minterteam/android" }
+    }
+}
+```
+
+project build.gradle
+```groovy
+
+ext {
+    minterSdkVersion = "0.1.0"
+}
+
+dependencies {
+    // for testnet use suffix "-testnet"
+    implementation "network.minter.android:minter-android-blockchain-testnet:${minterSdkVersion}"
+
+    // for main net
+    implementation "network.minter.android:minter-android-blockchain:${minterSdkVersion}"
+}
+```
+
+## Initialize it
+```java
+
+MinterBlockChainApi.initialize();
+```
+
+## Docs
+TODO (tests and javadocs available for now)
+
+# Build
+TODO (ndk required)

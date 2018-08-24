@@ -69,6 +69,10 @@ public class MinterBlockChainApi {
         mApiService.addHeader("X-Minter-Client-Version", BuildConfig.VERSION_NAME);
     }
 
+    public static void initialize() {
+        initialize(BASE_NODE_URL, false);
+    }
+
     public static void initialize(String baseNodeApiUrl, boolean debug) {
         if (INSTANCE != null) {
             return;
