@@ -154,7 +154,7 @@ public final class TxSendCoin extends Operation {
     }
 
     /**
-     * You MUST multiply this rawValue on {@code Transaction#VALUE_MUL} by yourself
+     * You MUST multiply this rawValue on {@link Transaction#VALUE_MUL} by yourself
      *
      * @param rawValue
      * @param radix

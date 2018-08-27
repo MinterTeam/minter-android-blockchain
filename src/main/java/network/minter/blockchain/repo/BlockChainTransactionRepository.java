@@ -43,9 +43,12 @@ import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.api.BlockChainTransactionEndpoint;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.HistoryTransaction;
+import network.minter.blockchain.models.TransactionCommissionValue;
+import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterHash;
+import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.data.DataRepository;
 import retrofit2.Call;
@@ -54,7 +57,6 @@ import static network.minter.core.internal.common.Preconditions.checkNotNull;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BlockChainTransactionRepository extends DataRepository<BlockChainTransactionEndpoint> implements DataRepository.Configurator {
@@ -64,7 +66,6 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
 
     /**
      * Get transactions by query
-     *
      * @param query
      * @return
      * @see TQuery
@@ -74,7 +75,8 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
     }
 
     /**
-     * @param hash
+     * Get full transaction information
+     * @param hash Valid transaction hash
      * @return
      * @see #getTransaction(String)
      */
@@ -84,8 +86,7 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
 
     /**
      * Get full transaction information
-     *
-     * @param txHash
+     * @param txHash Valid transaction hash with prefix "Mt"
      * @return
      */
     public Call<BCResult<HistoryTransaction>> getTransaction(String txHash) {
@@ -95,6 +96,25 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
     @Override
     public void configure(ApiService.Builder api) {
         api.registerTypeAdapter(HistoryTransaction.class, new HistoryTransactionDeserializer());
+    }
+
+    /**
+     * Resolve transaction commission before sending it
+     * @param sign Transaction sign is NOT A TRANSACTION HASH, it's a valid transaction and valid to send
+     * @return
+     * @see network.minter.blockchain.models.operational.Transaction#sign(PrivateKey)
+     */
+    public Call<BCResult<TransactionCommissionValue>> getTransactionCommission(TransactionSign sign) {
+        return getTransactionCommission(sign.getTxSign());
+    }
+
+    /**
+     * Resolve transaction commission before sending it
+     * @param sign
+     * @return
+     */
+    public Call<BCResult<TransactionCommissionValue>> getTransactionCommission(String sign) {
+        return getInstantService().getTxCommission(sign);
     }
 
     @NonNull
@@ -123,7 +143,6 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
 
     /**
      * Transaction getting query (@TODO documentation)
-     *
      * @link https://github.com/MinterTeam/minter-wiki/wiki/Minter-Node-JSON-API
      */
     public static class TQuery {

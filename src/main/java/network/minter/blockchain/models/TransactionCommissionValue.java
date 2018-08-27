@@ -24,48 +24,44 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.api;
+package network.minter.blockchain.models;
 
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.HistoryTransaction;
-import network.minter.blockchain.models.TransactionCommissionValue;
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import network.minter.blockchain.models.operational.Transaction;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public interface BlockChainTransactionEndpoint {
-
-	/**
-	 * Get list of transactions filtered by given query
-	 *
-	 * @param urlEncodedQuery
-	 * @return
-	 * @see network.minter.blockchain.repo.BlockChainTransactionRepository.TQuery
-	 */
-	@GET("/api/transactions")
-	Call<BCResult<List<HistoryTransaction>>> getTransactions(@Query("query") String urlEncodedQuery);
-
-	/**
-	 * Get full information about transaction
-	 *
-	 * @param txHash Transaction hash (hex bytes with prefix: Mt)
-	 * @return
-	 * @see network.minter.core.MinterSDK#PREFIX_TX
-	 */
-	Call<BCResult<HistoryTransaction>> getTransaction(@Query("hash") String txHash);
+public class TransactionCommissionValue {
+    @SerializedName("commission")
+    public BigInteger value;
 
     /**
-     * Calculates signed transaction commission
-     * @param signedTx Valid transaction, signed with private key
-     * @return
+     * BigDecimal value
+     * @return commission
      */
-    @GET("/api/estimateTxCommission")
-    Call<BCResult<TransactionCommissionValue>> getTxCommission(@Query("tx") String signedTx);
+    public BigDecimal getValue() {
+        return new BigDecimal(value).divide(Transaction.VALUE_MUL_DEC);
+    }
+
+    /**
+     * Double value
+     * @return commission
+     */
+    public double getValueDouble() {
+        return getValue().doubleValue();
+    }
+
+    /**
+     * Source value multiplied by {@link Transaction#VALUE_MUL}
+     * @return commission
+     */
+    public BigInteger getValueBigInteger() {
+        return value;
+    }
 }
