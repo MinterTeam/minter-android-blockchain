@@ -23,7 +23,7 @@ project build.gradle
 ```groovy
 
 ext {
-    minterSdkVersion = "0.1.0"
+    minterSdkVersion = "0.1.1"
 }
 
 dependencies {
@@ -35,14 +35,18 @@ dependencies {
 }
 ```
 
-## Initialize it
+## Basic Usage
+### Initialize it
 ```java
 
 MinterBlockChainApi.initialize();
 ```
 
+### Usage
+Look at [tests](src/tests/java/network/minter/blockchain) to see how to create and sign transactions
+
 ## Docs
 TODO (tests and javadocs available for now)
 
 # Build
-TODO (ndk required)
+TODO
