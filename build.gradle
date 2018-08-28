@@ -65,7 +65,7 @@ ext {
     minterMaxSdk = 28
     minterBuildTools = "28.0.2"
     minterLibSupport = "27.1.1"
-    minterCoreVers = "0.1.0"
+    minterCoreVers = version
     pomDescription = "Minter Android Blockchain API SDK"
 }
 
