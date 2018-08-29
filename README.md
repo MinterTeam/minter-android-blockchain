@@ -1,6 +1,6 @@
 Minter Android Blockchain API SDK
 =================================
-[![Download](https://api.bintray.com/packages/minterteam/android/minter-android-blockchain-testnet/images/download.svg?version=0.1.1) ](https://bintray.com/minterteam/android/minter-android-blockchain-testnet/0.1.1/link)
+[![Download](https://api.bintray.com/packages/minterteam/android/minter-android-blockchain-testnet/images/download.svg) ](https://bintray.com/minterteam/android/minter-android-blockchain-testnet/_latestVersion)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
