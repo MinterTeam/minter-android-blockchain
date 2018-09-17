@@ -24,15 +24,15 @@ project build.gradle
 ```groovy
 
 ext {
-    minterSdkVersion = "0.1.1"
+    minterBlockchainSDK = "0.1.2"
 }
 
 dependencies {
     // for testnet use suffix "-testnet"
-    implementation "network.minter.android:minter-android-blockchain-testnet:${minterSdkVersion}"
+    implementation "network.minter.android:minter-android-blockchain-testnet:${minterBlockchainSDK}"
 
     // for main net
-    implementation "network.minter.android:minter-android-blockchain:${minterSdkVersion}"
+    implementation "network.minter.android:minter-android-blockchain:${minterBlockchainSDK}"
 }
 ```
 
