@@ -31,8 +31,8 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0-rc02'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
+        classpath 'com.android.tools.build:gradle:3.2.0-rc03'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
@@ -44,7 +44,7 @@ allprojects {
         maven { url "https://dl.bintray.com/ethereum/maven/" }
         maven { url 'https://clojars.org/repo/' }
         maven { url 'https://jitpack.io' }
-        maven { url "https://maven.edwardstock.com/artifactory/libs-release-local" }
+        maven { url 'https://dl.bintray.com/minterteam/android' }
         maven { url "https://repo1.maven.org/maven2/com/google/zxing/" }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/'}
     }
@@ -58,7 +58,7 @@ apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '0.1.2'
+version = '0.1.3'
 
 ext {
     minterMinSdk = 16
@@ -165,7 +165,7 @@ dependencies {
     annotationProcessor 'org.parceler:parceler:1.1.11'
 
     // stuff
-    implementation 'com.jakewharton.timber:timber:4.5.1'
+    implementation 'com.jakewharton.timber:timber:4.6.1'
 
     // testing
     testImplementation 'junit:junit:4.12'
@@ -174,7 +174,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     androidTestImplementation 'com.google.code.gson:gson:2.8.2'
-    androidTestImplementation 'com.android.support:multidex:1.0.3'
 }
 
 // Coverage
