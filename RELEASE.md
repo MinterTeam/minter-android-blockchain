@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.1.4
+ - https base minter node url
+
 ## 0.1.3
  - package dependencies fix
 
