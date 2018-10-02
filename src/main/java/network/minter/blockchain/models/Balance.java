@@ -26,7 +26,7 @@
 
 package network.minter.blockchain.models;
 
-import android.support.v4.util.ObjectsCompat;
+import com.google.common.base.Objects;
 
 import org.parceler.Parcel;
 
@@ -79,7 +79,7 @@ public class Balance {
 
         @Override
         public int hashCode() {
-            return ObjectsCompat.hash(coin, balance);
+            return Objects.hashCode(coin, balance);
         }
 
         @Override
@@ -87,8 +87,8 @@ public class Balance {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             CoinBalance balance1 = (CoinBalance) o;
-            return ObjectsCompat.equals(coin, balance1.coin) &&
-                    ObjectsCompat.equals(balance, balance1.balance);
+            return Objects.equal(coin, balance1.coin) &&
+                    Objects.equal(balance, balance1.balance);
         }
     }
 
