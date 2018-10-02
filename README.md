@@ -24,7 +24,7 @@ project build.gradle
 ```groovy
 
 ext {
-    minterBlockchainSDK = "0.1.3"
+    minterBlockchainSDK = "0.2.0"
 }
 
 dependencies {
@@ -44,7 +44,7 @@ Use our nodes
 MinterBlockChainApi.initialize();
 ```
 
-Or you can pass you own
+Or it's HIGHLY RECOMMENDED to use you own node instead of Minter's.
 ```java
 MinterBlockChainApi.initialize("https://your-node.local");
 ```

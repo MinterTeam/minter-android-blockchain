@@ -30,7 +30,6 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BCResult<Result> {
@@ -42,32 +41,69 @@ public class BCResult<Result> {
     public String message;
 
     public enum ResultCode {
-        Unknown(-1),
-        EmptyResponse(1000),
-        @SerializedName("0") Success(0),
-        @SerializedName("1") DecodeError(1),
-        @SerializedName("107") InsufficientFundsB(107),
-        @Deprecated
-        @SerializedName("2") InsufficientFunds(2),
-        @Deprecated
-        @SerializedName("3") UnknownTransactionType(3),
-        @Deprecated
-        @SerializedName("4") WrongNonce(4),
-        @Deprecated
-        @SerializedName("5") CoinNotExists(5),
-        @Deprecated
-        @SerializedName("6") CoinAlreadyExists(6),
-        @SerializedName("301") CoinDoesNotExists(301),
-        @Deprecated
-        @SerializedName("7") WrongCrr(7),
-        @Deprecated
-        @SerializedName("8") CrossConvert(8),
-        @Deprecated
-        @SerializedName("9") CandidateExists(9),
-        @Deprecated
-        @SerializedName("10") WrongCommission(10),
-        @Deprecated
-        @SerializedName("11") CandidateNotFound(11);
+        // general
+        @SerializedName("0")
+        Success(0),
+        @SerializedName("101")
+        WrongNonce(101),
+        @SerializedName("102")
+        CoinNotExists(102),
+        @SerializedName("103")
+        CoinReserveNotSufficient(103),
+        @SerializedName("105")
+        TxTooLarge(105),
+        @SerializedName("106")
+        DecodeError(106),
+        @SerializedName("107")
+        InsufficientFunds(107),
+        @SerializedName("109")
+        TxPayloadTooLarge(109),
+        @SerializedName("110")
+        TxServiceDataTooLarge(110),
+
+        // coin creation
+        @SerializedName("201")
+        CoinAlreadyExists(201),
+        @SerializedName("202")
+        WrongCrr(202),
+        @SerializedName("203")
+        InvalidCoinSymbol(203),
+        @SerializedName("204")
+        InvalidCoinName(204),
+
+        // convert
+        @SerializedName("301")
+        CrossConvert(301),
+
+        // candidate
+        @SerializedName("401")
+        CandidateExists(401),
+        @SerializedName("402")
+        WrongCommission(402),
+        @SerializedName("403")
+        CandidateNotFound(403),
+        @SerializedName("404")
+        StakeNotFound(404),
+        @SerializedName("405")
+        InsufficientStake(405),
+        @SerializedName("406")
+        IsNotOwnerOfCandidate(406),
+        @SerializedName("407")
+        IncorrectPubKey(407),
+        @SerializedName("408")
+        StakeShouldBePositive(408),
+
+        // check
+        @SerializedName("501")
+        CheckInvalidLock(501),
+        @SerializedName("502")
+        CheckExpired(502),
+        @SerializedName("503")
+        CheckUsed(503),
+        @SerializedName("504")
+        TooHighGasPrice(504),
+        @SerializedName("505")
+        WrongGasCoin(505);
 
         final int resVal;
 
