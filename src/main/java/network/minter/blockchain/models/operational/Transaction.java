@@ -28,29 +28,35 @@ package network.minter.blockchain.models.operational;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import com.edwardstock.secp256k1.NativeSecp256k1;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
+import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
 import timber.log.Timber;
 
+import static network.minter.blockchain.models.operational.Transaction.SignatureType.Multi;
+import static network.minter.blockchain.models.operational.Transaction.SignatureType.Single;
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.helpers.StringHelper.strrpad;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class Transaction implements Parcelable {
@@ -68,17 +74,48 @@ public class Transaction implements Parcelable {
             return new Transaction[size];
         }
     };
-    private BigInteger mNonce = new BigInteger("2");
+    private BigInteger mNonce;
     private BigInteger mGasPrice = new BigInteger("1");
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
     private OperationType mType = OperationType.SendCoin;
     private Operation mOperationData;
-    private BigInteger mV = new BigInteger("1");
-    private BigInteger mR = new BigInteger("0");
-    private BigInteger mS = new BigInteger("0");
+
     // max - 128 bytes
     private BytesData mPayload = new BytesData(new byte[0]);
     private BytesData mServiceData = new BytesData(new byte[0]);
+    private SignatureType mSignatureType = Single;
+    private SignatureData mSignatureData;
+
+    public enum SignatureType {
+        Single((byte) 0x01, SignatureSingleData.class),
+        Multi((byte) 0x02, SignatureMultiData.class);
+
+        BigInteger mVal;
+        Class<? extends SignatureData> mTypeClass;
+
+        SignatureType(byte val, Class<? extends SignatureData> cls) {
+            mVal = new BigInteger(String.valueOf(val));
+            mTypeClass = cls;
+        }
+
+        public static SignatureType findByValue(BigInteger val) {
+            for (SignatureType t : SignatureType.values()) {
+                if (t.getValue().equals(val)) {
+                    return t;
+                }
+            }
+
+            return null;
+        }
+
+        public BigInteger getValue() {
+            return mVal;
+        }
+
+        public Class<? extends SignatureData> getSignClass() {
+            return mTypeClass;
+        }
+    }
 
     protected Transaction(BigInteger nonce) {
         mNonce = nonce;
@@ -93,23 +130,22 @@ public class Transaction implements Parcelable {
         mGasCoin = in.readString();
         mType = (OperationType) in.readValue(OperationType.class.getClassLoader());
         mOperationData = (Operation) in.readValue(Operation.class.getClassLoader());
-        mV = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mR = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mS = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mPayload = (BytesData) in.readValue(BytesData.class.getClassLoader());
         mServiceData = (BytesData) in.readValue(BytesData.class.getClassLoader());
+        mSignatureType = (SignatureType) in.readValue(SignatureType.class.getClassLoader());
+        mSignatureData = (SignatureData) in.readValue(mSignatureType.mTypeClass.getClassLoader());
     }
 
     /**
      * Decodes raw hex-encoded transaction
-     *
      * @param hexEncoded transaction in hex string
-     * @param type       Operation class
-     * @param <Op>       Operation type
+     * @param txType Transaction type class
+     * @param signType Signature type class
+     * @param <OT> Operation type
+     * @param <ST> Signature type
      * @return Valid transaction with operation data
      */
-    public static <Op extends Operation> Transaction fromEncoded(@NonNull String hexEncoded, @NonNull Class<Op> type) {
-        checkNotNull(type, "Class of transaction type must be set");
+    public static Transaction fromEncoded(@Nonnull String hexEncoded) {
         checkNotNull(hexEncoded, "hexEncoded data can't be null");
         checkArgument(hexEncoded.length() > 0, "Encoded transaction is empty");
         final BytesData bd = new BytesData(hexEncoded);
@@ -119,16 +155,13 @@ public class Transaction implements Parcelable {
         Transaction transaction = new Transaction();
         transaction.decodeRLP(decoded);
 
-        checkArgument(transaction.mType.getOpClass().equals(type),
-                "Passed transaction class does not matches with incoming data transaction type. Given: %s, expected: %s",
-                type.getName(),
-                transaction.mType.getOpClass().getName()
-        );
-
         Throwable t = null;
         try {
             transaction.mOperationData = transaction.mType.getOpClass().getDeclaredConstructor(Transaction.class).newInstance(transaction);
             transaction.mOperationData.decodeRLP(transaction.fromRawRlp(4, decoded));
+
+            transaction.mSignatureData = transaction.mSignatureType.getSignClass().newInstance();
+            transaction.mSignatureData.decodeRLP(transaction.fromRawRlp(8, decoded));
         } catch (InstantiationException e) {
             t = e;
         } catch (IllegalAccessException e) {
@@ -147,6 +180,36 @@ public class Transaction implements Parcelable {
         return transaction;
     }
 
+    /**
+     * Signature type
+     * @return {@link SignatureType}
+     * @see SignatureType
+     * @see SignatureData
+     */
+    public SignatureType getSignatureType() {
+        return mSignatureType;
+    }
+
+    /**
+     * Signature data (for single or multi)
+     * @param cls class to cast with
+     * @param <SignData> type extends signature data
+     * @return object extends {@link SignatureData}
+     */
+    public <SignData extends SignatureData> SignData getSignatureData(Class<SignData> cls) {
+        return cls.cast(mSignatureData);
+    }
+
+    /**
+     * Signature data (for single or multi)
+     * @param <SignData> type of signature data
+     * @return object extends {@link SignatureData}
+     */
+    @SuppressWarnings("unchecked")
+    public <SignData extends SignatureData> SignData getSignatureData() {
+        return (SignData) mSignatureData;
+    }
+
     public BigInteger getNonce() {
         return mNonce;
     }
@@ -159,7 +222,61 @@ public class Transaction implements Parcelable {
         return mType;
     }
 
-    public TransactionSign sign(@NonNull final PrivateKey privateKey) {
+    /**
+     * Sign transaction data with private key
+     * @param privateKey private key data
+     * @return {@link TransactionSign} Raw transaction sign
+     * @deprecated Since we've got multi-signature functional, you should use explicit sign methods:
+     *         {@link #signSingle(PrivateKey)} or {@link #signMulti(MinterAddress, List)}.
+     *         Will be removed in 0.4.0
+     */
+    @Deprecated
+    public TransactionSign sign(@Nonnull final PrivateKey privateKey) {
+        return signSingle(privateKey);
+    }
+
+    /**
+     * Sign multi signature transaction data with private keys
+     * @param privateKeys private key list to sign with
+     * @return {@link TransactionSign} Raw transaction sign
+     * @since 0.3.0
+     */
+    public TransactionSign signMulti(MinterAddress signatureAddress, @Nonnull final List<PrivateKey> privateKeys) {
+        mSignatureType = Multi;
+        checkArgument(privateKeys.size() > 0, "Private keys can't be empty");
+
+        final BytesData rawTxData = new BytesData(encode(true));
+        final BytesData hash = rawTxData.sha3Data();
+
+        final List<SignatureSingleData> signaturesData = new ArrayList<>(privateKeys.size());
+
+        long ctx = NativeSecp256k1.contextCreate();
+        try {
+            for (final PrivateKey pk : privateKeys) {
+                final NativeSecp256k1.RecoverableSignature signature = NativeSecp256k1.signRecoverableSerialized(ctx, hash.getData(), pk.getData());
+                final SignatureSingleData signatureData = new SignatureSingleData();
+                signatureData.setSign(signature);
+                signaturesData.add(signatureData);
+            }
+        } finally {
+            // DON'T forget cleanup to avoid leaks
+            NativeSecp256k1.contextCleanup(ctx);
+        }
+
+        mSignatureData = new SignatureMultiData();
+        ((SignatureMultiData) mSignatureData).setSigns(signatureAddress, signaturesData);
+
+        return new TransactionSign(new BytesData(encode(false)).toHexString());
+    }
+
+    /**
+     * Sign transaction data with single private key
+     * @param privateKey private key data
+     * @return {@link TransactionSign} Raw transaction sign
+     * @since 0.3.0
+     */
+    public TransactionSign signSingle(@Nonnull final PrivateKey privateKey) {
+        mSignatureType = Single;
         final BytesData rawTxData = new BytesData(encode(true));
         final BytesData hash = rawTxData.sha3Data();
 
@@ -177,16 +294,25 @@ public class Transaction implements Parcelable {
             return null;
         }
 
-        mV = new BigInteger(signature.v);
-        mR = new BigInteger(signature.r);
-        mS = new BigInteger(signature.s);
+        mSignatureData = new SignatureSingleData();
+        ((SignatureSingleData) mSignatureData).setSign(signature);
 
         return new TransactionSign(new BytesData(encode(false)).toHexString());
     }
 
+    /**
+     * Get transaction data
+     * @param cls class to cast data object
+     * @param <OpType> operation type
+     * @return object extends {@link Operation}
+     */
+    public <OpType extends Operation> OpType getData(Class<OpType> cls) {
+        return cls.cast(mOperationData);
+    }
+
     @SuppressWarnings("unchecked")
-    public <Op extends Operation> Op getData() {
-        return (Op) mOperationData;
+    public <OpType extends Operation> OpType getData() {
+        return (OpType) mOperationData;
     }
 
     <Op extends Operation> Transaction setData(Op operationData) {
@@ -197,6 +323,10 @@ public class Transaction implements Parcelable {
 
     public String getGasCoin() {
         return mGasCoin.replace("\0", "");
+    }
+
+    public BytesData getPayload() {
+        return mPayload;
     }
 
     @Override
@@ -211,11 +341,10 @@ public class Transaction implements Parcelable {
         dest.writeString(mGasCoin);
         dest.writeValue(mType);
         dest.writeValue(mOperationData);
-        dest.writeValue(mV);
-        dest.writeValue(mR);
-        dest.writeValue(mS);
         dest.writeValue(mPayload);
         dest.writeValue(mServiceData);
+        dest.writeValue(mSignatureType);
+        dest.writeValue(mSignatureType);
     }
 
     byte[] fromRawRlp(int idx, Object[] raw) {
@@ -227,7 +356,6 @@ public class Transaction implements Parcelable {
 
     /**
      * Object[] contains exact 10 elements
-     *
      * @param raw rlp encoded bytes array
      */
     void decodeRLP(Object[] raw) {
@@ -236,32 +364,40 @@ public class Transaction implements Parcelable {
         mGasCoin = StringHelper.bytesToString(fromRawRlp(2, raw), 10);
         mType = OperationType.findByValue(new BigInteger(fromRawRlp(3, raw)));
         /**
-         * ha, where is the 4th index? see {@link #fromEncoded(java.lang.String, java.lang.Class) }
+         * ha, where is the 4th index?
+         * see here: {@link #fromEncoded(String, Class, Class)}
          */
         mPayload = new BytesData(fromRawRlp(5, raw));
         mServiceData = new BytesData(fromRawRlp(6, raw));
-        mV = new BigInteger(fromRawRlp(7, raw));
-        mR = new BigInteger(fromRawRlp(8, raw));
-        mS = new BigInteger(fromRawRlp(9, raw));
+        mSignatureType = SignatureType.findByValue(new BigInteger(fromRawRlp(7, raw)));
+        /**
+         * And there's no 8 index, it's signature data
+         * decode here: {@link #fromEncoded(String, Class, Class)}
+         */
     }
 
     byte[] encode(boolean forSignature) {
         final byte[] data = mOperationData.encodeRLP();
+
         if (forSignature) {
             return RLP.encode(new Object[]{
                     mNonce, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
                     data,
                     mPayload.getData(),
-                    mServiceData.getData()
+                    mServiceData.getData(),
+                    mSignatureType.getValue()
             });
         }
+
+        final byte[] signData = mSignatureData.encodeRLP();
 
         return RLP.encode(new Object[]{
                 mNonce, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
                 data,
                 mPayload.getData(),
                 mServiceData.getData(),
-                mV, mR, mS
+                mSignatureType.getValue(),
+                signData
         });
     }
 
@@ -280,11 +416,65 @@ public class Transaction implements Parcelable {
             mTx = new Transaction(nonce);
         }
 
+        /**
+         * Set fee coin. By default if not set, using {@link MinterSDK#DEFAULT_COIN}
+         * @param coin string coin name. Min length: 3, maximum: 10
+         * @return {@link Builder}
+         */
         public Builder setGasCoin(String coin) {
             mTx.mGasCoin = strrpad(10, coin);
             return this;
         }
 
+        /**
+         * Set arbitrary user-defined bytes
+         * @param data max size: 1024 bytes
+         * @return {@link Builder}
+         */
+        public Builder setPayload(byte[] data) {
+            return setPayload(new BytesData(data, true));
+        }
+
+        /**
+         * Set arbitrary user-defined bytes
+         * @param data max size: 1024 bytes
+         * @return {@link Builder}
+         */
+        public Builder setPayload(BytesData data) {
+            checkArgument(data.size() <= 1024, "Data size can't be maximum 1024 bytes");
+            mTx.mPayload = new BytesData(data, true);
+            return this;
+        }
+
+        /**
+         * Set arbitrary user-defined bytes
+         * @param hexString max decoded size: 1024 bytes, means max string length should be 2048
+         * @return {@link Builder}
+         */
+        public Builder setPayload(@Nonnull String hexString) {
+            checkNotNull(hexString, "Hex data string can't be null");
+            checkArgument(hexString.length() <= 2048, "Hex string length can't have length > 2048 (1024 bytes)");
+            mTx.mPayload = new BytesData(hexString);
+            return this;
+        }
+
+        /**
+         * Set arbitrary user-defined bytes
+         * @param byteBuffer max size: 1024 bytes
+         * @return {@link Builder}
+         */
+        public Builder setPayload(ByteBuffer byteBuffer) {
+            return setPayload(byteBuffer.array());
+        }
+
+        /**
+         * Set transaction number. Calculation:
+         * 1. get total num of transactions by address
+         * 2. increment value
+         * 3. you have nonce
+         * @param nonce nonce value
+         * @return {@link Builder}
+         */
         public Builder setNonce(BigInteger nonce) {
             mTx.mNonce = nonce;
             return this;

@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.models;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -38,7 +36,6 @@ import timber.log.Timber;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BaseApiTest {
@@ -50,11 +47,7 @@ public class BaseApiTest {
             @Override
             protected void log(int priority, String tag, String message, Throwable t) {
                 if (message.length() < 4000) {
-                    if (priority == Log.ASSERT) {
-                        System.err.println(String.format("[%d]%s: %s", priority, tag, message));
-                    } else {
-                        System.out.println(String.format("[%d]%s: %s", priority, tag, message));
-                    }
+                    System.out.println(String.format("[%d]%s: %s", priority, tag, message));
                     return;
                 }
 
@@ -65,11 +58,7 @@ public class BaseApiTest {
                     do {
                         int end = Math.min(newline, i + 4000);
                         String part = message.substring(i, end);
-                        if (priority == Log.ASSERT) {
-                            System.err.println(String.format("[%d]%s: %s", priority, tag, part));
-                        } else {
-                            System.out.println(String.format("[%d]%s: %s", priority, tag, part));
-                        }
+                        System.out.println(String.format("[%d]%s: %s", priority, tag, part));
                         i = end;
                     } while (i < newline);
                 }

@@ -26,46 +26,13 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.annotation.TargetApi;
 
-import java.util.List;
-
-import network.minter.core.internal.common.Pair;
+import android.os.Parcelable;
 
 /**
  * minter-android-blockchain. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class OperationInvalidDataException extends Exception {
+public abstract class SignatureData extends RLPSerializable implements Parcelable {
 
-    /**
-     * Contains list of invalid operation fields
-     */
-    private final List<Pair<String, String>> mInvalidFields;
-
-    public OperationInvalidDataException(String message, List<Pair<String, String>> invalidFields) {
-        super(message);
-        mInvalidFields = invalidFields;
-    }
-
-    public OperationInvalidDataException(String message, List<Pair<String, String>> invalidFields, Throwable cause) {
-        super(message, cause);
-        mInvalidFields = invalidFields;
-    }
-
-    public OperationInvalidDataException(List<Pair<String, String>> invalidFields, Throwable cause) {
-        super(cause);
-        mInvalidFields = invalidFields;
-    }
-
-    @TargetApi(24)
-    public OperationInvalidDataException(String message, List<Pair<String, String>> invalidFields, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-        mInvalidFields = invalidFields;
-    }
-
-    public List<Pair<String, String>> getInvalidFields() {
-        return mInvalidFields;
-    }
 }

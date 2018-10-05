@@ -26,46 +26,42 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.annotation.TargetApi;
+import javax.annotation.Nonnull;
 
-import java.util.List;
-
-import network.minter.core.internal.common.Pair;
+import network.minter.core.util.RLP;
 
 /**
  * minter-android-blockchain. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class OperationInvalidDataException extends Exception {
-
+public abstract class RLPSerializable {
     /**
-     * Contains list of invalid operation fields
+     * Decode data from encoded RLP
+     * @param rlpEncodedData
      */
-    private final List<Pair<String, String>> mInvalidFields;
+    protected abstract void decodeRLP(@Nonnull byte[] rlpEncodedData);
+    /**
+     * Encodes all create fields via RLP
+     * @return encoded byte[]
+     * @see RLP
+     */
+    @Nonnull
+    protected abstract byte[] encodeRLP();
 
-    public OperationInvalidDataException(String message, List<Pair<String, String>> invalidFields) {
-        super(message);
-        mInvalidFields = invalidFields;
+    protected byte[][] objArrToByteArrArr(Object[] input) {
+        byte[][] out = new byte[input.length][];
+        for (int i = 0; i < input.length; i++) {
+            out[i] = (byte[]) input[i];
+        }
+
+        return out;
     }
 
-    public OperationInvalidDataException(String message, List<Pair<String, String>> invalidFields, Throwable cause) {
-        super(message, cause);
-        mInvalidFields = invalidFields;
+    protected byte[] fromRawRlp(int idx, Object[] raw) {
+        return (byte[]) raw[idx];
     }
 
-    public OperationInvalidDataException(List<Pair<String, String>> invalidFields, Throwable cause) {
-        super(cause);
-        mInvalidFields = invalidFields;
-    }
-
-    @TargetApi(24)
-    public OperationInvalidDataException(String message, List<Pair<String, String>> invalidFields, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-        mInvalidFields = invalidFields;
-    }
-
-    public List<Pair<String, String>> getInvalidFields() {
-        return mInvalidFields;
+    protected byte[] fromRawRlp(int idx, byte[][] raw) {
+        return raw[idx];
     }
 }

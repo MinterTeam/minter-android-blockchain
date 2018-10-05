@@ -28,11 +28,9 @@ package network.minter.blockchain.models.operational;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import network.minter.core.util.RLP;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.common.Preconditions.firstNonNull;
@@ -42,10 +40,10 @@ import static network.minter.core.internal.common.Preconditions.firstNonNull;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public abstract class Operation implements Parcelable {
+public abstract class Operation extends RLPSerializable implements Parcelable {
     private final Transaction mTx;
 
-    public Operation(@NonNull Transaction rawTx) {
+    public Operation(@Nonnull Transaction rawTx) {
         mTx = checkNotNull(rawTx, "Transaction must be set");
     }
 
@@ -85,16 +83,10 @@ public abstract class Operation implements Parcelable {
         return 0;
     }
 
-    @CallSuper
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(mTx);
-    }
-
-    protected abstract void decodeRLP(@NonNull byte[] rlpEncodedData);
-
-    protected byte[] fromRawRlp(int idx, Object[] raw) {
-        return (byte[]) raw[idx];
     }
 
     @Nullable
@@ -103,15 +95,6 @@ public abstract class Operation implements Parcelable {
     protected Transaction getTx() {
         return mTx;
     }
-
-    /**
-     * Encodes all create fields via RLP
-     *
-     * @return encoded byte[]
-     * @see RLP
-     */
-    @NonNull
-    protected abstract byte[] encodeRLP();
 
 
 }

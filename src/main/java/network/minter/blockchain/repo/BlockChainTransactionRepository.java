@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.repo;
 
-import android.support.annotation.NonNull;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -38,6 +36,8 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.api.BlockChainTransactionEndpoint;
@@ -60,7 +60,7 @@ import static network.minter.core.internal.common.Preconditions.checkNotNull;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BlockChainTransactionRepository extends DataRepository<BlockChainTransactionEndpoint> implements DataRepository.Configurator {
-    public BlockChainTransactionRepository(@NonNull ApiService.Builder apiBuilder) {
+    public BlockChainTransactionRepository(@Nonnull ApiService.Builder apiBuilder) {
         super(apiBuilder);
     }
 
@@ -70,7 +70,7 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
      * @return
      * @see TQuery
      */
-    public Call<BCResult<List<HistoryTransaction>>> getTransactions(@NonNull TQuery query) {
+    public Call<BCResult<List<HistoryTransaction>>> getTransactions(@Nonnull TQuery query) {
         return getInstantService(this).getTransactions(checkNotNull(query, "Query required").build());
     }
 
@@ -117,7 +117,7 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
         return getInstantService().getTxCommission(sign);
     }
 
-    @NonNull
+    @Nonnull
     @Override
     protected Class<BlockChainTransactionEndpoint> getServiceClass() {
         return BlockChainTransactionEndpoint.class;

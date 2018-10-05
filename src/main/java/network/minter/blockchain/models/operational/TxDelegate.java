@@ -28,11 +28,12 @@ package network.minter.blockchain.models.operational;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import network.minter.core.crypto.PublicKey;
 import network.minter.core.internal.helpers.StringHelper;
@@ -156,7 +157,7 @@ public final class TxDelegate extends Operation {
                 .addResult("mStake", mStake != null && mStake.compareTo(new BigInteger("0")) > 0, "Stake must be set (more than 0)");
     }
 
-    @NonNull
+    @Nonnull
     @Override
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
@@ -167,7 +168,7 @@ public final class TxDelegate extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@NonNull byte[] rlpEncodedData) {
+    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
         final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mPubKey = new PublicKey(fromRawRlp(0, decoded));

@@ -26,10 +26,10 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.util.Pair;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import network.minter.core.internal.common.Pair;
 
 /**
  * minter-android-blockchain. 2018

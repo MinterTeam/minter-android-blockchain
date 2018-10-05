@@ -26,11 +26,11 @@
 
 package network.minter.blockchain;
 
-import android.support.annotation.NonNull;
-
 import com.google.gson.GsonBuilder;
 
 import java.math.BigInteger;
+
+import javax.annotation.Nonnull;
 
 import network.minter.blockchain.repo.BlockChainAccountRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
@@ -62,7 +62,7 @@ public class MinterBlockChainApi {
         this(BASE_NODE_URL);
     }
 
-    private MinterBlockChainApi(@NonNull String baseNodeApiUrl) {
+    private MinterBlockChainApi(@Nonnull String baseNodeApiUrl) {
         mApiService = new ApiService.Builder(baseNodeApiUrl, getGsonBuilder());
         mApiService.addHeader("Content-Type", "application/json");
         mApiService.addHeader("X-Minter-Client-Name", "MinterAndroid");

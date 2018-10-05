@@ -29,23 +29,23 @@ package network.minter.blockchain;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.util.Collections;
 
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
-import network.minter.blockchain.models.operational.OperationType;
+import network.minter.blockchain.models.operational.SignatureMultiData;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.models.operational.TxSendCoin;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
+import network.minter.core.internal.helpers.StringHelper;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * MinterWallet. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class TransactionSendCoinTest {
@@ -55,17 +55,19 @@ public class TransactionSendCoinTest {
     }
 
     @Test
-    public void testEncode() throws OperationInvalidDataException {
-        PrivateKey privateKey = new PrivateKey("4c9a495b52aeaa839e53c3eb2f2d6650d892277bde58a24bb6a396f2bb31aa37");
-        MinterAddress toAddress = new MinterAddress("Mxccc3fc91a3d47dc1ee26d62611a09831f0214d62");
-        final String encodedTransaction = "f87e01018a4d4e540000000000000001aae98a4d4e540000000000000094ccc3fc91a3d47dc1ee26d62611a09831f0214d62888ac7230489e8000080801ba024219a3729a7a7750df77027567b3b89ca2adbcaa3391182fe1ce4cdc4e9431ba05fec62e4fd71a25fe3a628bfd3a4d86519345a47f721034de04b3259d73b1945";
+    public void testEncodeSingle() throws OperationInvalidDataException {
+        PrivateKey privateKey = new PrivateKey("df1f236d0396cc43147e44206c341a65573326e907d033690e31a21323c03a9f");
+        MinterAddress toAddress = new MinterAddress("Mxee81347211c72524338f9680072af90744333146");
+        final String encodedTransaction = "f88701018a4d4e540000000000000001aae98a4d4e540000000000000094ee81347211c72524338f9680072af90744333146880de0b6b3a764000084746573748001b845f8431ba0452a96ffe1214b22a5841034cf136da0a3a84de75942f764a993944418e77804a04fbfcb06f76c2ff12d81561c6345583de3d6418391022b6e9ae73080235a59da";
         BigInteger nonce = new BigInteger("1");
-        double valueHuman = 10D;
+        double valueHuman = 1D;
         String coin = "MNT";
         String gasCoin = "MNT";
+        byte[] payload = "test".getBytes();
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoin(gasCoin)
+                .setPayload(payload)
                 .sendCoin()
                 .setCoin(coin)
                 .setValue(valueHuman)
@@ -73,37 +75,80 @@ public class TransactionSendCoinTest {
                 .build();
 
         assertNotNull(tx);
-        TransactionSign sign = tx.sign(privateKey);
+        TransactionSign sign = tx.signSingle(privateKey);
         assertNotNull(sign);
-        assertEquals(sign.getTxSign(), encodedTransaction);
+        assertEquals(encodedTransaction, sign.getTxSign());
     }
 
     @Test
-    public void testDecode() {
-        MinterAddress toAddress = new MinterAddress("Mxccc3fc91a3d47dc1ee26d62611a09831f0214d62");
-        final String encodedTransaction = "f87e01018a4d4e540000000000000001aae98a4d4e540000000000000094ccc3fc91a3d47dc1ee26d62611a09831f0214d62888ac7230489e8000080801ba024219a3729a7a7750df77027567b3b89ca2adbcaa3391182fe1ce4cdc4e9431ba05fec62e4fd71a25fe3a628bfd3a4d86519345a47f721034de04b3259d73b1945";
+    public void testDecodeSingle() {
+        MinterAddress toAddress = new MinterAddress("Mxee81347211c72524338f9680072af90744333146");
+        final String encodedTransaction = "f88701018a4d4e540000000000000001aae98a4d4e540000000000000094ee81347211c72524338f9680072af90744333146880de0b6b3a764000084746573748001b845f8431ba0452a96ffe1214b22a5841034cf136da0a3a84de75942f764a993944418e77804a04fbfcb06f76c2ff12d81561c6345583de3d6418391022b6e9ae73080235a59da";
         BigInteger nonce = new BigInteger("1");
-        BigInteger gasPrice = new BigInteger("1");
-        OperationType type = OperationType.SendCoin;
-        double valueHuman = 10D;
-        BigInteger value = new BigInteger("10").multiply(Transaction.VALUE_MUL);
+        double valueHuman = 1D;
         String coin = "MNT";
         String gasCoin = "MNT";
+        String payload = "test";
 
-        Transaction tx = Transaction.fromEncoded(encodedTransaction, TxSendCoin.class);
+        Transaction transaction = Transaction.fromEncoded(encodedTransaction);
+        assertNotNull(transaction);
+        assertEquals(toAddress, transaction.<TxSendCoin>getData().getTo());
+        assertEquals(nonce, transaction.getNonce());
+        assertEquals(valueHuman, transaction.<TxSendCoin>getData().getValue());
+        assertEquals(coin, transaction.<TxSendCoin>getData().getCoin());
+        assertEquals(gasCoin, transaction.getGasCoin());
+        assertEquals(payload, StringHelper.bytesToString(transaction.getPayload().getData()));
+    }
+
+    @Test
+    public void testDecodeMulti() {
+        MinterAddress toAddress = new MinterAddress("Mxe176cbf6b307c61c5939a517fd0c09a6f999f1d2");
+        MinterAddress from = new MinterAddress("Mx00d818c90ac54d21171da11fe14801b555a8d138");
+        final String encodedTransaction = "f8a001018a4d4e540000000000000001aae98a4d4e540000000000000094e176cbf6b307c61c5939a517fd0c09a6f999f1d2880de0b6b3a764000084746573748002b85ef85c9400d818c90ac54d21171da11fe14801b555a8d138f845f8431ba0ba50e4deb5d61634483ce0b5fa7cf12b0aa089cb38b65d08384ddc3131754e08a01b25e860aef6ec253783860844d0631a3c3ce8958c63dd756c6d81ea0f4d2d36";
+        BigInteger nonce = new BigInteger("1");
+        double valueHuman = 1D;
+        String coin = "MNT";
+        String gasCoin = "MNT";
+        String payload = "test";
+
+        Transaction transaction = Transaction.fromEncoded(encodedTransaction);
+        assertNotNull(transaction);
+        assertEquals(transaction.<SignatureMultiData>getSignatureData().getSignatureAddress(), from);
+        assertEquals(toAddress, transaction.<TxSendCoin>getData().getTo());
+        assertEquals(nonce, transaction.getNonce());
+        assertEquals(valueHuman, transaction.<TxSendCoin>getData().getValue());
+        assertEquals(coin, transaction.<TxSendCoin>getData().getCoin());
+        assertEquals(gasCoin, transaction.getGasCoin());
+        assertEquals(payload, StringHelper.bytesToString(transaction.getPayload().getData()));
+    }
+
+    /**
+     * @throws OperationInvalidDataException
+     */
+    @Test
+    public void testEncodeMulti() throws OperationInvalidDataException {
+        PrivateKey privateKey = new PrivateKey("df1f236d0396cc43147e44206c341a65573326e907d033690e31a21323c03a9f");
+        MinterAddress toAddress = new MinterAddress("Mxe176cbf6b307c61c5939a517fd0c09a6f999f1d2");
+        MinterAddress from = new MinterAddress("Mx00d818c90ac54d21171da11fe14801b555a8d138");
+        final String encodedTransaction = "f8a001018a4d4e540000000000000001aae98a4d4e540000000000000094e176cbf6b307c61c5939a517fd0c09a6f999f1d2880de0b6b3a764000084746573748002b85ef85c9400d818c90ac54d21171da11fe14801b555a8d138f845f8431ba0ba50e4deb5d61634483ce0b5fa7cf12b0aa089cb38b65d08384ddc3131754e08a01b25e860aef6ec253783860844d0631a3c3ce8958c63dd756c6d81ea0f4d2d36";
+        BigInteger nonce = new BigInteger("1");
+        double valueHuman = 1D;
+        String coin = "MNT";
+        String gasCoin = "MNT";
+        byte[] payload = "test".getBytes();
+
+        Transaction tx = new Transaction.Builder(nonce)
+                .setGasCoin(gasCoin)
+                .setPayload(payload)
+                .sendCoin()
+                .setCoin(coin)
+                .setValue(valueHuman)
+                .setTo(toAddress)
+                .build();
 
         assertNotNull(tx);
-        assertEquals(nonce, tx.getNonce());
-        assertEquals(gasPrice, tx.getGasPrice());
-        assertEquals(gasCoin, tx.getGasCoin());
-        assertEquals(type, tx.getType());
-
-        assertNotNull(tx.getData());
-        assertTrue(tx.getData() instanceof TxSendCoin);
-        TxSendCoin data = tx.getData();
-        assertEquals(valueHuman, data.getValue());
-        assertEquals(value, data.getValueBigInteger());
-        assertEquals(coin, data.getCoin());
-        assertEquals(toAddress, data.getTo());
+        TransactionSign sign = tx.signMulti(from, Collections.singletonList(privateKey));
+        assertNotNull(sign);
+        assertEquals(encodedTransaction, sign.getTxSign());
     }
 }

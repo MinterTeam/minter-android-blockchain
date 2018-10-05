@@ -28,11 +28,12 @@ package network.minter.blockchain.models.operational;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
@@ -246,7 +247,7 @@ public final class TxCreateCoin extends Operation {
                 .addResult("mConstantReserveRatio", mConstantReserveRatio != null && mConstantReserveRatio > 1 && mConstantReserveRatio <= 100, "Reserve ratio must from 1% to 100%");
     }
 
-    @NonNull
+    @Nonnull
     @Override
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
@@ -259,7 +260,7 @@ public final class TxCreateCoin extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@NonNull byte[] rlpEncodedData) {
+    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
         final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mName = bytesToString(fromRawRlp(0, decoded));

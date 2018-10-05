@@ -26,12 +26,12 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.support.annotation.Nullable;
-
 import com.google.gson.annotations.SerializedName;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import javax.annotation.Nullable;
 
 /**
  * minter-android-blockchain. 2018

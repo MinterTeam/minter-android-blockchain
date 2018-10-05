@@ -28,11 +28,12 @@ package network.minter.blockchain.models.operational;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
@@ -98,7 +99,7 @@ public final class TxSendCoin extends Operation {
      * @param decimalValue Floating point string value. Precision up to 18 digits: 0.10203040506078090
      * @return self
      */
-    public TxSendCoin setValue(@NonNull final CharSequence decimalValue) {
+    public TxSendCoin setValue(@Nonnull final CharSequence decimalValue) {
         checkNotNull(decimalValue);
         return setValue(new BigDecimal(decimalValue.toString()));
     }
@@ -179,7 +180,7 @@ public final class TxSendCoin extends Operation {
                 .addResult("mValue", mValue != null, "Value must be set");
     }
 
-    @NonNull
+    @Nonnull
     @Override
     protected byte[] encodeRLP() {
         byte[] to = this.mTo.getData();
@@ -188,7 +189,7 @@ public final class TxSendCoin extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@NonNull byte[] rlpEncodedData) {
+    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
         final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 

@@ -28,11 +28,12 @@ package network.minter.blockchain.models.operational;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
@@ -144,7 +145,7 @@ public final class TxCoinSell extends Operation {
                 .addResult("mValueToSell", mValueToSell != null, "Value must be set");
     }
 
-    @NonNull
+    @Nonnull
     @Override
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
@@ -155,7 +156,7 @@ public final class TxCoinSell extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@NonNull byte[] rlpEncodedData) {
+    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
         final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 

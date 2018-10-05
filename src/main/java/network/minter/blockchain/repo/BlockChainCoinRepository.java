@@ -26,10 +26,10 @@
 
 package network.minter.blockchain.repo;
 
-import android.support.annotation.NonNull;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import javax.annotation.Nonnull;
 
 import network.minter.blockchain.api.BlockChainCoinEndpoint;
 import network.minter.blockchain.models.BCResult;
@@ -49,7 +49,7 @@ import static network.minter.core.internal.common.Preconditions.checkNotNull;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpoint> {
-    public BlockChainCoinRepository(@NonNull ApiService.Builder apiBuilder) {
+    public BlockChainCoinRepository(@Nonnull ApiService.Builder apiBuilder) {
         super(apiBuilder);
     }
 
@@ -59,7 +59,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @param symbol Coin name (for example: MNT)
      * @return Full info about coin
      */
-    public Call<BCResult<Coin>> getCoinInfo(@NonNull String symbol) {
+    public Call<BCResult<Coin>> getCoinInfo(@Nonnull String symbol) {
         return getInstantService().getCoinInformation(checkNotNull(symbol, "Symbol required"));
     }
 
@@ -70,7 +70,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @param coinToBuy   Buying coin coin
      * @return Exchange calculation
      */
-    public Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigDecimal valueToSell, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(@Nonnull String coinToSell, BigDecimal valueToSell, @Nonnull String coinToBuy) {
         return getCoinExchangeCurrencyToSell(coinToSell, valueToSell.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
     }
 
@@ -81,7 +81,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @param coinToBuy   Buying coin coin
      * @return Exchange calculation
      */
-    public Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(@NonNull String coinToSell, BigInteger valueToSell, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(@Nonnull String coinToSell, BigInteger valueToSell, @Nonnull String coinToBuy) {
         return getInstantService().getCoinExchangeCurrencyToSell(
                 checkNotNull(coinToSell, "Source coin required").toUpperCase(),
                 valueToSell.toString(), checkNotNull(coinToBuy, "Target coin required").toUpperCase()
@@ -95,7 +95,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @param coinToBuy  Buying coin
      * @return Exchange calculation
      */
-    public Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigDecimal valueToBuy, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(@Nonnull String coinToSell, BigDecimal valueToBuy, @Nonnull String coinToBuy) {
         return getCoinExchangeCurrencyToBuy(coinToSell, valueToBuy.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
     }
 
@@ -106,14 +106,14 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @param coinToBuy  Buying coin
      * @return Exchange calculation
      */
-    public Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(@NonNull String coinToSell, BigInteger valueToBuy, @NonNull String coinToBuy) {
+    public Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(@Nonnull String coinToSell, BigInteger valueToBuy, @Nonnull String coinToBuy) {
         return getInstantService().getCoinExchangeCurrencyToBuy(
                 checkNotNull(coinToSell, "Source coin required").toUpperCase(),
                 valueToBuy.toString(), checkNotNull(coinToBuy, "Target coin required").toUpperCase()
         );
     }
 
-    @NonNull
+    @Nonnull
     @Override
     protected Class<BlockChainCoinEndpoint> getServiceClass() {
         return BlockChainCoinEndpoint.class;

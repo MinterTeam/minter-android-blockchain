@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.repo;
 
-import android.support.annotation.NonNull;
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -38,6 +36,8 @@ import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import network.minter.blockchain.api.BlockChainAccountEndpoint;
 import network.minter.blockchain.models.BCResult;
@@ -58,11 +58,11 @@ import static network.minter.core.internal.helpers.CollectionsHelper.asMap;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BlockChainAccountRepository extends DataRepository<BlockChainAccountEndpoint> {
-    public BlockChainAccountRepository(@NonNull ApiService.Builder apiBuilder) {
+    public BlockChainAccountRepository(@Nonnull ApiService.Builder apiBuilder) {
         super(apiBuilder);
     }
 
-    public Call<BCResult<Balance>> getBalance(@NonNull MinterAddress key) {
+    public Call<BCResult<Balance>> getBalance(@Nonnull MinterAddress key) {
         checkNotNull(key, "Public key required!");
         return getBalance(key.toString());
     }
@@ -72,12 +72,12 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
      * @param address
      * @return
      */
-    public Call<BCResult<Balance>> getBalance(@NonNull String address) {
+    public Call<BCResult<Balance>> getBalance(@Nonnull String address) {
         return getInstantService(api -> api.registerTypeAdapter(Balance.class, new CoinBalanceDeserializer()))
                 .getBalance(checkNotNull(address, "Address required!"));
     }
 
-    public Call<BCResult<CountableData>> getTransactionCount(@NonNull MinterAddress key) {
+    public Call<BCResult<CountableData>> getTransactionCount(@Nonnull MinterAddress key) {
         checkNotNull(key, "Public key required!");
         return getTransactionCount(key.toString());
     }
@@ -87,7 +87,7 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
      * @param address fq address
      * @return Prepared request with transaction count result
      */
-    public Call<BCResult<CountableData>> getTransactionCount(@NonNull String address) {
+    public Call<BCResult<CountableData>> getTransactionCount(@Nonnull String address) {
         return getInstantService().getTransactionCount(checkNotNull(address, "Address required!"));
     }
 
@@ -97,13 +97,13 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
      * @return Prepared request
      * @see TransactionSendResult
      */
-    public Call<BCResult<TransactionSendResult>> sendTransaction(@NonNull TransactionSign transactionSign) {
+    public Call<BCResult<TransactionSendResult>> sendTransaction(@Nonnull TransactionSign transactionSign) {
         return getInstantService().sendTransaction(
                 asMap("transaction", transactionSign.getTxSign())
         );
     }
 
-    @NonNull
+    @Nonnull
     @Override
     protected Class<BlockChainAccountEndpoint> getServiceClass() {
         return BlockChainAccountEndpoint.class;
