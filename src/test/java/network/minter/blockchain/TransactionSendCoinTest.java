@@ -58,6 +58,7 @@ public class TransactionSendCoinTest {
     public void testEncodeSingle() throws OperationInvalidDataException {
         PrivateKey privateKey = new PrivateKey("df1f236d0396cc43147e44206c341a65573326e907d033690e31a21323c03a9f");
         MinterAddress toAddress = new MinterAddress("Mxee81347211c72524338f9680072af90744333146");
+        MinterAddress from = new MinterAddress("Mxe176cbf6b307c61c5939a517fd0c09a6f999f1d2");
         final String encodedTransaction = "f88701018a4d4e540000000000000001aae98a4d4e540000000000000094ee81347211c72524338f9680072af90744333146880de0b6b3a764000084746573748001b845f8431ba0452a96ffe1214b22a5841034cf136da0a3a84de75942f764a993944418e77804a04fbfcb06f76c2ff12d81561c6345583de3d6418391022b6e9ae73080235a59da";
         BigInteger nonce = new BigInteger("1");
         double valueHuman = 1D;
@@ -78,10 +79,35 @@ public class TransactionSendCoinTest {
         TransactionSign sign = tx.signSingle(privateKey);
         assertNotNull(sign);
         assertEquals(encodedTransaction, sign.getTxSign());
+        assertEquals(from, privateKey.getPublicKey().toMinter());
+
+
+    }
+
+    @Test
+    public void testDecodeReal() {
+        String m = "assume patient pause gravity miracle embark purchase warm comfort already meat squirrel";
+
+        PrivateKey privateKey = PrivateKey.fromMnemonic(m);
+        String encodedTransaction = "f88301018a4d4e540000000000000001aae98a4d4e54000000000000009406431236daf96979aa6cdf470a7df26430ad8efb880de0b6b3a7640000808001b845f8431ba0e65f971a2c460250ff59f0e25f1778b626bbf75164395f3d7be12d50f28cd106a01c9c25908084e801f99d932d69cd53d2284e86b8a960a22394f778eb207a3a69";
+        MinterAddress from = new MinterAddress("Mx4c74fb299a1abc37c35e272c76484e0542790f4c");
+        MinterAddress to = new MinterAddress("Mx06431236daf96979aa6cdf470a7df26430ad8efb");
+
+        Transaction tx = Transaction.fromEncoded(encodedTransaction);
+        final TxSendCoin data = tx.getData(TxSendCoin.class);
+        assertNotNull(tx);
+        assertEquals("MNT", data.getCoin());
+        assertEquals(1D, data.getValue());
+        assertEquals(to, data.getTo());
+        TransactionSign s = tx.signSingle(privateKey);
+        assertEquals(encodedTransaction, s.getTxSign());
+        assertEquals(from, privateKey.getPublicKey().toMinter());
+
     }
 
     @Test
     public void testDecodeSingle() {
+        PrivateKey privateKey = new PrivateKey("df1f236d0396cc43147e44206c341a65573326e907d033690e31a21323c03a9f");
         MinterAddress toAddress = new MinterAddress("Mxee81347211c72524338f9680072af90744333146");
         final String encodedTransaction = "f88701018a4d4e540000000000000001aae98a4d4e540000000000000094ee81347211c72524338f9680072af90744333146880de0b6b3a764000084746573748001b845f8431ba0452a96ffe1214b22a5841034cf136da0a3a84de75942f764a993944418e77804a04fbfcb06f76c2ff12d81561c6345583de3d6418391022b6e9ae73080235a59da";
         BigInteger nonce = new BigInteger("1");
@@ -98,6 +124,9 @@ public class TransactionSendCoinTest {
         assertEquals(coin, transaction.<TxSendCoin>getData().getCoin());
         assertEquals(gasCoin, transaction.getGasCoin());
         assertEquals(payload, StringHelper.bytesToString(transaction.getPayload().getData()));
+
+        TransactionSign sign = transaction.signSingle(privateKey);
+        assertEquals(encodedTransaction, sign.getTxSign());
     }
 
     @Test
