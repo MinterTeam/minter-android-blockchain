@@ -120,6 +120,7 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
             Balance balance = new Balance();
 
             JsonObject o = json.getAsJsonObject();
+            o = o.get("balance").getAsJsonObject();
 
             final Map<String, Balance.CoinBalance> out = new HashMap<>();
             for (String key : o.keySet()) {

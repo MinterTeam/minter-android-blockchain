@@ -165,11 +165,12 @@ dependencies {
     annotationProcessor 'org.parceler:parceler:1.1.11'
 
     // stuff
-    implementation 'com.jakewharton.timber:timber:4.6.1'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.google.guava:guava:26.0-android'
 
     // testing
     testImplementation 'junit:junit:4.12'
+    testImplementation 'com.jakewharton.timber:timber:4.7.1'
     androidTestImplementation "com.android.support:support-annotations:${minterLibSupport}"
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'

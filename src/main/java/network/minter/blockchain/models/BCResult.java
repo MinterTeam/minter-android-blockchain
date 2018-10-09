@@ -28,6 +28,8 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import javax.annotation.Nonnull;
+
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
@@ -39,6 +41,16 @@ public class BCResult<Result> {
     public Result result;
     @SerializedName("log")
     public String message;
+
+    @Nonnull
+    @Override
+    public String toString() {
+        return String.format("BCResult{code=%s, result=%s, message=%s}",
+                code.name(),
+                (result != null ? "<has result: " + result.getClass().getName() + ">" : "null"),
+                message
+        );
+    }
 
     public enum ResultCode {
         // general
