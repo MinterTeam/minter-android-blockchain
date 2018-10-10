@@ -32,7 +32,8 @@ import com.google.gson.GsonBuilder;
 import org.junit.Before;
 
 import network.minter.core.MinterSDK;
-import timber.log.Timber;
+import network.minter.core.internal.log.Mint;
+import network.minter.core.internal.log.StdLogger;
 
 /**
  * MinterWallet. 2018
@@ -43,27 +44,7 @@ public class BaseApiTest {
     static {
         MinterSDK.initialize();
         //noinspection ConstantConditions
-        Timber.plant(new Timber.DebugTree() {
-            @Override
-            protected void log(int priority, String tag, String message, Throwable t) {
-                if (message.length() < 4000) {
-                    System.out.println(String.format("[%d]%s: %s", priority, tag, message));
-                    return;
-                }
-
-                // Split by line, then ensure each line can fit into Log's maximum length.
-                for (int i = 0, length = message.length(); i < length; i++) {
-                    int newline = message.indexOf('\n', i);
-                    newline = newline != -1 ? newline : length;
-                    do {
-                        int end = Math.min(newline, i + 4000);
-                        String part = message.substring(i, end);
-                        System.out.println(String.format("[%d]%s: %s", priority, tag, part));
-                        i = end;
-                    } while (i < newline);
-                }
-            }
-        });
+        Mint.brew(new StdLogger());
     }
 
     private Gson mGson;

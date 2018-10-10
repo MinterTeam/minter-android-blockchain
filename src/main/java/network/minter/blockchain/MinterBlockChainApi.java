@@ -43,15 +43,16 @@ import network.minter.core.internal.api.converters.BigIntegerDeserializer;
 import network.minter.core.internal.api.converters.BytesDataDeserializer;
 import network.minter.core.internal.api.converters.MinterAddressDeserializer;
 import network.minter.core.internal.api.converters.MinterHashDeserializer;
+import network.minter.core.internal.log.Mint;
+import network.minter.core.internal.log.TimberLogger;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class MinterBlockChainApi {
-	private final static String BASE_NODE_URL = BuildConfig.BASE_NODE_URL;
+    private final static String BASE_NODE_URL = BuildConfig.BASE_NODE_URL;
     private static MinterBlockChainApi INSTANCE;
     private final ApiService.Builder mApiService;
     private BlockChainAccountRepository mAccountRepository;
@@ -70,14 +71,17 @@ public class MinterBlockChainApi {
     }
 
     public static void initialize() {
-        initialize(BASE_NODE_URL, false);
+        initialize(BASE_NODE_URL, false, new TimberLogger());
     }
 
-    public static void initialize(String baseNodeApiUrl, boolean debug) {
+    public static void initialize(String baseNodeApiUrl, boolean debug, Mint.Leaf logger) {
         if (INSTANCE != null) {
             return;
         }
 
+        if (debug) {
+            Mint.brew(logger);
+        }
         INSTANCE = new MinterBlockChainApi(baseNodeApiUrl);
         INSTANCE.mApiService.setDebug(debug);
         if (debug) {
@@ -86,15 +90,7 @@ public class MinterBlockChainApi {
     }
 
     public static void initialize(boolean debug) {
-        if (INSTANCE != null) {
-            return;
-        }
-
-        INSTANCE = new MinterBlockChainApi();
-        INSTANCE.mApiService.setDebug(debug);
-        if (debug) {
-            INSTANCE.mApiService.setDebugRequestLevel(HttpLoggingInterceptor.Level.BODY);
-        }
+        initialize(BASE_NODE_URL, debug, new TimberLogger());
     }
 
     public static MinterBlockChainApi getInstance() {

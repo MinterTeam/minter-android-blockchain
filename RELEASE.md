@@ -11,6 +11,7 @@
         Old signature: `Transaction#fromEncoded(String hexString, Class<T extends Operation> cls)`,
      new: `Transaction#fromEncoded(String hexString)`
  - Reduced android dependencies, more pure java for JRE support (in future)
+ - Custom logger
 
 ## 0.2.0
  - BREAKING CHANGES:

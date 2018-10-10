@@ -170,7 +170,6 @@ dependencies {
 
     // testing
     testImplementation 'junit:junit:4.12'
-    testImplementation 'com.jakewharton.timber:timber:4.7.1'
     androidTestImplementation "com.android.support:support-annotations:${minterLibSupport}"
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
