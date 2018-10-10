@@ -45,9 +45,9 @@ import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.helpers.StringHelper;
+import network.minter.core.internal.log.Mint;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
-import timber.log.Timber;
 
 import static network.minter.blockchain.models.operational.Transaction.SignatureType.Multi;
 import static network.minter.blockchain.models.operational.Transaction.SignatureType.Single;
@@ -139,10 +139,6 @@ public class Transaction implements Parcelable {
     /**
      * Decodes raw hex-encoded transaction
      * @param hexEncoded transaction in hex string
-     * @param txType Transaction type class
-     * @param signType Signature type class
-     * @param <OT> Operation type
-     * @param <ST> Signature type
      * @return Valid transaction with operation data
      */
     public static Transaction fromEncoded(@Nonnull String hexEncoded) {
@@ -173,7 +169,7 @@ public class Transaction implements Parcelable {
         }
 
         if (t != null) {
-            Timber.e(t, "Unable to decode transaction");
+            Mint.e(t, "Unable to decode transaction");
             return null;
         }
 
