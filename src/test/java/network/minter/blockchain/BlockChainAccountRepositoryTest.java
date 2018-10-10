@@ -47,15 +47,13 @@ public class BlockChainAccountRepositoryTest {
 
     static {
         MinterSDK.initialize();
+        MinterBlockChainApi.initialize(true);
     }
 
     @Test
     public void testResolveBalance() {
         // init object with your Minter address
         MinterAddress myAddress = new MinterAddress("Mx06431236daf96979aa6cdf470a7df26430ad8efb");
-
-        MinterBlockChainApi.initialize(true);
-
 
         BlockChainAccountRepository repo = MinterBlockChainApi.getInstance()
                 .account();
