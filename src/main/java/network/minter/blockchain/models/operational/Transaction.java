@@ -80,7 +80,7 @@ public class Transaction implements Parcelable {
     private OperationType mType = OperationType.SendCoin;
     private Operation mOperationData;
 
-    // max - 128 bytes
+    // max - 1024 bytes (1 kilobyte)
     private BytesData mPayload = new BytesData(new byte[0]);
     private BytesData mServiceData = new BytesData(new byte[0]);
     private SignatureType mSignatureType = Single;
@@ -174,6 +174,21 @@ public class Transaction implements Parcelable {
         }
 
         return transaction;
+    }
+
+    /**
+     * Use this to decrease object lifetime (especially if you need to create final instance of this object)
+     */
+    public void cleanup() {
+        mNonce = null;
+        mGasPrice = null;
+        mGasCoin = null;
+        mType = null;
+        mOperationData = null;
+        mPayload = null;
+        mServiceData = null;
+        mSignatureType = null;
+        mSignatureData = null;
     }
 
     /**
@@ -437,7 +452,7 @@ public class Transaction implements Parcelable {
          * @return {@link Builder}
          */
         public Builder setPayload(BytesData data) {
-            checkArgument(data.size() <= 1024, "Data size can't be maximum 1024 bytes");
+            checkArgument(data.size() <= 1024, "Payload maximum size: 1024 bytes");
             mTx.mPayload = new BytesData(data, true);
             return this;
         }
@@ -449,7 +464,7 @@ public class Transaction implements Parcelable {
          */
         public Builder setPayload(@Nonnull String hexString) {
             checkNotNull(hexString, "Hex data string can't be null");
-            checkArgument(hexString.length() <= 2048, "Hex string length can't have length > 2048 (1024 bytes)");
+            checkArgument(hexString.length() <= 2048, "Payload maximum size: 1024 bytes (2048 in hex string)");
             mTx.mPayload = new BytesData(hexString);
             return this;
         }

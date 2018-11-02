@@ -42,6 +42,7 @@ import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
 
+import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.helpers.BytesHelper.lpad;
 
@@ -150,6 +151,8 @@ public final class TxSendCoin extends Operation {
     }
 
     public TxSendCoin setCoin(final String coin) {
+        checkArgument(coin != null && coin.length() >= 3 && coin.length() <= 10, String.format("Invalid coin passed: %s", coin));
+
         mCoin = StringHelper.strrpad(10, coin.toUpperCase());
         return this;
     }

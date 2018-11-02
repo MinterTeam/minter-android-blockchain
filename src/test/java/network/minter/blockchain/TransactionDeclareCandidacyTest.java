@@ -36,6 +36,7 @@ import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.crypto.PrivateKey;
+import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -48,7 +49,11 @@ import static junit.framework.Assert.assertNotNull;
 public class TransactionDeclareCandidacyTest {
 
     static {
-        MinterSDK.initialize();
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

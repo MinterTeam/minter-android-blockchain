@@ -34,6 +34,7 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.PrivateKey;
+import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -46,7 +47,11 @@ import static junit.framework.Assert.assertNotNull;
 public class TransactionBuyCoinTest {
 
     static {
-        MinterSDK.initialize();
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.3.1
+ - Added minter check creation support
+
 ## 0.3.0
  - Multiple signatures support
  - BREAKING CHANGES:

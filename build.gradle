@@ -31,7 +31,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
@@ -58,15 +58,45 @@ apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '0.3.0'
+version = '0.3.1'
 
 ext {
     minterMinSdk = 16
     minterMaxSdk = 28
     minterBuildTools = "28.0.2"
     minterLibSupport = "27.1.1"
-    minterCoreVers = "0.2.0"
+    minterCoreVers = "0.2.1"
+
+
+    buildArtifactName = project.name
+    buildArtifactVersion = version
+    buildArtifactGroup = group
+
+    pomName = "Minter Core"
+    pomUrl = "https://github.com/MinterTeam/minter-android-blockchain"
+    pomScm = {
+        connection = "scm:git:git://github.com/MinterTeam/minter-android-blockchain.git"
+        url = pomUrl
+    }
+    pomInceptionYear = "2018"
+    pomContributors = {}
     pomDescription = "Minter Android Blockchain API SDK"
+    pomDevelopers = {
+        developer {
+            id = "edwardstock"
+            name = "Eduard Maximovich"
+            email = "edwatd.vstock@gmail.com"
+            roles = ["maintainer"]
+            timezone = "Europe/Moscow"
+        }
+    }
+    pomLicenses = {
+        license {
+            name = "MIT License"
+            url = "https://opensource.org/licenses/MIT"
+            distribution = "repo"
+        }
+    }
 }
 
 def libPath = ""
