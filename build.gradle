@@ -31,7 +31,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
@@ -58,15 +58,45 @@ apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '0.3.0'
+version = '0.3.1'
 
 ext {
     minterMinSdk = 16
     minterMaxSdk = 28
-    minterBuildTools = "28.0.2"
-    minterLibSupport = "27.1.1"
-    minterCoreVers = "0.2.0"
+    minterBuildTools = "28.0.3"
+    minterLibSupport = "28.0.0"
+    minterCoreVers = "0.2.1"
+
+
+    buildArtifactName = project.name
+    buildArtifactVersion = version
+    buildArtifactGroup = group
+
+    pomName = "Minter Core"
+    pomUrl = "https://github.com/MinterTeam/minter-android-blockchain"
+    pomScm = {
+        connection = "scm:git:git://github.com/MinterTeam/minter-android-blockchain.git"
+        url = pomUrl
+    }
+    pomInceptionYear = "2018"
+    pomContributors = {}
     pomDescription = "Minter Android Blockchain API SDK"
+    pomDevelopers = {
+        developer {
+            id = "edwardstock"
+            name = "Eduard Maximovich"
+            email = "edwatd.vstock@gmail.com"
+            roles = ["maintainer"]
+            timezone = "Europe/Moscow"
+        }
+    }
+    pomLicenses = {
+        license {
+            name = "MIT License"
+            url = "https://opensource.org/licenses/MIT"
+            distribution = "repo"
+        }
+    }
 }
 
 def libPath = ""
@@ -156,7 +186,7 @@ dependencies {
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 
     // network
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
@@ -174,7 +204,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.squareup.retrofit2:converter-gson:2.4.0'
-    androidTestImplementation 'com.google.code.gson:gson:2.8.2'
+    androidTestImplementation 'com.google.code.gson:gson:2.8.5'
 }
 
 // Coverage

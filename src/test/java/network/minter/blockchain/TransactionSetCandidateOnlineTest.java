@@ -29,6 +29,7 @@ package network.minter.blockchain;
 import org.junit.Test;
 
 import network.minter.core.MinterSDK;
+import network.minter.core.internal.exceptions.NativeLoadException;
 
 /**
  * minter-android-blockchain. 2018
@@ -38,7 +39,11 @@ import network.minter.core.MinterSDK;
 public class TransactionSetCandidateOnlineTest {
 
     static {
-        MinterSDK.initialize();
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
