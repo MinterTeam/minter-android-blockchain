@@ -29,6 +29,9 @@ package network.minter.blockchain.models.operational;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -36,11 +39,11 @@ import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
 
+import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
 import static network.minter.core.internal.helpers.StringHelper.bytesToString;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxCoinSellAll extends Operation {
@@ -58,6 +61,7 @@ public final class TxCoinSellAll extends Operation {
     };
     private String mCoinToSell;
     private String mCoinToBuy;
+    private BigInteger mMinValueToBuy;
 
     public TxCoinSellAll(Transaction rawTx) {
         super(rawTx);
@@ -67,6 +71,7 @@ public final class TxCoinSellAll extends Operation {
         super(in);
         mCoinToSell = in.readString();
         mCoinToBuy = in.readString();
+        mMinValueToBuy = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
 
     @Override
@@ -74,6 +79,7 @@ public final class TxCoinSellAll extends Operation {
         super.writeToParcel(dest, flags);
         dest.writeString(mCoinToSell);
         dest.writeString(mCoinToBuy);
+        dest.writeValue(mMinValueToBuy);
     }
 
     public String getCoinToSell() {
@@ -94,6 +100,31 @@ public final class TxCoinSellAll extends Operation {
         return this;
     }
 
+    public TxCoinSellAll setMinValueToBuy(BigInteger amount) {
+        mMinValueToBuy = amount;
+        return this;
+    }
+
+    public TxCoinSellAll setMinValueToBuy(BigDecimal amount) {
+        return setMinValueToBuy(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+    }
+
+    public BigInteger getMinValueToBuyBigInteger() {
+        return mMinValueToBuy;
+    }
+
+    public BigDecimal getMinValueToBuy() {
+        return new BigDecimal(mMinValueToBuy).divide(Transaction.VALUE_MUL_DEC);
+    }
+
+    public TxCoinSellAll setMinValueToBuy(double amount) {
+        return setMinValueToBuy(new BigDecimal(amount));
+    }
+
+    public double getMinValueToBuyDouble() {
+        return getMinValueToBuy().doubleValue();
+    }
+
     @Override
     public OperationType getType() {
         return OperationType.SellAllCoins;
@@ -104,7 +135,8 @@ public final class TxCoinSellAll extends Operation {
     protected FieldsValidationResult validate() {
         return new FieldsValidationResult()
                 .addResult("mCoinToBuy", mCoinToBuy != null && mCoinToBuy.length() > 2 && mCoinToBuy.length() < 11, "Coin length must be from 3 to 10 chars")
-                .addResult("mCoinToSell", mCoinToSell != null && mCoinToSell.length() > 2 && mCoinToSell.length() < 11, "Coin length must be from 3 to 10 chars");
+                .addResult("mCoinToSell", mCoinToSell != null && mCoinToSell.length() > 2 && mCoinToSell.length() < 11, "Coin length must be from 3 to 10 chars")
+                .addResult("mMinValueToBuy", mMinValueToBuy != null, "Minimum value to buy must be set");
     }
 
     @Nonnull
@@ -112,7 +144,8 @@ public final class TxCoinSellAll extends Operation {
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
                 mCoinToSell,
-                mCoinToBuy
+                mCoinToBuy,
+                mMinValueToBuy
         });
     }
 
@@ -123,5 +156,6 @@ public final class TxCoinSellAll extends Operation {
 
         mCoinToSell = bytesToString(fromRawRlp(0, decoded));
         mCoinToBuy = bytesToString(fromRawRlp(1, decoded));
+        mMinValueToBuy = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 }

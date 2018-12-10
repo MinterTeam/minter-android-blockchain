@@ -1,5 +1,10 @@
 # Release notes
 
+## 0.4.0
+ - BREAKING: 
+    - Added Min/MaxValueToBuy to Sell/SellAll/Buy coin model and it's all required
+    - Renamed some methods for more consistency
+
 ## 0.3.1
  - Added minter check creation support
  - Updated core library
