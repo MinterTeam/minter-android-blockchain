@@ -55,17 +55,18 @@ public class TransactionBuyCoinTest {
     }
 
     @Test
-    public void testEncodeSignle() throws OperationInvalidDataException {
+    public void testEncodeSingle() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f87401018a4d4e540000000000000004a0df8a4d4e5400000000000000880de0b6b3a76400008a5445535400000000000080801ba006ad0dc7da7253d2c4927c0fac643e53e82e5fcbf91aac70ff6075869d62cdf7a0180b8af5f54da22cdd9200068270d6ccc092d21c9769c12beb1d9b60a8d1be53";
-        final PrivateKey privateKey = new PrivateKey("4c9a495b52aeaa839e53c3eb2f2d6650d892277bde58a24bb6a396f2bb31aa37");
+        final String validTx = "f88401018a4d4e540000000000000004abea8a54455354000000000000880de0b6b3a76400008a4d4e54000000000000008a31000000000000000000808001b845f8431ba0c30019067fe6ede8d5dff8e6977ac19d02a34159ff6f9ac270879b1154ae738ba07038e90b2ba9d5a779a3eb41de5f55679b4b144f8e8ab03ac1d1ea7952531235";
+        final PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoin("MNT")
                 .buyCoin()
-                .setCoinToBuy("MNT")
-                .setCoinToSell("TEST")
+                .setCoinToBuy("TEST")
+                .setCoinToSell("MNT")
                 .setValueToBuy(1)
+                .setMaxValueToSell(1)
                 .build();
 
         assertNotNull(tx);
@@ -78,7 +79,7 @@ public class TransactionBuyCoinTest {
 //        final BigInteger nonce = new BigInteger("1");
 //        final String validTx = "f87401018a4d4e540000000000000004a0df8a4d4e5400000000000000880de0b6b3a76400008a5445535400000000000080801ba006ad0dc7da7253d2c4927c0fac643e53e82e5fcbf91aac70ff6075869d62cdf7a0180b8af5f54da22cdd9200068270d6ccc092d21c9769c12beb1d9b60a8d1be53";
 //
-//        Transaction tx = Transaction.fromEncoded(validTx, TxCoinBuy.class);
+//        Transaction tx = Transaction.fromEncoded(validTx);
 //        assertNotNull(tx);
 //
 //        assertEquals(nonce, tx.getNonce());

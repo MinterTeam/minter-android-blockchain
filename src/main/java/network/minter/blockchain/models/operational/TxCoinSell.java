@@ -63,6 +63,7 @@ public final class TxCoinSell extends Operation {
     private String mCoinToSell;
     private BigInteger mValueToSell;
     private String mCoinToBuy;
+    private BigInteger mMinValueToBuy;
 
     public TxCoinSell(Transaction rawTx) {
         super(rawTx);
@@ -73,6 +74,7 @@ public final class TxCoinSell extends Operation {
         mCoinToSell = in.readString();
         mValueToSell = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mCoinToBuy = in.readString();
+        mMinValueToBuy = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
 
     @Override
@@ -86,6 +88,7 @@ public final class TxCoinSell extends Operation {
         dest.writeString(mCoinToSell);
         dest.writeValue(mValueToSell);
         dest.writeString(mCoinToBuy);
+        dest.writeValue(mMinValueToBuy);
     }
 
     public String getCoinToSell() {
@@ -106,20 +109,20 @@ public final class TxCoinSell extends Operation {
         return this;
     }
 
-    public BigInteger getValueBigInteger() {
+    public BigInteger getValueToSellBigInteger() {
         return mValueToSell;
     }
 
     public BigDecimal getValueToSell() {
-        return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(mValueToSell));
-    }
-
-    public TxCoinSell setValueToSell(double amount) {
-        return setValueToSell(new BigDecimal(amount));
+        return new BigDecimal(mValueToSell).divide(Transaction.VALUE_MUL_DEC);
     }
 
     public double getValueToSellDouble() {
         return getValueToSell().doubleValue();
+    }
+
+    public TxCoinSell setValueToSell(double amount) {
+        return setValueToSell(new BigDecimal(amount));
     }
 
     public TxCoinSell setValueToSell(BigInteger amount) {
@@ -129,6 +132,19 @@ public final class TxCoinSell extends Operation {
 
     public TxCoinSell setValueToSell(BigDecimal amount) {
         return setValueToSell(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+    }
+
+    public TxCoinSell setMinValueToBuy(double amount) {
+        return setMinValueToBuy(new BigDecimal(amount));
+    }
+
+    public TxCoinSell setMinValueToBuy(BigInteger amount) {
+        mMinValueToBuy = amount;
+        return this;
+    }
+
+    public TxCoinSell setMinValueToBuy(BigDecimal amount) {
+        return setMinValueToBuy(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
     }
 
     @Override
@@ -142,7 +158,8 @@ public final class TxCoinSell extends Operation {
         return new FieldsValidationResult()
                 .addResult("mCoinToBuy", mCoinToBuy != null && mCoinToBuy.length() > 2 && mCoinToBuy.length() < 11, "Coin length must be from 3 to 10 chars")
                 .addResult("mCoinToSell", mCoinToSell != null && mCoinToSell.length() > 2 && mCoinToSell.length() < 11, "Coin length must be from 3 to 10 chars")
-                .addResult("mValueToSell", mValueToSell != null, "Value must be set");
+                .addResult("mValueToSell", mValueToSell != null, "Value must be set")
+                .addResult("mMinValueToBuy", mMinValueToBuy != null, "Minimum value to buy must be set");
     }
 
     @Nonnull
@@ -151,7 +168,8 @@ public final class TxCoinSell extends Operation {
         return RLP.encode(new Object[]{
                 mCoinToSell,
                 mValueToSell,
-                mCoinToBuy
+                mCoinToBuy,
+                mMinValueToBuy
         });
     }
 
@@ -163,5 +181,6 @@ public final class TxCoinSell extends Operation {
         mCoinToSell = bytesToString(fromRawRlp(0, decoded));
         mValueToSell = fixBigintSignedByte(fromRawRlp(1, decoded));
         mCoinToBuy = bytesToString(fromRawRlp(2, decoded));
+        mMinValueToBuy = fixBigintSignedByte(fromRawRlp(3, decoded));
     }
 }
