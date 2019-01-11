@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,23 +28,25 @@ package network.minter.blockchain;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
+import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
+import network.minter.blockchain.models.operational.TxCreateCoin;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TransactionBuyCoinTest {
+public class TxCreateCoinTest {
 
     static {
         try {
@@ -55,18 +57,19 @@ public class TransactionBuyCoinTest {
     }
 
     @Test
-    public void testEncodeSingle() throws OperationInvalidDataException {
+    public void testEncode() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88401018a4d4e540000000000000004abea8a54455354000000000000880de0b6b3a76400008a4d4e54000000000000008a31000000000000000000808001b845f8431ba0c30019067fe6ede8d5dff8e6977ac19d02a34159ff6f9ac270879b1154ae738ba07038e90b2ba9d5a779a3eb41de5f55679b4b144f8e8ab03ac1d1ea7952531235";
+        final String validTx = "f88401018a4d4e540000000000000005abea8a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a808001b845f8431ca0cab62b0670de21a16df3bc11af2553964c9fc5ae18b2adaa43d43f826bc143eea014e564991ab69f41a325fb90022ef3556921a6757c3b69d487051dde11c5d84a";
         final PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoin("MNT")
-                .buyCoin()
-                .setCoinToBuy("TEST")
-                .setCoinToSell("MNT")
-                .setValueToBuy(1)
-                .setMaxValueToSell(1)
+                .createCoin()
+                .setName("SUPER TEST")
+                .setSymbol("SPRTEST")
+                .setInitialAmount(100)
+                .setInitialReserve(10)
+                .setConstantReserveRatio(10)
                 .build();
 
         assertNotNull(tx);
@@ -75,21 +78,24 @@ public class TransactionBuyCoinTest {
     }
 
     @Test
-    public void testDecodeSingle() {
-//        final BigInteger nonce = new BigInteger("1");
-//        final String validTx = "f87401018a4d4e540000000000000004a0df8a4d4e5400000000000000880de0b6b3a76400008a5445535400000000000080801ba006ad0dc7da7253d2c4927c0fac643e53e82e5fcbf91aac70ff6075869d62cdf7a0180b8af5f54da22cdd9200068270d6ccc092d21c9769c12beb1d9b60a8d1be53";
-//
-//        Transaction tx = Transaction.fromEncoded(validTx);
-//        assertNotNull(tx);
-//
-//        assertEquals(nonce, tx.getNonce());
-//        assertEquals("MNT", tx.getGasCoin());
-//        assertEquals(OperationType.BuyCoin, tx.getType());
-//        TxCoinBuy data = tx.getData();
-//
-//        assertNotNull(data);
-//        assertEquals("MNT", data.getCoinToBuy());
-//        assertEquals("TEST", data.getCoinToSell());
-//        assertEquals(1D, data.getValueToBuyDouble());
+    public void testDecode() {
+        final BigInteger nonce = new BigInteger("1");
+        final String validTx = "f88401018a4d4e540000000000000005abea8a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a808001b845f8431ca0cab62b0670de21a16df3bc11af2553964c9fc5ae18b2adaa43d43f826bc143eea014e564991ab69f41a325fb90022ef3556921a6757c3b69d487051dde11c5d84a";
+
+        Transaction tx = Transaction.fromEncoded(validTx);
+        assertNotNull(tx);
+
+        assertEquals(nonce, tx.getNonce());
+        assertEquals("MNT", tx.getGasCoin());
+        assertEquals(OperationType.CreateCoin, tx.getType());
+        TxCreateCoin data = tx.getData();
+
+        assertNotNull(data);
+        assertEquals("SUPER TEST", data.getName());
+        assertEquals("SPRTEST", data.getSymbol());
+        assertEquals(new BigDecimal("100"), data.getInitialAmount());
+        assertEquals(new BigDecimal("10"), data.getInitialReserve());
+        assertEquals(10, data.getConstantReserveRatio());
+
     }
 }

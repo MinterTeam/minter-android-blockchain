@@ -24,46 +24,33 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.api;
+package network.minter.blockchain;
 
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.Balance;
-import network.minter.blockchain.models.CountableData;
-import network.minter.blockchain.models.TransactionSendResult;
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
+import network.minter.core.MinterSDK;
+import network.minter.core.internal.exceptions.NativeLoadException;
 
 /**
- * minter-android-blockchain. 2018
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-blockchain. 2019
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public interface BlockChainAccountEndpoint {
+public class TxCreateMultisigAddressTest {
 
-    /**
-     * Returns current balance of an account
-     * @param address Address of an account
-     * @return
-     */
-    @GET("/balance/{address}")
-    Call<BCResult<Balance>> getBalance(@Path("address") String address);
+    static {
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
+    }
 
-    /**
-     * Returns count of outgoing transactions from given account
-     * @param address Address of an account
-     * @return
-     */
-    @GET("/transactionCount/{address}")
-    Call<BCResult<CountableData>> getTransactionCount(@Path("address") String address);
 
-    /**
-     * Broadcasts transaction onto Minter network
-     * @param data
-     * @return
-     */
-    @GET("/send_transaction")
-    Call<BCResult<TransactionSendResult>> sendTransaction(@Query("tx") String signedTxHash);
+    public void testEncode() {
+
+    }
+
+    public void testDecode() {
+
+    }
 
 
 }

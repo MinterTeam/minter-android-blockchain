@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -140,7 +140,7 @@ public final class TxCoinBuy extends Operation {
 
 
     public TxCoinBuy setValueToBuy(double amount) {
-        return setValueToBuy(new BigDecimal(amount));
+        return setValueToBuy(new BigDecimal(String.valueOf(amount)));
     }
 
     public TxCoinBuy setValueToBuy(BigDecimal amount) {
@@ -148,7 +148,7 @@ public final class TxCoinBuy extends Operation {
     }
 
     public TxCoinBuy setMaxValueToSell(double amount) {
-        return setMaxValueToSell(new BigDecimal(amount));
+        return setMaxValueToSell(new BigDecimal(String.valueOf(amount)));
     }
 
     public TxCoinBuy setMaxValueToSell(BigInteger amount) {

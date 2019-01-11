@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -180,7 +180,7 @@ public final class TxCreateCoin extends Operation {
     }
 
     public TxCreateCoin setInitialAmount(double amount) {
-        return setInitialAmount(new BigDecimal(amount));
+        return setInitialAmount(new BigDecimal(String.valueOf(amount)));
     }
 
     /**
@@ -212,7 +212,7 @@ public final class TxCreateCoin extends Operation {
     }
 
     public TxCreateCoin setInitialReserve(double amount) {
-        return setInitialReserve(new BigDecimal(amount));
+        return setInitialReserve(new BigDecimal(String.valueOf(amount)));
     }
 
     /**

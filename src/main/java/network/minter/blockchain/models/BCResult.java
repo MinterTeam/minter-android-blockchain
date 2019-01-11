@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -35,27 +35,17 @@ import javax.annotation.Nonnull;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class BCResult<Result> {
-    public ResultCode code = ResultCode.Success;
     public int statusCode = 200;
     @SerializedName("result")
     public Result result;
-    @SerializedName("log")
-    public String message;
+    public ErrorResult error;
 
-    @Nonnull
-    @Override
-    public String toString() {
-        return String.format("BCResult{code=%s, result=%s, message=%s}",
-                code.name(),
-                (result != null ? "<has result: " + result.getClass().getName() + ">" : "null"),
-                message
-        );
-    }
-
+    /**
+     * @see https://github.com/MinterTeam/minter-go-node/blob/6fd49c9099ca6ea4adbdf04f396b0103c4865602/core/code/code.go
+     */
     public enum ResultCode {
+        UnknownError(-1),
         // general
-        @SerializedName("0")
-        Success(0),
         @SerializedName("101")
         WrongNonce(101),
         @SerializedName("102")
@@ -72,6 +62,12 @@ public class BCResult<Result> {
         TxPayloadTooLarge(109),
         @SerializedName("110")
         TxServiceDataTooLarge(110),
+        @SerializedName("110")
+        InvalidMultisendData(111),
+        @SerializedName("112")
+        CoinSupplyOverflow(112),
+        @SerializedName("113")
+        TxFromSenderAlreadyInMempool(113),
 
         // coin creation
         @SerializedName("201")
@@ -82,10 +78,16 @@ public class BCResult<Result> {
         InvalidCoinSymbol(203),
         @SerializedName("204")
         InvalidCoinName(204),
+        @SerializedName("204")
+        WrongCoinSupply(205),
 
         // convert
         @SerializedName("301")
         CrossConvert(301),
+        @SerializedName("302")
+        MaximumValueToSellReached(302),
+        @SerializedName("303")
+        MinimumValueToBuylReached(303),
 
         // candidate
         @SerializedName("401")
@@ -104,6 +106,8 @@ public class BCResult<Result> {
         IncorrectPubKey(407),
         @SerializedName("408")
         StakeShouldBePositive(408),
+        @SerializedName("409")
+        TooLowStake(409),
 
         // check
         @SerializedName("501")
@@ -115,7 +119,20 @@ public class BCResult<Result> {
         @SerializedName("504")
         TooHighGasPrice(504),
         @SerializedName("505")
-        WrongGasCoin(505);
+        WrongGasCoin(505),
+
+        @SerializedName("601")
+        IncorrectWeights(601),
+        @SerializedName("602")
+        MultisigExists(602),
+        @SerializedName("603")
+        MultisigNotExists(603),
+        @SerializedName("604")
+        IncorrectMultiSignature(604),
+        @SerializedName("605")
+        TooLargeOwnersList(605),
+
+        ;
 
         final int resVal;
 
@@ -127,18 +144,73 @@ public class BCResult<Result> {
             return resVal;
         }
 
+        public static boolean isKnownError(int code) {
+            for (ResultCode c : ResultCode.values()) {
+                if (code == c.getValue()) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static ResultCode findByCode(int code) {
+            for (ResultCode c : ResultCode.values()) {
+                if (code == c.getValue()) {
+                    return c;
+                }
+            }
+
+            return UnknownError;
+        }
+
     }
 
     public static <T> BCResult<T> copyError(BCResult<?> another) {
         BCResult<T> out = new BCResult<>();
         out.statusCode = another.statusCode;
-        out.code = another.code;
-        out.message = another.message;
+        out.error = another.error;
 
         return out;
     }
 
+    public boolean isOk() {
+        return error == null && result != null;
+    }
+
+    @Nonnull
+    @Override
+    public String toString() {
+        return String.format("BCResult{code=%s, result=%s, message=%s}",
+                error != null ? error.getResultCode().name() : "{no error code}",
+                (result != null ? "{has result: " + result.getClass().getName() + "}" : "null"),
+                error != null ? error.getMessage() : "null"
+        );
+    }
+
     public boolean isSuccess() {
-        return statusCode == 200 && code == ResultCode.Success;
+        return statusCode == 200 && error == null;
+    }
+
+    public static final class ErrorResult {
+        public int code;
+        public String message;
+        // use this to get friendly message
+        public String data;
+
+        public ResultCode getResultCode() {
+            return ResultCode.findByCode(code);
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            if (data == null || data.isEmpty()) {
+                return message;
+            }
+            return data;
+        }
     }
 }

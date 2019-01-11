@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -49,7 +49,7 @@ public interface BlockChainTransactionEndpoint {
 	 * @return
 	 * @see network.minter.blockchain.repo.BlockChainTransactionRepository.TQuery
 	 */
-	@GET("/api/transactions")
+    @GET("/transactions")
 	Call<BCResult<List<HistoryTransaction>>> getTransactions(@Query("query") String urlEncodedQuery);
 
 	/**
@@ -59,6 +59,7 @@ public interface BlockChainTransactionEndpoint {
 	 * @return
 	 * @see network.minter.core.MinterSDK#PREFIX_TX
 	 */
+    @GET("/transaction")
 	Call<BCResult<HistoryTransaction>> getTransaction(@Query("hash") String txHash);
 
     /**
@@ -66,6 +67,6 @@ public interface BlockChainTransactionEndpoint {
      * @param signedTx Valid transaction, signed with private key
      * @return
      */
-    @GET("/api/estimateTxCommission")
+    @GET("/api/estimate_tx_commission")
     Call<BCResult<TransactionCommissionValue>> getTxCommission(@Query("tx") String signedTx);
 }

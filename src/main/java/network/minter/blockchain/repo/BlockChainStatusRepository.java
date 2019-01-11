@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,53 +24,37 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain;
+package network.minter.blockchain.repo;
 
-import org.junit.Test;
+import javax.annotation.Nonnull;
 
-import java.io.IOException;
-
+import network.minter.blockchain.api.BlockChainStatusEndpoint;
 import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.Balance;
-import network.minter.blockchain.repo.BlockChainAccountRepository;
-import network.minter.core.MinterSDK;
-import network.minter.core.crypto.MinterAddress;
-import network.minter.core.internal.exceptions.NativeLoadException;
-import retrofit2.Response;
-
-import static org.junit.Assert.assertNotNull;
+import network.minter.blockchain.models.NetworkStatus;
+import network.minter.core.internal.api.ApiService;
+import network.minter.core.internal.data.DataRepository;
+import retrofit2.Call;
 
 /**
- * minter-android-blockchain. 2018
+ * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class BlockChainAccountRepositoryTest {
-
-    static {
-        try {
-            MinterSDK.initialize();
-        } catch (NativeLoadException e) {
-            e.printStackTrace();
-        }
-        MinterBlockChainApi.initialize(true);
+public class BlockChainStatusRepository extends DataRepository<BlockChainStatusEndpoint> {
+    public BlockChainStatusRepository(@Nonnull ApiService.Builder apiBuilder) {
+        super(apiBuilder);
     }
 
-    @Test
-    public void testResolveBalance() {
-        // init object with your Minter address
-        MinterAddress myAddress = new MinterAddress("Mx06431236daf96979aa6cdf470a7df26430ad8efb");
+    /**
+     * This endpoint shows current state of the node. You also can use it to check if node is running in normal mode.
+     * @return Network status info object
+     */
+    public Call<BCResult<NetworkStatus>> getNetworkStatus() {
+        return getInstantService().status();
+    }
 
-        BlockChainAccountRepository repo = MinterBlockChainApi.getInstance()
-                .account();
-        Response<BCResult<Balance>> res = null;
-        try {
-            res = repo.getBalance(myAddress)
-                    .execute();
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-
-        assertNotNull(res);
-        System.out.println(res.body().toString());
+    @Nonnull
+    @Override
+    protected Class<BlockChainStatusEndpoint> getServiceClass() {
+        return BlockChainStatusEndpoint.class;
     }
 }

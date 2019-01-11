@@ -1,5 +1,16 @@
 # Release notes
 
+## 0.5.0
+ - BREAKING:
+    - New api methods, some fields are removed/partly moved to another place due blockchain api has been changed.
+ - Fixed conversion from double to BigDecimal - now only through the string. Don't do this: `new BigDecimal(0.1d)` - it leads too much garbage
+ - Added support for new types of transaction:
+    - Create multisig address (transaction for creating multisignature address)
+    - Multisend (single transaction for sending coins to multiple addresses)
+    - Edit candidate (transaction for editing existing candidate)
+ - Added network "status" endpoint to repositories
+
+
 ## 0.4.0
  - BREAKING: 
     - Added Min/MaxValueToBuy to Sell/SellAll/Buy coin model and it's all required

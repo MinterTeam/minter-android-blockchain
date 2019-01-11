@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -61,7 +61,15 @@ public enum OperationType {
     @SerializedName("10")
     SetCandidateOnline((byte) 0x0A, TxSetCandidateOnline.class, 100D),
     @SerializedName("11")
-    SetCandidateOffline((byte) 0x0B, TxSetCandidateOffline.class, 100D);
+    SetCandidateOffline((byte) 0x0B, TxSetCandidateOffline.class, 100D),
+    @SerializedName("12")
+    CreateMultisigAddress((byte) 0x0C, null, 100D),
+    @SerializedName("13")
+    Multisend((byte) 0x0D, TxMultisend.class, /*commission: 10+(n-1)*5 units*/ 0D),
+    @SerializedName("14")
+    EditCandidate((byte) 0x0E, TxEditCandidateTransaction.class, 10000D),
+
+    ;
 
     private final static String FEE_BASE_STRING = "0.001";
     public final static BigDecimal FEE_BASE = new BigDecimal(FEE_BASE_STRING);
@@ -73,7 +81,7 @@ public enum OperationType {
     OperationType(byte value, Class<? extends Operation> opClass, double fee) {
         mValue = new BigInteger(String.valueOf(value));
         mOpClass = opClass;
-        mFee = getFeeBase().multiply(new BigDecimal(fee));
+        mFee = getFeeBase().multiply(new BigDecimal(String.valueOf(fee)));
     }
 
     @Nullable

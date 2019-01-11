@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -51,7 +51,6 @@ import network.minter.core.internal.data.DataRepository;
 import retrofit2.Call;
 
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
-import static network.minter.core.internal.helpers.CollectionsHelper.asMap;
 
 /**
  * minter-android-blockchain. 2018
@@ -98,9 +97,7 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
      * @see TransactionSendResult
      */
     public Call<BCResult<TransactionSendResult>> sendTransaction(@Nonnull TransactionSign transactionSign) {
-        return getInstantService().sendTransaction(
-                asMap("transaction", transactionSign.getTxSign())
-        );
+        return getInstantService().sendTransaction(transactionSign.getTxSign());
     }
 
     @Nonnull
