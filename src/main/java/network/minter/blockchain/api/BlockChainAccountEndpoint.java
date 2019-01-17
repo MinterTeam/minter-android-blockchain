@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,17 +26,14 @@
 
 package network.minter.blockchain.api;
 
-import java.util.Map;
-
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Balance;
 import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionSendResult;
 import retrofit2.Call;
-import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * minter-android-blockchain. 2018
@@ -49,7 +46,7 @@ public interface BlockChainAccountEndpoint {
      * @param address Address of an account
      * @return
      */
-    @GET("/api/balance/{address}")
+    @GET("/balance/{address}")
     Call<BCResult<Balance>> getBalance(@Path("address") String address);
 
     /**
@@ -57,7 +54,7 @@ public interface BlockChainAccountEndpoint {
      * @param address Address of an account
      * @return
      */
-    @GET("/api/transactionCount/{address}")
+    @GET("/transactionCount/{address}")
     Call<BCResult<CountableData>> getTransactionCount(@Path("address") String address);
 
     /**
@@ -65,8 +62,8 @@ public interface BlockChainAccountEndpoint {
      * @param data
      * @return
      */
-    @POST("/api/sendTransaction")
-    Call<BCResult<TransactionSendResult>> sendTransaction(@Body Map<String, String> data);
+    @GET("/send_transaction")
+    Call<BCResult<TransactionSendResult>> sendTransaction(@Query("tx") String signedTxHash);
 
 
 }

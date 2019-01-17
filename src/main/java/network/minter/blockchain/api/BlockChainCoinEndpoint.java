@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -47,7 +47,7 @@ public interface BlockChainCoinEndpoint {
      * @param coin Coin Symbol (min: 3, max 10 chars)
      * @return Coin information pojo
      */
-    @GET("/api/coinInfo/{symbol}")
+    @GET("/coin_info")
     Call<BCResult<Coin>> getCoinInformation(@Query("symbol") String coin);
 
     /**
@@ -58,7 +58,7 @@ public interface BlockChainCoinEndpoint {
      * @param coinToBuy   coin to convert to
      * @return
      */
-    @GET("/api/estimateCoinSell")
+    @GET("/estimate_coin_sell")
     Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_sell") String valueToSell,
@@ -73,7 +73,7 @@ public interface BlockChainCoinEndpoint {
      * @param coinToBuy  coin to convert to
      * @return
      */
-    @GET("/api/estimateCoinBuy")
+    @GET("/estimate_coin_buy")
     Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_buy") String valueToBuy,

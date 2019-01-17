@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain;
+package network.minter.blockchain.transactions;
 
 import org.junit.Test;
 
@@ -69,7 +69,7 @@ public class OperationTypeTest {
         }};
 
         for (Map.Entry<String, Double> entry : coinCosts.entrySet()) {
-            final BigDecimal res = new BigDecimal(entry.getValue()).add(OperationType.CreateCoin.getFee());
+            final BigDecimal res = new BigDecimal(String.valueOf(entry.getValue())).add(OperationType.CreateCoin.getFee());
             BigDecimal result = TxCreateCoin.calculateCreatingCost(entry.getKey());
             if (!res.setScale(4, BigDecimal.ROUND_DOWN).equals(result.setScale(4, BigDecimal.ROUND_DOWN))) {
                 System.err.println("Invalid fee in coin name: " + entry.getKey());

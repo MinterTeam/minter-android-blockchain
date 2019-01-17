@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -103,12 +103,12 @@ public final class TxDeclareCandidacy extends Operation {
     }
 
     public TxDeclareCandidacy setAddress(String address) {
-        this.mAddress = new MinterAddress(address);
+        mAddress = new MinterAddress(address);
         return this;
     }
 
     public TxDeclareCandidacy setAddress(MinterAddress address) {
-        this.mAddress = address;
+        mAddress = address;
         return this;
     }
 
@@ -142,7 +142,7 @@ public final class TxDeclareCandidacy extends Operation {
 
     public TxDeclareCandidacy setCommission(Integer commission) {
         checkArgument(commission >= 0, "Commission must be unsigned integer");
-        this.mCommission = commission;
+        mCommission = commission;
         return this;
     }
 
@@ -190,7 +190,7 @@ public final class TxDeclareCandidacy extends Operation {
     }
 
     public TxDeclareCandidacy setStake(double amount) {
-        return setStake(new BigDecimal(amount));
+        return setStake(new BigDecimal(String.valueOf(amount)));
     }
 
     @Override

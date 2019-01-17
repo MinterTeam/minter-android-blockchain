@@ -28,47 +28,347 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.math.BigInteger;
-import java.util.List;
+import org.parceler.Parcel;
 
-import network.minter.blockchain.models.operational.Operation;
-import network.minter.blockchain.models.operational.OperationType;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterCheck;
+import network.minter.core.crypto.MinterPublicKey;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@Parcel
 public class HistoryTransaction {
+    /*
+"data": {
+"coin": "MNT",
+"to": "Mx184ac726059e43643e67290666f7b3195093f870",
+"value": "100000000000000000000"
+},
+
+    @SerializedName("12")
+    CreateMultisigAddress((byte) 0x0C, null, 100D),
+
+    @SerializedName("13")
+    Multisend((byte) 0x0D, TxMultisend.class, /*commission: 10+(n-1)*5 units 0D),
+
+    @SerializedName("14")
+    EditCandidate((byte) 0x0E, TxEditCandidateTransaction.class, 10000D),
+     */
+
     public BytesData hash;
-    public int height;
-    public int index;
-    public OperationType type;
+    @SerializedName("raw_tx")
+    public BytesData rawTx;
     public MinterAddress from;
     public BigInteger nonce;
-    public BigInteger gasPrice;
-    @SerializedName("tx_result")
-    public TxResult txResult;
-    public Object data;
+    public Type type;
+    @SerializedName("gas_price")
+    public int gasPrice;
+    public int gas;
+    @SerializedName("gas_coin")
+    public String gasCoin;
     public String payload;
+    @SerializedName("service_data")
+    public String serviceData;
+    public TxBaseResult data;
+    public Map<String, String> tags;
 
-    @SuppressWarnings("unchecked")
-    public <T extends Operation> T getData() {
-        return (T) data;
+    public enum Type {
+        @SerializedName("1")
+        Send(TxSendCoinResult.class),
+        @SerializedName("2")
+        SellCoin(TxConvertCoinResult.class),
+        @SerializedName("3")
+        SellAllCoins(TxConvertCoinResult.class),
+        @SerializedName("4")
+        BuyCoin(TxConvertCoinResult.class),
+        @SerializedName("5")
+        CreateCoin(TxCreateResult.class),
+        @SerializedName("6")
+        DeclareCandidacy(TxDeclareCandidacyResult.class),
+        @SerializedName("7")
+        Delegate(TxDelegateUnbondResult.class),
+        @SerializedName("8")
+        Unbond(TxDelegateUnbondResult.class),
+        @SerializedName("9")
+        RedeemCheck(TxRedeemCheckResult.class),
+        @SerializedName("10")
+        SetCandidateOnline(TxSetCandidateOnlineOfflineResult.class),
+        @SerializedName("11")
+        SetCandidateOffline(TxSetCandidateOnlineOfflineResult.class),
+        @SerializedName("12")
+        CreateMultisig(TxCreateMultisigResult.class),
+        @SerializedName("13")
+        Multisend(TxMultisendResult.class),
+        @SerializedName("14")
+        EditCandidate(TxEditCandidateResult.class),
+        ;
+
+        Class<? extends TxBaseResult> mCls;
+
+        Type(Class<? extends TxBaseResult> cls) {
+            mCls = cls;
+        }
+
+        public Class<? extends TxBaseResult> getOpClass() {
+            return mCls;
+        }
     }
 
-    //@todo: unready
-    public static class TxResult {
-        public BigInteger gasWanted;
-        public BigInteger gasUsed;
-        public List<Tag> tags;
-        public Object fee; //@TODO
+    @Parcel
+    public static class TxBaseResult {
     }
 
-    public static class Tag {
-        public String key;
-        public String value;
+    /**
+     * Data model for sending transaction
+     */
+    @Parcel
+    public static class TxSendCoinResult extends TxBaseResult {
+        public MinterAddress to;
+        public String coin;
+        @SerializedName("value")
+        public BigInteger amount;
+
+        public MinterAddress getTo() {
+            return to;
+        }
+
+        public String getCoin() {
+            if (coin == null) {
+                return null;
+            }
+            return coin.toUpperCase();
+        }
+
+        public BigDecimal getAmount() {
+            return new BigDecimal(amount).divide(Transaction.VALUE_MUL_DEC);
+        }
+    }
+
+    /**
+     * Data model for creating coin transaction
+     */
+    @Parcel
+    public static class TxCreateResult extends TxBaseResult {
+        public String name;
+        public String symbol;
+        @SerializedName("initial_amount")
+        public BigInteger initialAmount;
+        @SerializedName("initial_reserve")
+        public BigInteger initialReserve;
+        @SerializedName("constant_reserve_ratio")
+        public BigDecimal constantReserveRatio;
+
+        public String getName() {
+            return name;
+        }
+
+        public String getSymbol() {
+            if (symbol == null) {
+                return null;
+            }
+
+            return symbol.toUpperCase();
+        }
+
+        public BigDecimal getInitialAmount() {
+            return new BigDecimal(initialAmount).divide(Transaction.VALUE_MUL_DEC);
+        }
+
+        public BigDecimal getInitialReserve() {
+            return new BigDecimal(initialReserve).divide(Transaction.VALUE_MUL_DEC);
+        }
+
+        public BigDecimal getConstantReserveRatio() {
+            return constantReserveRatio;
+        }
+    }
+
+    /**
+     * Data model for exchanging coins transaction
+     */
+    @Parcel
+    public static class TxConvertCoinResult extends TxBaseResult {
+        @SerializedName("coin_to_sell")
+        public String coinToSell;
+        @SerializedName("coin_to_buy")
+        public String coinToBuy;
+        @SerializedName("value_to_buy")
+        public BigInteger valueToBuy;
+        @SerializedName("value_to_sell")
+        public BigInteger valueToSell;
+        @SerializedName("minimum_value_to_buy")
+        public BigInteger minValueToBuy;
+        @SerializedName("maximum_value_to_sell")
+        public BigInteger maxValueToSell;
+
+
+        public String getCoinToSell() {
+            if (coinToSell == null) {
+                return null;
+            }
+            return coinToSell.toUpperCase();
+        }
+
+        public String getCoinToBuy() {
+            if (coinToBuy == null) {
+                return null;
+            }
+            return coinToBuy.toUpperCase();
+        }
+
+        public BigDecimal getValueToBuy() {
+            if (valueToBuy == null) {
+                valueToBuy = BigInteger.ZERO;
+            }
+            return new BigDecimal(valueToBuy).divide(Transaction.VALUE_MUL_DEC);
+        }
+
+        public BigDecimal getValueToSell() {
+            if (valueToSell == null) {
+                valueToSell = BigInteger.ZERO;
+            }
+            return new BigDecimal(valueToSell).divide(Transaction.VALUE_MUL_DEC);
+        }
+    }
+
+    /**
+     * Data model for declaring validator candidacy
+     */
+    @Parcel
+    public static class TxDeclareCandidacyResult extends TxBaseResult {
+        public MinterAddress address;
+        @SerializedName("pub_key")
+        public MinterPublicKey publicKey;
+        public int commission;
+        public String coin;
+        public BigInteger stake;
+
+        public MinterAddress getAddress() {
+            return address;
+        }
+
+        public MinterPublicKey getPublicKey() {
+            return publicKey;
+        }
+
+        public int getCommission() {
+            return commission;
+        }
+
+        public String getCoin() {
+            if (coin == null) {
+                return null;
+            }
+            return coin.toUpperCase();
+        }
+
+        public BigDecimal getStake() {
+            if (stake == null) {
+                stake = BigInteger.ZERO;
+            }
+            return new BigDecimal(stake).divide(Transaction.VALUE_MUL_DEC);
+        }
+    }
+
+    /**
+     * Data model for enabling validator transaction
+     */
+    @Parcel
+    public static class TxSetCandidateOnlineOfflineResult extends TxBaseResult {
+        @SerializedName("pub_key")
+        public MinterPublicKey publicKey;
+
+        public MinterPublicKey getPublicKey() {
+            return publicKey;
+        }
+    }
+
+    /**
+     * Data model for delegating and unbonding transactions
+     */
+    @Parcel
+    public static class TxDelegateUnbondResult extends TxBaseResult {
+        @SerializedName("pub_key")
+        public MinterPublicKey publicKey;
+        public String coin;
+        public String stake;
+
+        public MinterPublicKey getPublicKey() {
+            return publicKey;
+        }
+
+        public BigDecimal getStake() {
+            if (stake == null || stake.isEmpty()) {
+                stake = "0";
+            }
+
+            return new BigDecimal(stake);
+        }
+
+        public String getCoin() {
+            if (coin == null) {
+                return null;
+            }
+
+            return coin.toUpperCase();
+        }
+    }
+
+    /**
+     * Data model for redeeming checks transactions
+     */
+    @Parcel
+    public static class TxRedeemCheckResult extends TxBaseResult {
+        @SerializedName("raw_check")
+        public MinterCheck rawCheck;
+        public BytesData proof;
+
+        public BytesData getProof() {
+            return proof;
+        }
+
+        public MinterCheck getRawCheck() {
+            return rawCheck;
+        }
+    }
+
+    @Parcel
+    public static class TxCreateMultisigResult extends TxBaseResult {
+        public BigInteger threshold;
+        public List<BigInteger> weights = new ArrayList<>();
+        public List<MinterAddress> addresses = new ArrayList<>();
+    }
+
+    @Parcel
+    public static class TxMultisendResult extends TxBaseResult {
+        @SerializedName("list")
+        public List<TxSendCoinResult> items;
+    }
+
+    @Parcel
+    public static class TxEditCandidateResult extends TxBaseResult {
+        @SerializedName("list")
+        public List<CandidateEditResult> items;
+    }
+
+    //@TODO standard! write to Lashin to fix this
+    @Parcel
+    public static class CandidateEditResult {
+        @SerializedName("reward_address")
+        public MinterAddress rewardAddress;
+        @SerializedName("owner_address")
+        public MinterAddress ownerAddress;
+        @SerializedName("pub_key")
+        public MinterPublicKey pubKey;
     }
 }

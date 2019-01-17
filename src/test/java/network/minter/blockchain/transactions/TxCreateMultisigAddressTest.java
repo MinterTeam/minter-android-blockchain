@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,28 +24,32 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.models.operational;
+package network.minter.blockchain.transactions;
 
-import org.parceler.Parcel;
+import network.minter.core.MinterSDK;
+import network.minter.core.internal.exceptions.NativeLoadException;
 
 /**
- * minter-android-blockchain. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-blockchain. 2019
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-@Parcel
-public final class TransactionSign {
-    private String mSign;
+public class TxCreateMultisigAddressTest {
 
-    public TransactionSign(String sign) {
-        mSign = sign;
+    static {
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
     }
 
-    TransactionSign() {
+
+    public void testEncode() {
+
     }
 
-    public String getTxSign() {
-        return mSign;
+    public void testDecode() {
+
     }
 
 

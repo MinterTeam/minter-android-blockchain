@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,29 +24,24 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.models.operational;
+package network.minter.blockchain.api;
 
-import org.parceler.Parcel;
+import java.util.List;
+
+import network.minter.blockchain.models.BCResult;
+import network.minter.blockchain.models.NetworkStatus;
+import retrofit2.Call;
+import retrofit2.http.GET;
 
 /**
- * minter-android-blockchain. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-blockchain. 2019
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-@Parcel
-public final class TransactionSign {
-    private String mSign;
+public interface BlockChainStatusEndpoint {
 
-    public TransactionSign(String sign) {
-        mSign = sign;
-    }
+    @GET("/status")
+    Call<BCResult<NetworkStatus>> status();
 
-    TransactionSign() {
-    }
-
-    public String getTxSign() {
-        return mSign;
-    }
-
-
+    @GET("/validators")
+    Call<BCResult<List<NetworkStatus.Validator>>> validators();
 }

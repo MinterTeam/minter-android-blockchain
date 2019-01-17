@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -215,7 +215,7 @@ public class CheckTransaction {
         }
 
         public Builder setValue(double value) {
-            return setValue(new BigDecimal(value));
+            return setValue(new BigDecimal(String.valueOf(value)));
         }
 
         public Builder setDueBlock(BigInteger dueBlockNum) {

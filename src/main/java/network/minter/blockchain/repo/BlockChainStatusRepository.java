@@ -24,54 +24,43 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.api;
+package network.minter.blockchain.repo;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
+import network.minter.blockchain.api.BlockChainStatusEndpoint;
 import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.HistoryTransaction;
-import network.minter.blockchain.models.TransactionCommissionValue;
-import network.minter.blockchain.models.UnconfirmedTransactions;
+import network.minter.blockchain.models.NetworkStatus;
+import network.minter.core.internal.api.ApiService;
+import network.minter.core.internal.data.DataRepository;
 import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
 
 /**
- * minter-android-blockchain. 2018
- *
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-blockchain. 2019
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public interface BlockChainTransactionEndpoint {
-
-	/**
-	 * Get list of transactions filtered by given query
-	 *
-	 * @param urlEncodedQuery
-	 * @return
-	 * @see network.minter.blockchain.repo.BlockChainTransactionRepository.TQuery
-	 */
-    @GET("/transactions")
-	Call<BCResult<List<HistoryTransaction>>> getTransactions(@Query("query") String urlEncodedQuery);
-
-	/**
-	 * Get full information about transaction
-	 *
-	 * @param txHash Transaction hash (hex bytes with prefix: Mt)
-	 * @return
-	 * @see network.minter.core.MinterSDK#PREFIX_TX
-	 */
-    @GET("/transaction")
-	Call<BCResult<HistoryTransaction>> getTransaction(@Query("hash") String txHash);
+public class BlockChainStatusRepository extends DataRepository<BlockChainStatusEndpoint> {
+    public BlockChainStatusRepository(@Nonnull ApiService.Builder apiBuilder) {
+        super(apiBuilder);
+    }
 
     /**
-     * Calculates signed transaction commission
-     * @param signedTx Valid transaction, signed with private key
-     * @return
+     * This endpoint shows current state of the node. You also can use it to check if node is running in normal mode.
+     * @return Network status info object
      */
-    @GET("/estimate_tx_commission")
-    Call<BCResult<TransactionCommissionValue>> getTxCommission(@Query("tx") String signedTx);
+    public Call<BCResult<NetworkStatus>> getNetworkStatus() {
+        return getInstantService().status();
+    }
 
+    public Call<BCResult<List<NetworkStatus.Validator>>> getValidators() {
+        return getInstantService().validators();
+    }
 
-    @GET("/unconfirmed_txs")
-    Call<BCResult<UnconfirmedTransactions>> getUnconfirmed();
+    @Nonnull
+    @Override
+    protected Class<BlockChainStatusEndpoint> getServiceClass() {
+        return BlockChainStatusEndpoint.class;
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain;
+package network.minter.blockchain.transactions;
 
 import org.junit.Test;
 
@@ -49,7 +49,7 @@ import static junit.framework.Assert.assertNotNull;
  * MinterWallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TransactionSendCoinTest {
+public class TxSendCoinTest {
 
     static {
         try {

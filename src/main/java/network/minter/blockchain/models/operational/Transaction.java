@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -35,6 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -340,6 +341,10 @@ public class Transaction implements Parcelable {
         return mPayload;
     }
 
+    public String getPayloadString() {
+        return new String(getPayload().getData(), Charset.forName("UTF-8"));
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -535,6 +540,18 @@ public class Transaction implements Parcelable {
 
         public TxSendCoin sendCoin() {
             return new TxSendCoin(mTx);
+        }
+
+        public TxCreateMultisigAddress createMultisigAddress() {
+            return new TxCreateMultisigAddress(mTx);
+        }
+
+        public TxMultisend multiSend() {
+            return new TxMultisend(mTx);
+        }
+
+        public TxEditCandidateTransaction editCandidate() {
+            return new TxEditCandidateTransaction(mTx);
         }
 
         public TxSetCandidateOffline setCandidateOffline() {

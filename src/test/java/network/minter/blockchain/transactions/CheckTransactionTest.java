@@ -24,27 +24,27 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain;
+package network.minter.blockchain.transactions;
 
 import org.junit.Test;
 
-import java.io.IOException;
+import java.math.BigInteger;
 
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.Balance;
-import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.blockchain.models.operational.CheckTransaction;
+import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
+import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
-import retrofit2.Response;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class BlockChainAccountRepositoryTest {
+public class CheckTransactionTest {
 
     static {
         try {
@@ -52,25 +52,28 @@ public class BlockChainAccountRepositoryTest {
         } catch (NativeLoadException e) {
             e.printStackTrace();
         }
-        MinterBlockChainApi.initialize(true);
     }
 
     @Test
-    public void testResolveBalance() {
-        // init object with your Minter address
-        MinterAddress myAddress = new MinterAddress("Mx06431236daf96979aa6cdf470a7df26430ad8efb");
+    public void testSignCheck() {
+        PrivateKey privateKey = new PrivateKey("64e27afaab363f21eec05291084367f6f1297a7b280d69d672febecda94a09ea");
+        MinterAddress address = new MinterAddress("Mxa7bc33954f1ce855ed1a8c768fdd32ed927def47");
+        String pass = "pass";
+        String validCheck = "Mcf89f01830f423f8a4d4e5400000000000000888ac7230489e80000b841ada7ad273bef8a1d22f3e314fdfad1e19b90b1fe8dc7eeb30bd1d391e89af8642af029c138c2e379b95d6bc71b26c531ea155d9435e156a3d113a14c912dfebf001ba0eb3d47f227c3da3b29e09234ad24c49296f177234f3c9700d780712a656c338ba05726e0ed31ab98c07869a99f22e84165fe4a777b0bac7bcf287532210cae1bba";
+        String validProof = "da021d4f84728e0d3d312a18ec84c21768e0caa12a53cb0a1452771f72b0d1a91770ae139fd6c23bcf8cec50f5f2e733eabb8482cf29ee540e56c6639aac469600";
 
-        BlockChainAccountRepository repo = MinterBlockChainApi.getInstance()
-                .account();
-        Response<BCResult<Balance>> res = null;
-        try {
-            res = repo.getBalance(myAddress)
-                    .execute();
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
+        CheckTransaction check = new CheckTransaction.Builder(new BigInteger("1"), pass)
+                .setCoin("MNT")
+                .setDueBlock(new BigInteger("999999"))
+                .setValue(10d)
+                .build();
 
-        assertNotNull(res);
-        System.out.println(res.body().toString());
+        TransactionSign sign = check.sign(privateKey);
+
+        assertEquals(validCheck, sign.getTxSign());
+
+        BytesData proof = CheckTransaction.makeProof(address, pass);
+        assertEquals(validProof, proof.toHexString());
+
     }
 }

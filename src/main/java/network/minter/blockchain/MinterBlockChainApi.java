@@ -33,16 +33,22 @@ import java.math.BigInteger;
 import javax.annotation.Nonnull;
 
 import network.minter.blockchain.repo.BlockChainAccountRepository;
+import network.minter.blockchain.repo.BlockChainBlockRepository;
+import network.minter.blockchain.repo.BlockChainCandidateRepository;
 import network.minter.blockchain.repo.BlockChainCoinRepository;
+import network.minter.blockchain.repo.BlockChainEventRepository;
+import network.minter.blockchain.repo.BlockChainStatusRepository;
 import network.minter.blockchain.repo.BlockChainTransactionRepository;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterHash;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.api.converters.BigIntegerDeserializer;
 import network.minter.core.internal.api.converters.BytesDataDeserializer;
 import network.minter.core.internal.api.converters.MinterAddressDeserializer;
 import network.minter.core.internal.api.converters.MinterHashDeserializer;
+import network.minter.core.internal.api.converters.MinterPublicKeyDeserializer;
 import network.minter.core.internal.log.Mint;
 import network.minter.core.internal.log.TimberLogger;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -58,6 +64,10 @@ public class MinterBlockChainApi {
     private BlockChainAccountRepository mAccountRepository;
     private BlockChainCoinRepository mCoinRepository;
     private BlockChainTransactionRepository mTransactionRepository;
+    private BlockChainBlockRepository mBlockRepository;
+    private BlockChainCandidateRepository mBlockChainCandidateRepository;
+    private BlockChainStatusRepository mStatusRepository;
+    private BlockChainEventRepository mEventRepository;
 
     private MinterBlockChainApi() {
         this(BASE_NODE_URL);
@@ -93,6 +103,10 @@ public class MinterBlockChainApi {
         initialize(BASE_NODE_URL, debug, new TimberLogger());
     }
 
+    public static void initialize(String baseNodeApiUrl) {
+        initialize(baseNodeApiUrl, false, new TimberLogger());
+    }
+
     public static MinterBlockChainApi getInstance() {
         return INSTANCE;
     }
@@ -103,8 +117,41 @@ public class MinterBlockChainApi {
         out.registerTypeAdapter(MinterHash.class, new MinterHashDeserializer());
         out.registerTypeAdapter(BigInteger.class, new BigIntegerDeserializer());
         out.registerTypeAdapter(BytesData.class, new BytesDataDeserializer());
+        out.registerTypeAdapter(MinterPublicKey.class, new MinterPublicKeyDeserializer());
 
         return out;
+    }
+
+    public BlockChainEventRepository event() {
+        if (mEventRepository == null) {
+            mEventRepository = new BlockChainEventRepository(mApiService);
+        }
+
+        return mEventRepository;
+    }
+
+    public BlockChainStatusRepository status() {
+        if (mStatusRepository == null) {
+            mStatusRepository = new BlockChainStatusRepository(mApiService);
+        }
+
+        return mStatusRepository;
+    }
+
+    public BlockChainCandidateRepository candidate() {
+        if (mBlockChainCandidateRepository == null) {
+            mBlockChainCandidateRepository = new BlockChainCandidateRepository(mApiService);
+        }
+
+        return mBlockChainCandidateRepository;
+    }
+
+    public BlockChainBlockRepository block() {
+        if (mBlockRepository == null) {
+            mBlockRepository = new BlockChainBlockRepository(mApiService);
+        }
+
+        return mBlockRepository;
     }
 
     public BlockChainAccountRepository account() {

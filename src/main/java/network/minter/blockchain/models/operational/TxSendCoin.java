@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -83,6 +83,10 @@ public final class TxSendCoin extends Operation {
         return new BigDecimal(mValue).divide(Transaction.VALUE_MUL_DEC).doubleValue();
     }
 
+    public String getCoinRaw() {
+        return mCoin;
+    }
+
     /**
      * Set double value
      *
@@ -91,7 +95,7 @@ public final class TxSendCoin extends Operation {
      * @see #setValue(BigDecimal)
      */
     public TxSendCoin setValue(double value) {
-        return setValue(new BigDecimal(value));
+        return setValue(new BigDecimal(String.valueOf(value)));
     }
 
     /**
@@ -199,6 +203,12 @@ public final class TxSendCoin extends Operation {
         mCoin = StringHelper.bytesToString(fromRawRlp(0, decoded));
         mTo = new MinterAddress(fromRawRlp(1, decoded));
         mValue = BytesHelper.fixBigintSignedByte(fromRawRlp(2, decoded));
+    }
+
+    protected void decodeRaw(byte[][] vrs) {
+        mCoin = new String(vrs[0]);
+        mTo = new MinterAddress(vrs[1]);
+        mValue = BytesHelper.fixBigintSignedByte(vrs[2]);
     }
 
     private TxSendCoin setValue(BigInteger value) {

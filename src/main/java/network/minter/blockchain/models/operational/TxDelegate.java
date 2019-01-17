@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -130,7 +130,7 @@ public final class TxDelegate extends Operation {
     }
 
     public TxDelegate setStake(double stake) {
-        return setStake(new BigDecimal(stake));
+        return setStake(new BigDecimal(String.valueOf(stake)));
     }
 
     public TxDelegate setStake(String stakeBigInteger) {
