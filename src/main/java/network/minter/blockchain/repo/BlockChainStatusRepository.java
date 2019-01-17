@@ -26,6 +26,8 @@
 
 package network.minter.blockchain.repo;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import network.minter.blockchain.api.BlockChainStatusEndpoint;
@@ -50,6 +52,10 @@ public class BlockChainStatusRepository extends DataRepository<BlockChainStatusE
      */
     public Call<BCResult<NetworkStatus>> getNetworkStatus() {
         return getInstantService().status();
+    }
+
+    public Call<BCResult<List<NetworkStatus.Validator>>> getValidators() {
+        return getInstantService().validators();
     }
 
     @Nonnull

@@ -58,7 +58,7 @@ public interface BlockChainCoinEndpoint {
      * @param coinToBuy   coin to convert to
      * @return
      */
-    @GET("/api/estimate_coin_sell")
+    @GET("/estimate_coin_sell")
     Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_sell") String valueToSell,
@@ -73,7 +73,7 @@ public interface BlockChainCoinEndpoint {
      * @param coinToBuy  coin to convert to
      * @return
      */
-    @GET("/api/estimate_coin_buy")
+    @GET("/estimate_coin_buy")
     Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_buy") String valueToBuy,

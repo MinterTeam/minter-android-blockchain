@@ -32,6 +32,7 @@ import com.google.gson.GsonBuilder;
 import org.junit.Before;
 
 import network.minter.core.MinterSDK;
+import network.minter.core.internal.exceptions.NativeLoadException;
 import network.minter.core.internal.log.Mint;
 import network.minter.core.internal.log.StdLogger;
 
@@ -42,7 +43,11 @@ import network.minter.core.internal.log.StdLogger;
 public class BaseApiTest {
 
     static {
-        MinterSDK.initialize();
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
         //noinspection ConstantConditions
         Mint.brew(new StdLogger());
     }

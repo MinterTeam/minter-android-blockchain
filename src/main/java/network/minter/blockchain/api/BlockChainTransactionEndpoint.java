@@ -31,6 +31,7 @@ import java.util.List;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.HistoryTransaction;
 import network.minter.blockchain.models.TransactionCommissionValue;
+import network.minter.blockchain.models.UnconfirmedTransactions;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -67,6 +68,10 @@ public interface BlockChainTransactionEndpoint {
      * @param signedTx Valid transaction, signed with private key
      * @return
      */
-    @GET("/api/estimate_tx_commission")
+    @GET("/estimate_tx_commission")
     Call<BCResult<TransactionCommissionValue>> getTxCommission(@Query("tx") String signedTx);
+
+
+    @GET("/unconfirmed_txs")
+    Call<BCResult<UnconfirmedTransactions>> getUnconfirmed();
 }

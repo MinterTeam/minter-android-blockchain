@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain;
+package network.minter.blockchain.transactions;
 
 import org.junit.Test;
 
@@ -33,20 +33,20 @@ import java.math.BigInteger;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
-import network.minter.blockchain.models.operational.TxCoinBuy;
+import network.minter.blockchain.models.operational.TxCoinSell;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TxBuyCoinTest {
+public class TxSellCoinTest {
 
     static {
         try {
@@ -59,16 +59,16 @@ public class TxBuyCoinTest {
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88201018a4d4e540000000000000004a9e88a54455354000000000000880de0b6b3a76400008a4d4e5400000000000000880de0b6b3a7640000808001b845f8431ca035fb922663baf737c65083dbf0ffa1976b40e5fd2cea86a5385356d73d06ee1fa052841d46ebfa251898337eb317526e8dcd2d0ba00cfb99797d0c1ca0c94a0ac9";
+        final String validTx = "f88201018a4d4e540000000000000002a9e88a4d4e5400000000000000880de0b6b3a76400008a54455354000000000000880de0b6b3a7640000808001b845f8431ba0a35355b5cde05af5fb4b30a246b44c667ea78350dd09e2bb0638a2e0307ad78fa02e5de94a20e3e722e76ef238f60f6e2dbbdaf6b9241606b71feec76aec11ea4a";
         final PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoin("MNT")
-                .buyCoin()
+                .sellCoin()
                 .setCoinToBuy("TEST")
                 .setCoinToSell("MNT")
-                .setValueToBuy(1)
-                .setMaxValueToSell(1)
+                .setValueToSell(1)
+                .setMinValueToBuy(1)
                 .build();
 
         assertNotNull(tx);
@@ -79,19 +79,19 @@ public class TxBuyCoinTest {
     @Test
     public void testDecodeSingle() {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88201018a4d4e540000000000000004a9e88a54455354000000000000880de0b6b3a76400008a4d4e5400000000000000880de0b6b3a7640000808001b845f8431ca035fb922663baf737c65083dbf0ffa1976b40e5fd2cea86a5385356d73d06ee1fa052841d46ebfa251898337eb317526e8dcd2d0ba00cfb99797d0c1ca0c94a0ac9";
+        final String validTx = "f88201018a4d4e540000000000000002a9e88a4d4e5400000000000000880de0b6b3a76400008a54455354000000000000880de0b6b3a7640000808001b845f8431ba0a35355b5cde05af5fb4b30a246b44c667ea78350dd09e2bb0638a2e0307ad78fa02e5de94a20e3e722e76ef238f60f6e2dbbdaf6b9241606b71feec76aec11ea4a";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);
 
         assertEquals(nonce, tx.getNonce());
         assertEquals("MNT", tx.getGasCoin());
-        assertEquals(OperationType.BuyCoin, tx.getType());
-        TxCoinBuy data = tx.getData();
+        assertEquals(OperationType.SellCoin, tx.getType());
+        TxCoinSell data = tx.getData();
 
         assertNotNull(data);
         assertEquals("TEST", data.getCoinToBuy());
         assertEquals("MNT", data.getCoinToSell());
-        assertEquals(1D, data.getValueToBuyDouble());
+        assertEquals(1D, data.getValueToSellDouble(), 0);
     }
 }

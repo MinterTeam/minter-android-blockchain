@@ -63,7 +63,7 @@ public enum OperationType {
     @SerializedName("11")
     SetCandidateOffline((byte) 0x0B, TxSetCandidateOffline.class, 100D),
     @SerializedName("12")
-    CreateMultisigAddress((byte) 0x0C, null, 100D),
+    CreateMultisigAddress((byte) 0x0C, TxCreateMultisigAddress.class, 100D),
     @SerializedName("13")
     Multisend((byte) 0x0D, TxMultisend.class, /*commission: 10+(n-1)*5 units*/ 0D),
     @SerializedName("14")

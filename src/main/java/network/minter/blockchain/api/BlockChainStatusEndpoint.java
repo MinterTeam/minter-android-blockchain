@@ -26,6 +26,8 @@
 
 package network.minter.blockchain.api;
 
+import java.util.List;
+
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.NetworkStatus;
 import retrofit2.Call;
@@ -37,6 +39,9 @@ import retrofit2.http.GET;
  */
 public interface BlockChainStatusEndpoint {
 
-    @GET("status")
+    @GET("/status")
     Call<BCResult<NetworkStatus>> status();
+
+    @GET("/validators")
+    Call<BCResult<List<NetworkStatus.Validator>>> validators();
 }

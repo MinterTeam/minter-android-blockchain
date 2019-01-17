@@ -32,6 +32,7 @@ import com.google.gson.annotations.SerializedName;
 import org.parceler.Parcel;
 
 import network.minter.core.crypto.BytesData;
+import network.minter.core.crypto.MinterPublicKey;
 
 /**
  * minter-android-blockchain. 2019
@@ -138,7 +139,7 @@ public class NetworkStatus {
         public String latestBlockTime;
         @SerializedName("catching_up")
         @Expose
-        public Boolean catchingUp;
+        public boolean catchingUp;
     }
 
     @Parcel
@@ -151,11 +152,21 @@ public class NetworkStatus {
         public SyncInfo syncInfo;
         @SerializedName("validator_info")
         @Expose
-        public ValidatorInfo validatorInfo;
+        public ValidatorStatus validatorStatus;
     }
 
     @Parcel
-    public static class ValidatorInfo {
+    public static class Validator {
+        @SerializedName("pubkey")
+        @Expose
+        public MinterPublicKey pubKey;
+        @SerializedName("voting_power")
+        @Expose
+        public String votingPower;
+    }
+
+    @Parcel
+    public static class ValidatorStatus {
         @SerializedName("address")
         @Expose
         public BytesData address;

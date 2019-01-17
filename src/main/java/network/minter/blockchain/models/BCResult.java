@@ -45,6 +45,11 @@ public class BCResult<Result> {
      */
     public enum ResultCode {
         UnknownError(-1),
+        /**
+         * @deprecated Leaving it here for compatibility. It will be removed after few minor versions.
+         */
+        @Deprecated
+        Success(0),
         // general
         @SerializedName("101")
         WrongNonce(101),
@@ -188,6 +193,7 @@ public class BCResult<Result> {
         );
     }
 
+    @Deprecated
     public boolean isSuccess() {
         return statusCode == 200 && error == null;
     }

@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain;
+package network.minter.blockchain.transactions;
 
 import org.junit.Test;
 

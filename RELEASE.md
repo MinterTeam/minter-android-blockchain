@@ -8,7 +8,8 @@
     - Create multisig address (transaction for creating multisignature address)
     - Multisend (single transaction for sending coins to multiple addresses)
     - Edit candidate (transaction for editing existing candidate)
- - Added network "status" endpoint to repositories
+ - Added missing endpoints and repositories
+ - More tests (still without mocks. Soon...)
 
 
 ## 0.4.0

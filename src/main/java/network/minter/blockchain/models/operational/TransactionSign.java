@@ -26,16 +26,22 @@
 
 package network.minter.blockchain.models.operational;
 
+import org.parceler.Parcel;
+
 /**
  * minter-android-blockchain. 2018
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@Parcel
 public final class TransactionSign {
-    private final String mSign;
+    private String mSign;
 
-    TransactionSign(String sign) {
+    public TransactionSign(String sign) {
         mSign = sign;
+    }
+
+    TransactionSign() {
     }
 
     public String getTxSign() {

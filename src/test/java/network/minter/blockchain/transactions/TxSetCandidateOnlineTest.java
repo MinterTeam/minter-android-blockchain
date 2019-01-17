@@ -24,18 +24,18 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain;
+package network.minter.blockchain.transactions;
 
 import org.junit.Test;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
-import network.minter.blockchain.models.operational.TxCreateCoin;
+import network.minter.blockchain.models.operational.TxSetCandidateOnline;
 import network.minter.core.MinterSDK;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TxCreateCoinTest {
+public class TxSetCandidateOnlineTest {
 
     static {
         try {
@@ -59,17 +59,13 @@ public class TxCreateCoinTest {
     @Test
     public void testEncode() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88401018a4d4e540000000000000005abea8a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a808001b845f8431ca0cab62b0670de21a16df3bc11af2553964c9fc5ae18b2adaa43d43f826bc143eea014e564991ab69f41a325fb90022ef3556921a6757c3b69d487051dde11c5d84a";
-        final PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
+        final String validTx = "f87b01018a4d4e54000000000000000aa2e1a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43808001b845f8431ba0273463d2b0a7149edf889f92c394cb89e47f00be17460eac0300cc8601c0dcafa0118b651cb3f05cd403a6adcd97b943552da3b0a75ee99eaf01619d973184dbe1";
+        final PrivateKey privateKey = new PrivateKey("05ddcd4e6f7d248ed1388f0091fe345bf9bf4fc2390384e26005e7675c98b3c1");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoin("MNT")
-                .createCoin()
-                .setName("SUPER TEST")
-                .setSymbol("SPRTEST")
-                .setInitialAmount(100)
-                .setInitialReserve(10)
-                .setConstantReserveRatio(10)
+                .setCandidateOnline()
+                .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
                 .build();
 
         assertNotNull(tx);
@@ -80,22 +76,17 @@ public class TxCreateCoinTest {
     @Test
     public void testDecode() {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88401018a4d4e540000000000000005abea8a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a808001b845f8431ca0cab62b0670de21a16df3bc11af2553964c9fc5ae18b2adaa43d43f826bc143eea014e564991ab69f41a325fb90022ef3556921a6757c3b69d487051dde11c5d84a";
+        final String validTx = "f87b01018a4d4e54000000000000000aa2e1a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43808001b845f8431ba0273463d2b0a7149edf889f92c394cb89e47f00be17460eac0300cc8601c0dcafa0118b651cb3f05cd403a6adcd97b943552da3b0a75ee99eaf01619d973184dbe1";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);
 
         assertEquals(nonce, tx.getNonce());
         assertEquals("MNT", tx.getGasCoin());
-        assertEquals(OperationType.CreateCoin, tx.getType());
-        TxCreateCoin data = tx.getData();
+        assertEquals(OperationType.SetCandidateOnline, tx.getType());
+        TxSetCandidateOnline data = tx.getData();
 
         assertNotNull(data);
-        assertEquals("SUPER TEST", data.getName());
-        assertEquals("SPRTEST", data.getSymbol());
-        assertEquals(new BigDecimal("100"), data.getInitialAmount());
-        assertEquals(new BigDecimal("10"), data.getInitialReserve());
-        assertEquals(10, data.getConstantReserveRatio());
-
+        assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), data.getPublicKey());
     }
 }
