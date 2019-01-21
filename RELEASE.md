@@ -1,5 +1,11 @@
 # Release notes
 
+## 0.5.1
+ - Added gas price methods, see BlockChainBlockRepository
+ - Opened gas price field and setter for transaction, it uses in new api
+ - Added ability to create non-singleton instances, for using in cases when need to connect to multiple nodes
+
+
 ## 0.5.0
  - BREAKING:
     - New api methods, some fields are removed/partly moved to another place due blockchain api has been changed.

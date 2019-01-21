@@ -58,7 +58,7 @@ apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '0.5.0'
+version = '0.5.1'
 
 ext {
     minterMinSdk = 16
@@ -72,7 +72,7 @@ ext {
     buildArtifactVersion = version
     buildArtifactGroup = group
 
-    pomName = "Minter Core"
+    pomName = "Minter Blockhain"
     pomUrl = "https://github.com/MinterTeam/minter-android-blockchain"
     pomScm = {
         connection = "scm:git:git://github.com/MinterTeam/minter-android-blockchain.git"

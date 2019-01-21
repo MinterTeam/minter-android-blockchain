@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -82,6 +82,26 @@ public class MinterBlockChainApi {
 
     public static void initialize() {
         initialize(BASE_NODE_URL, false, new TimberLogger());
+    }
+
+    /**
+     * Use this if no need to use singleton, for example, for accessing multiple instances simultaneously
+     * @param baseNodeApiUrl
+     * @param debug
+     * @param logger
+     * @return
+     */
+    public static MinterBlockChainApi createInstance(String baseNodeApiUrl, boolean debug, Mint.Leaf logger) {
+        if (debug) {
+            Mint.brew(logger);
+        }
+        MinterBlockChainApi api = new MinterBlockChainApi(baseNodeApiUrl);
+        api.mApiService.setDebug(debug);
+        if (debug) {
+            api.mApiService.setDebugRequestLevel(HttpLoggingInterceptor.Level.BODY);
+        }
+
+        return api;
     }
 
     public static void initialize(String baseNodeApiUrl, boolean debug, Mint.Leaf logger) {
