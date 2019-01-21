@@ -443,6 +443,17 @@ public class Transaction implements Parcelable {
         }
 
         /**
+         * Set transaction gas, it useful for highly loaded network, by default, value is 1
+         * @param gasPrice
+         * @return
+         * @see
+         */
+        public Builder setGasPrice(BigInteger gasPrice) {
+            mTx.mGasPrice = gasPrice;
+            return this;
+        }
+
+        /**
          * Set arbitrary user-defined bytes
          * @param data max size: 1024 bytes
          * @return {@link Builder}

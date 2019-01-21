@@ -73,6 +73,8 @@ public class BCResult<Result> {
         CoinSupplyOverflow(112),
         @SerializedName("113")
         TxFromSenderAlreadyInMempool(113),
+        @SerializedName("114")
+        TooLowGasPrice(114),
 
         // coin creation
         @SerializedName("201")
