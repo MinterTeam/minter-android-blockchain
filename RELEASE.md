@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.5.2
+ - Added `getApiService()` to modify api client
+
 ## 0.5.1
  - Added gas price methods, see BlockChainBlockRepository
  - Opened gas price field and setter for transaction, it uses in new api

@@ -131,6 +131,10 @@ public class MinterBlockChainApi {
         return INSTANCE;
     }
 
+    public ApiService.Builder getApiService() {
+        return mApiService;
+    }
+
     public GsonBuilder getGsonBuilder() {
         GsonBuilder out = new GsonBuilder();
         out.registerTypeAdapter(MinterAddress.class, new MinterAddressDeserializer());
