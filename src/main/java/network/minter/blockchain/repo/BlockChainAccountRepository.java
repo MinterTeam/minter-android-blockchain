@@ -42,7 +42,6 @@ import javax.annotation.Nonnull;
 import network.minter.blockchain.api.BlockChainAccountEndpoint;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Balance;
-import network.minter.blockchain.models.CountableData;
 import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.crypto.MinterAddress;
@@ -76,20 +75,6 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
                 .getBalance(checkNotNull(address, "Address required!"));
     }
 
-    public Call<BCResult<CountableData>> getTransactionCount(@Nonnull MinterAddress key) {
-        checkNotNull(key, "Public key required!");
-        return getTransactionCount(key.toString());
-    }
-
-    /**
-     * Returns the number of transactions sent from an address
-     * @param address fq address
-     * @return Prepared request with transaction count result
-     */
-    public Call<BCResult<CountableData>> getTransactionCount(@Nonnull String address) {
-        return getInstantService().getTransactionCount(checkNotNull(address, "Address required!"));
-    }
-
     /**
      * SendCoin transaction
      * @param transactionSign Raw signed TX
@@ -118,6 +103,7 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
 
             JsonObject o = json.getAsJsonObject();
             o = o.get("balance").getAsJsonObject();
+            balance.txCount = json.getAsJsonObject().get("transaction_count").getAsBigInteger();
 
             final Map<String, Balance.CoinBalance> out = new HashMap<>();
             for (String key : o.keySet()) {
