@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -27,6 +27,7 @@
 package network.minter.blockchain.models;
 
 import com.google.common.base.Objects;
+import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
 
@@ -44,6 +45,8 @@ import network.minter.blockchain.models.operational.Transaction;
 @Parcel
 public class Balance {
     public Map<String, CoinBalance> coins;
+    @SerializedName("transaction_count")
+    public BigInteger txCount;
 
     public CoinBalance get(String coin) {
         return coins.get(coin.toUpperCase());

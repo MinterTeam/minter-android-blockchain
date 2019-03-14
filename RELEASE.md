@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.5.4
+ - Removed `transactionCount` method and moved this info to balance model `Balance.txCount`
+
 ## 0.5.3
  - New balance api endpoint (from /balance/{address} to /address/?address=Mx...
 

@@ -55,5 +55,8 @@ public class BalanceRepositoryTest {
 
         assertNotNull(resp.body());
         assertTrue(resp.isSuccessful());
+
+        assertNotNull(resp.body().result.get("MNT"));
+        assertNotNull(resp.body().result.txCount);
     }
 }
