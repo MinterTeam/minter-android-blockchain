@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.5.3
+ - New balance api endpoint (from /balance/{address} to /address/?address=Mx...
+
 ## 0.5.2
  - Added `getApiService()` to modify api client
 
