@@ -24,46 +24,36 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.api;
+package network.minter.blockchain.repos;
 
+import org.junit.Test;
+
+import java.io.IOException;
+
+import network.minter.blockchain.MinterBlockChainApi;
 import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Balance;
-import network.minter.blockchain.models.CountableData;
-import network.minter.blockchain.models.TransactionSendResult;
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
+import network.minter.blockchain.repo.BlockChainAccountRepository;
+import retrofit2.Response;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
- * minter-android-blockchain. 2018
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-blockchain. 2019
+ * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public interface BlockChainAccountEndpoint {
+public class BalanceRepositoryTest {
 
-    /**
-     * Returns current balance of an account
-     * @param address Address of an account
-     * @return
-     */
-    @GET("/address")
-    Call<BCResult<Balance>> getBalance(@Query("address") String address);
+    @Test
+    public void testGetBalance() throws IOException {
+        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
 
-    /**
-     * Returns count of outgoing transactions from given account
-     * @param address Address of an account
-     * @return
-     */
-    @GET("/transactionCount/{address}")
-    Call<BCResult<CountableData>> getTransactionCount(@Path("address") String address);
+        BlockChainAccountRepository repo = MinterBlockChainApi.getInstance().account();
 
-    /**
-     * Broadcasts transaction onto Minter network
-     * @param data
-     * @return
-     */
-    @GET("/send_transaction")
-    Call<BCResult<TransactionSendResult>> sendTransaction(@Query("tx") String signedTxHash);
+        Response<BCResult<Balance>> resp = repo.getBalance("Mx06431236daf96979aa6cdf470a7df26430ad8efb").execute();
 
-
+        assertNotNull(resp.body());
+        assertTrue(resp.isSuccessful());
+    }
 }
