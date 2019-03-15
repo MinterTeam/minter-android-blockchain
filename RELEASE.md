@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.5.5
+ - Fixed sending transaction: now blockchain requires 0x before transaction sign
+
 ## 0.5.4
  - Removed `transactionCount` method and moved this info to balance model `Balance.txCount`
 
