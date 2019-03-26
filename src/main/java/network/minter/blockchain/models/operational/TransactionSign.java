@@ -35,7 +35,7 @@ import org.parceler.Parcel;
  */
 @Parcel
 public final class TransactionSign {
-    private String mSign;
+    String mSign;
 
     public TransactionSign(String sign) {
         mSign = sign;
