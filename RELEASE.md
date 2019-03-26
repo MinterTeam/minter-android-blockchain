@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.5.6
+ - Changed `stake` to `value` in delegate/unbound transactions
+
 ## 0.5.5
  - Fixed sending transaction: now blockchain requires 0x before transaction sign
 
