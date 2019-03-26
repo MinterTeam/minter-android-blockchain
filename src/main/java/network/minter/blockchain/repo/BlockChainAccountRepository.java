@@ -82,7 +82,13 @@ public class BlockChainAccountRepository extends DataRepository<BlockChainAccoun
      * @see TransactionSendResult
      */
     public Call<BCResult<TransactionSendResult>> sendTransaction(@Nonnull TransactionSign transactionSign) {
-        return getInstantService().sendTransaction(transactionSign.getTxSign());
+        //TODO: move it to sign
+        String sig = transactionSign.getTxSign();
+        if (!sig.startsWith("0x")) {
+            sig = "0x" + sig;
+        }
+        transactionSign.clear();
+        return getInstantService().sendTransaction(sig);
     }
 
     @Nonnull

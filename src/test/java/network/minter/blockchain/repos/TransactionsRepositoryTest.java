@@ -44,6 +44,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * minter-android-blockchain. 2019
+ *
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class TransactionsRepositoryTest {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -301,18 +301,27 @@ public class HistoryTransaction {
         @SerializedName("pub_key")
         public MinterPublicKey publicKey;
         public String coin;
-        public String stake;
+        public String value;
 
         public MinterPublicKey getPublicKey() {
             return publicKey;
         }
 
-        public BigDecimal getStake() {
-            if (stake == null || stake.isEmpty()) {
-                stake = "0";
+        public BigDecimal getValue() {
+            if (value == null || value.isEmpty()) {
+                value = "0";
             }
 
-            return new BigDecimal(stake);
+            return new BigDecimal(value);
+        }
+
+        /**
+         * @return
+         * @deprecated use {@link #getValue()}
+         */
+        @Deprecated
+        public BigDecimal getStake() {
+            return getValue();
         }
 
         public String getCoin() {

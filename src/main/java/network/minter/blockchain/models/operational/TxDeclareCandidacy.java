@@ -156,7 +156,7 @@ public final class TxDeclareCandidacy extends Operation {
     }
 
     /**
-     * Get normalized stake
+     * Get normalized value
      *
      * @return big decimal value
      */
@@ -170,7 +170,7 @@ public final class TxDeclareCandidacy extends Operation {
     }
 
     /**
-     * Get normalized stake in double value
+     * Get normalized value in double value
      * Be carefully! Value can be overflowed
      *
      * @return normalized double value

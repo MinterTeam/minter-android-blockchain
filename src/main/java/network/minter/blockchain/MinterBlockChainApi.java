@@ -128,6 +128,9 @@ public class MinterBlockChainApi {
     }
 
     public static MinterBlockChainApi getInstance() {
+        if (INSTANCE == null) {
+            throw new IllegalStateException("You forget to call MinterBlockchainApi.initialize");
+        }
         return INSTANCE;
     }
 
