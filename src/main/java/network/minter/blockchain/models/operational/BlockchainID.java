@@ -45,4 +45,14 @@ public enum BlockchainID {
     public byte getId() {
         return mId.byteValue();
     }
+
+    public static BlockchainID valueOf(BigInteger val) {
+        for (BlockchainID id : BlockchainID.values()) {
+            if (id.mId.equals(val)) {
+                return id;
+            }
+        }
+
+        return null;
+    }
 }

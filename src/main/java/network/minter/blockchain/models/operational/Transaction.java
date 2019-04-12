@@ -129,6 +129,7 @@ public class Transaction implements Parcelable {
 
     protected Transaction(Parcel in) {
         mNonce = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+        mChainId = (BlockchainID) in.readValue(BlockchainID.class.getClassLoader());
         mGasPrice = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mGasCoin = in.readString();
         mType = (OperationType) in.readValue(OperationType.class.getClassLoader());
@@ -356,6 +357,7 @@ public class Transaction implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(mNonce);
+        dest.writeValue(mChainId);
         dest.writeValue(mGasPrice);
         dest.writeString(mGasCoin);
         dest.writeValue(mType);
@@ -379,16 +381,17 @@ public class Transaction implements Parcelable {
      */
     void decodeRLP(Object[] raw) {
         mNonce = new BigInteger(fromRawRlp(0, raw));
-        mGasPrice = new BigInteger(fromRawRlp(1, raw));
-        mGasCoin = StringHelper.bytesToString(fromRawRlp(2, raw), 10);
-        mType = OperationType.findByValue(new BigInteger(fromRawRlp(3, raw)));
+        mChainId = BlockchainID.valueOf(new BigInteger(fromRawRlp(1, raw)));
+        mGasPrice = new BigInteger(fromRawRlp(2, raw));
+        mGasCoin = StringHelper.bytesToString(fromRawRlp(3, raw), 10);
+        mType = OperationType.findByValue(new BigInteger(fromRawRlp(4, raw)));
         /**
-         * ha, where is the 4th index?
+         * ha, where is the 5th index?
          * see here: {@link #fromEncoded(String, Class, Class)}
          */
-        mPayload = new BytesData(fromRawRlp(5, raw));
-        mServiceData = new BytesData(fromRawRlp(6, raw));
-        mSignatureType = SignatureType.findByValue(new BigInteger(fromRawRlp(7, raw)));
+        mPayload = new BytesData(fromRawRlp(6, raw));
+        mServiceData = new BytesData(fromRawRlp(7, raw));
+        mSignatureType = SignatureType.findByValue(new BigInteger(fromRawRlp(8, raw)));
         /**
          * And there's no 8 index, it's signature data
          * decode here: {@link #fromEncoded(String, Class, Class)}
@@ -400,7 +403,7 @@ public class Transaction implements Parcelable {
 
         if (forSignature) {
             return RLP.encode(new Object[]{
-                    mNonce, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
+                    mNonce, mChainId, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
                     data,
                     mPayload.getData(),
                     mServiceData.getData(),
@@ -411,7 +414,7 @@ public class Transaction implements Parcelable {
         final byte[] signData = mSignatureData.encodeRLP();
 
         return RLP.encode(new Object[]{
-                mNonce, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
+                mNonce, mChainId, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
                 data,
                 mPayload.getData(),
                 mServiceData.getData(),
