@@ -1,5 +1,9 @@
 # Release notes
 
+## 0.6.0
+ - BREAKING:
+    - Added "chainId" to transactions. Now all transactions requires this field to determine correct network
+
 ## 0.5.6
  - Changed `stake` to `value` in delegate/unbound transactions
 

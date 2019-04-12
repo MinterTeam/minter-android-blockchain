@@ -41,6 +41,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import network.minter.blockchain.BuildConfig;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
@@ -76,6 +77,7 @@ public class Transaction implements Parcelable {
         }
     };
     private BigInteger mNonce;
+    private BlockchainID mChainId;
     private BigInteger mGasPrice = new BigInteger("1");
     private String mGasCoin = MinterSDK.DEFAULT_COIN;
     private OperationType mType = OperationType.SendCoin;
@@ -182,6 +184,7 @@ public class Transaction implements Parcelable {
      */
     public void cleanup() {
         mNonce = null;
+        mChainId = null;
         mGasPrice = null;
         mGasCoin = null;
         mType = null;
@@ -428,8 +431,27 @@ public class Transaction implements Parcelable {
     public static class Builder {
         private final Transaction mTx;
 
+        /**
+         * Init builder with transaction nonce. If you don't have it yet, set it later using {@link #setNonce(BigInteger)}
+         * @param nonce transaction nonce
+         */
         public Builder(BigInteger nonce) {
             mTx = new Transaction(nonce);
+            mTx.mChainId = BuildConfig.BLOCKCHAIN_ID;
+        }
+
+        /**
+         * Set network identifier for entire transaction. By default, it depends on choosed flavor,
+         * but if you are using other then flavor network url, set it on your way.
+         * DON't try to send testnet transaction ot mainnet or vise-versa, blockchain will return 115 error code anyway.
+         * @param id network identifier
+         * @return {@link Builder}
+         * @see BlockchainID#MainNet
+         * @see BlockchainID#TestNet
+         */
+        public Builder setBlockchainId(BlockchainID id) {
+            mTx.mChainId = id;
+            return this;
         }
 
         /**
@@ -444,9 +466,8 @@ public class Transaction implements Parcelable {
 
         /**
          * Set transaction gas, it useful for highly loaded network, by default, value is 1
-         * @param gasPrice
-         * @return
-         * @see
+         * @param gasPrice commission multiplier
+         * @return {@link Builder}
          */
         public Builder setGasPrice(BigInteger gasPrice) {
             mTx.mGasPrice = gasPrice;
@@ -507,6 +528,13 @@ public class Transaction implements Parcelable {
             return this;
         }
 
+        /**
+         * Create custom transaction builder, if (for example) you were forked minter blockchain and were created own transaction.
+         * OR you can create dynamically any of existing transaction using just Class<?> object
+         * @param operationClass
+         * @param <Op>
+         * @return
+         */
         public <Op extends Operation> Op create(Class<Op> operationClass) {
             try {
                 return operationClass.getDeclaredConstructor(Transaction.class).newInstance(mTx);
@@ -521,58 +549,114 @@ public class Transaction implements Parcelable {
             }
         }
 
+        /**
+         * Create "Buy coin" transaction builder
+         * @return {@link TxCoinBuy}
+         */
         public TxCoinBuy buyCoin() {
             return new TxCoinBuy(mTx);
         }
 
+        /**
+         * Create "Sell coin" transaction builder
+         * @return {@link TxCoinSell}
+         */
         public TxCoinSell sellCoin() {
             return new TxCoinSell(mTx);
         }
 
+        /**
+         * Create "Sell all coins" transaction builder
+         * @return {@link TxCoinSellAll}
+         */
         public TxCoinSellAll sellAllCoins() {
             return new TxCoinSellAll(mTx);
         }
 
+        /**
+         * Create "Create coin" transaction builder
+         * @return {@link TxCreateCoin}
+         */
         public TxCreateCoin createCoin() {
             return new TxCreateCoin(mTx);
         }
 
+        /**
+         * Create "Declare candidacy" transaction builder
+         * @return {@link TxDeclareCandidacy}
+         */
         public TxDeclareCandidacy declareCandidacy() {
             return new TxDeclareCandidacy(mTx);
         }
 
+        /**
+         * Create "Delegate" transaction builder
+         * @return {@link TxDelegate}
+         */
         public TxDelegate delegate() {
             return new TxDelegate(mTx);
         }
 
+        /**
+         * Create "Check redeem" transaction builder
+         * @return {@link TxRedeemCheck}
+         */
         public TxRedeemCheck redeemCheck() {
             return new TxRedeemCheck(mTx);
         }
 
+        /**
+         * Create "Sending coin" transaction builder
+         * @return {@link TxSendCoin}
+         */
         public TxSendCoin sendCoin() {
             return new TxSendCoin(mTx);
         }
 
+        /**
+         * Create "Multiple signature" transaction builder
+         * @return {@link TxCreateMultisigAddress}
+         */
         public TxCreateMultisigAddress createMultisigAddress() {
             return new TxCreateMultisigAddress(mTx);
         }
 
+        /**
+         * Create "Multiple send coins" transaction builder
+         * @return {@link TxMultisend}
+         */
         public TxMultisend multiSend() {
             return new TxMultisend(mTx);
         }
 
+        /**
+         * Create "Validator candidate editing" transaction builder
+         * @return {@link TxEditCandidateTransaction}
+         */
         public TxEditCandidateTransaction editCandidate() {
             return new TxEditCandidateTransaction(mTx);
         }
 
+        /**
+         * Create "Make validator candidate offline" transaction builder
+         * @return {@link TxSetCandidateOffline}
+         */
         public TxSetCandidateOffline setCandidateOffline() {
             return new TxSetCandidateOffline(mTx);
         }
 
+        /**
+         * Create "Make validator candidate online" transaction builder
+         * @return {@link TxSetCandidateOnline}
+         */
         public TxSetCandidateOnline setCandidateOnline() {
             return new TxSetCandidateOnline(mTx);
         }
 
+        /**
+         * Create "Get back mo money!" transaction builder
+         * @return {@link TxUnbound}
+         */
         public TxUnbound unbound() {
             return new TxUnbound(mTx);
         }

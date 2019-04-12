@@ -34,9 +34,11 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.models.operational.TxEditCandidateTransaction;
+import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.crypto.PrivateKey;
+import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -46,6 +48,15 @@ import static org.junit.Assert.assertNotNull;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class TxEditCandidateTest {
+
+    static {
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
