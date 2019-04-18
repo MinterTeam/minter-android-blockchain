@@ -75,6 +75,8 @@ public class BCResult<Result> {
         TxFromSenderAlreadyInMempool(113),
         @SerializedName("114")
         TooLowGasPrice(114),
+        @SerializedName("115")
+        WrongChainId(115),
 
         // coin creation
         @SerializedName("201")
