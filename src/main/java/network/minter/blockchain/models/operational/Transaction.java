@@ -403,7 +403,7 @@ public class Transaction implements Parcelable {
 
         if (forSignature) {
             return RLP.encode(new Object[]{
-                    mNonce, mChainId, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
+		            mNonce, BigInteger.valueOf(mChainId.getId()), mGasPrice, mGasCoin, mOperationData.getType().getValue(),
                     data,
                     mPayload.getData(),
                     mServiceData.getData(),
@@ -414,7 +414,7 @@ public class Transaction implements Parcelable {
         final byte[] signData = mSignatureData.encodeRLP();
 
         return RLP.encode(new Object[]{
-                mNonce, mChainId, mGasPrice, mGasCoin, mOperationData.getType().getValue(),
+		        mNonce, BigInteger.valueOf(mChainId.getId()), mGasPrice, mGasCoin, mOperationData.getType().getValue(),
                 data,
                 mPayload.getData(),
                 mServiceData.getData(),
