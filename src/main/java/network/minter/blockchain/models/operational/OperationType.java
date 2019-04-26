@@ -53,11 +53,11 @@ public enum OperationType {
     @SerializedName("6")
     DeclareCandidacy((byte) 0x06, TxDeclareCandidacy.class, 10000D),
     @SerializedName("7")
-    Delegate((byte) 0x07, TxDelegate.class, 100D),
+    Delegate((byte) 0x07, TxDelegate.class, 200D),
     @SerializedName("8")
-    Unbound((byte) 0x08, TxUnbound.class, 100D),
+    Unbound((byte) 0x08, TxUnbound.class, 200D),
     @SerializedName("9")
-    RedeemCheck((byte) 0x09, TxRedeemCheck.class, 10D),
+    RedeemCheck((byte) 0x09, TxRedeemCheck.class, 30D),
     @SerializedName("10")
     SetCandidateOnline((byte) 0x0A, TxSetCandidateOnline.class, 100D),
     @SerializedName("11")

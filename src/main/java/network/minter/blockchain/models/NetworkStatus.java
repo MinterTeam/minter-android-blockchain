@@ -157,7 +157,7 @@ public class NetworkStatus {
 
     @Parcel
     public static class Validator {
-        @SerializedName("pubkey")
+        @SerializedName("pub_key")
         @Expose
         public MinterPublicKey pubKey;
         @SerializedName("voting_power")
