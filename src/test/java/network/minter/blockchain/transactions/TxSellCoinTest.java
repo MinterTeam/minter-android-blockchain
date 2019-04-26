@@ -34,6 +34,7 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TxCoinSell;
+import network.minter.blockchain.models.operational.TxCoinSellAll;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
@@ -59,7 +60,7 @@ public class TxSellCoinTest {
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88201018a4d4e540000000000000002a9e88a4d4e5400000000000000880de0b6b3a76400008a54455354000000000000880de0b6b3a7640000808001b845f8431ba0a35355b5cde05af5fb4b30a246b44c667ea78350dd09e2bb0638a2e0307ad78fa02e5de94a20e3e722e76ef238f60f6e2dbbdaf6b9241606b71feec76aec11ea4a";
+	    final String validTx = "f8830102018a4d4e540000000000000002a9e88a4d4e5400000000000000880de0b6b3a76400008a54455354000000000000880de0b6b3a7640000808001b845f8431ba0e34be907a18acb5a1aed263ef419f32f5adc6e772b92f949906b497bba557df3a0291d7704980994f7a6f5950ca84720746b5928f21c3cfc5a5fbca2a9f4d35db0";
         final PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
 
         Transaction tx = new Transaction.Builder(nonce)
@@ -76,10 +77,51 @@ public class TxSellCoinTest {
         assertEquals(validTx, resultTx);
     }
 
+	@Test
+	public void testSellAllEncodeSingle()
+			throws OperationInvalidDataException {
+		final BigInteger nonce = new BigInteger("1");
+		final String validTx = "f87a0102018a4d4e540000000000000003a0df8a4d4e54000000000000008a54455354000000000000880de0b6b3a7640000808001b845f8431ca0b10794a196b6ad2f94e6162613ca9538429dd49ca493594ba9d99f80d2499765a03c1d78e9e04f57336691e8812a16faccb00bf92ac817ab61cd9bf001e9380d47";
+		final PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
+
+		Transaction tx = new Transaction.Builder(nonce)
+				.setGasCoin("MNT")
+				.sellAllCoins()
+				.setCoinToBuy("TEST")
+				.setCoinToSell("MNT")
+				.setMinValueToBuy(1)
+				.build();
+
+		assertNotNull(tx);
+		final String resultTx = tx.signSingle(privateKey).getTxSign();
+		assertEquals(validTx, resultTx);
+	}
+
+	@Test
+	public void testSellAllDecodeSingle()
+			throws OperationInvalidDataException {
+
+		final BigInteger nonce = new BigInteger("1");
+		final String validTx = "f87a0102018a4d4e540000000000000003a0df8a4d4e54000000000000008a54455354000000000000880de0b6b3a7640000808001b845f8431ca0b10794a196b6ad2f94e6162613ca9538429dd49ca493594ba9d99f80d2499765a03c1d78e9e04f57336691e8812a16faccb00bf92ac817ab61cd9bf001e9380d47";
+
+		Transaction tx = Transaction.fromEncoded(validTx);
+		assertNotNull(tx);
+
+		assertEquals(nonce, tx.getNonce());
+		assertEquals("MNT", tx.getGasCoin());
+		assertEquals(OperationType.SellAllCoins, tx.getType());
+		TxCoinSellAll data = tx.getData();
+
+		assertNotNull(data);
+		assertEquals("TEST", data.getCoinToBuy());
+		assertEquals("MNT", data.getCoinToSell());
+		assertEquals(1D, data.getMinValueToBuyDouble(), 0);
+	}
+
     @Test
     public void testDecodeSingle() {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88201018a4d4e540000000000000002a9e88a4d4e5400000000000000880de0b6b3a76400008a54455354000000000000880de0b6b3a7640000808001b845f8431ba0a35355b5cde05af5fb4b30a246b44c667ea78350dd09e2bb0638a2e0307ad78fa02e5de94a20e3e722e76ef238f60f6e2dbbdaf6b9241606b71feec76aec11ea4a";
+	    final String validTx = "f8830102018a4d4e540000000000000002a9e88a4d4e5400000000000000880de0b6b3a76400008a54455354000000000000880de0b6b3a7640000808001b845f8431ba0e34be907a18acb5a1aed263ef419f32f5adc6e772b92f949906b497bba557df3a0291d7704980994f7a6f5950ca84720746b5928f21c3cfc5a5fbca2a9f4d35db0";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);

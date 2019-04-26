@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 
+import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
@@ -59,11 +60,12 @@ public class TxBuyCoinTest {
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88201018a4d4e540000000000000004a9e88a54455354000000000000880de0b6b3a76400008a4d4e5400000000000000880de0b6b3a7640000808001b845f8431ca035fb922663baf737c65083dbf0ffa1976b40e5fd2cea86a5385356d73d06ee1fa052841d46ebfa251898337eb317526e8dcd2d0ba00cfb99797d0c1ca0c94a0ac9";
+	    final String validTx = "f8830102018a4d4e540000000000000004a9e88a54455354000000000000880de0b6b3a76400008a4d4e5400000000000000880de0b6b3a7640000808001b845f8431ca04ee095a20ca58062a5758e2a6d3941857daa8943b5873c57f111190ca88dbc56a01148bf2fcc721ca353105e4f4a3419bec471d7ae08173f443a28c3ae6d27018a";
         final PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoin("MNT")
+		        .setBlockchainId(BlockchainID.TestNet)
                 .buyCoin()
                 .setCoinToBuy("TEST")
                 .setCoinToSell("MNT")
@@ -79,7 +81,7 @@ public class TxBuyCoinTest {
     @Test
     public void testDecodeSingle() {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88201018a4d4e540000000000000004a9e88a54455354000000000000880de0b6b3a76400008a4d4e5400000000000000880de0b6b3a7640000808001b845f8431ca035fb922663baf737c65083dbf0ffa1976b40e5fd2cea86a5385356d73d06ee1fa052841d46ebfa251898337eb317526e8dcd2d0ba00cfb99797d0c1ca0c94a0ac9";
+	    final String validTx = "f8830102018a4d4e540000000000000004a9e88a54455354000000000000880de0b6b3a76400008a4d4e5400000000000000880de0b6b3a7640000808001b845f8431ca04ee095a20ca58062a5758e2a6d3941857daa8943b5873c57f111190ca88dbc56a01148bf2fcc721ca353105e4f4a3419bec471d7ae08173f443a28c3ae6d27018a";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);

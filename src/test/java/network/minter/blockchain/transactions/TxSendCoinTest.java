@@ -31,6 +31,7 @@ import org.junit.Test;
 import java.math.BigInteger;
 import java.util.Collections;
 
+import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.SignatureMultiData;
 import network.minter.blockchain.models.operational.Transaction;
@@ -58,6 +59,39 @@ public class TxSendCoinTest {
             e.printStackTrace();
         }
     }
+
+	@Test
+	public void testCompare()
+			throws OperationInvalidDataException {
+//
+//        String enc = "f8840102018a4d4e540000000000000001aae98a4d4e5400000000000000940000000000000000000000000000000000000000888ac7230489e80000808001b845f8431ba098c5c9721bbef9c5e06405497a3855373f9ecd63975d3d075b56a59a60513277a0600574b4f760819c67eb8602aab24aa8ab53f27aced4bc0df28c6c7ceb7bd279";
+//
+//        Transaction tx = Transaction.fromEncoded(enc);
+//
+//        System.out.println("aaa");
+//
+//        byte[] res = RLP.encode(new Object[]{
+//                StringHelper.strrpad(10, "MNT"),
+//                new byte[]{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+//                new BigInteger("10")
+//        });
+
+//
+		Transaction tx = new Transaction.Builder(new BigInteger("1"))
+				.setGasCoin("MNT")
+				.setBlockchainId(BlockchainID.TestNet)
+				.setGasPrice(new BigInteger("1"))
+				.sendCoin()
+				.setCoin("MNT")
+				.setValue("10")
+				.setTo(new MinterAddress("Mx0000000000000000000000000000000000000000"))
+				.build();
+
+		PrivateKey privateKey = new PrivateKey("df1f236d0396cc43147e44206c341a65573326e907d033690e31a21323c03a9f");
+		TransactionSign signature = tx.signSingle(privateKey);
+
+		System.out.println(signature.getTxSign());
+	}
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {

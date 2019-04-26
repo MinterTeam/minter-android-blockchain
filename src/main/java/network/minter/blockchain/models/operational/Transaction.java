@@ -158,10 +158,10 @@ public class Transaction implements Parcelable {
         Throwable t = null;
         try {
             transaction.mOperationData = transaction.mType.getOpClass().getDeclaredConstructor(Transaction.class).newInstance(transaction);
-            transaction.mOperationData.decodeRLP(transaction.fromRawRlp(4, decoded));
+	        transaction.mOperationData.decodeRLP(transaction.fromRawRlp(5, decoded));
 
             transaction.mSignatureData = transaction.mSignatureType.getSignClass().newInstance();
-            transaction.mSignatureData.decodeRLP(transaction.fromRawRlp(8, decoded));
+	        transaction.mSignatureData.decodeRLP(transaction.fromRawRlp(9, decoded));
         } catch (InstantiationException e) {
             t = e;
         } catch (IllegalAccessException e) {
@@ -387,14 +387,14 @@ public class Transaction implements Parcelable {
         mType = OperationType.findByValue(new BigInteger(fromRawRlp(4, raw)));
         /**
          * ha, where is the 5th index?
-         * see here: {@link #fromEncoded(String, Class, Class)}
+         * see here: {@link #fromEncoded(String)}
          */
         mPayload = new BytesData(fromRawRlp(6, raw));
         mServiceData = new BytesData(fromRawRlp(7, raw));
         mSignatureType = SignatureType.findByValue(new BigInteger(fromRawRlp(8, raw)));
         /**
          * And there's no 8 index, it's signature data
-         * decode here: {@link #fromEncoded(String, Class, Class)}
+         * decode here: {@link #fromEncoded(String)}
          */
     }
 

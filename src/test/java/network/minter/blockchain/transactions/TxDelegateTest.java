@@ -60,7 +60,7 @@ public class TxDelegateTest {
     @Test
     public void testEncode() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88f01018a4d4e540000000000000007b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ca07d7e28a5dc1e5ceca0c0b52c22331d813b9eed8a4a6bfad8b8a3c96cad72eddfa020358b98ceceaca7b36d034b738916a410af531a88c1a4cb7c95990b9a0c703e";
+	    final String validTx = "f8900102018a4d4e540000000000000007b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ba01c2c8f702d80cf64da1e9bf1f07a52e2fee8721aebe419aa9f62260a98983f89a07ed297d71d9dc37a57ffe9bb16915dccc703d8c09f30da8aadb9d5dbab8c7da9";
         final PrivateKey privateKey = new PrivateKey("6e1df6ec69638d152f563c5eca6c13cdb5db4055861efc11ec1cdd578afd96bf");
 
         Transaction tx = new Transaction.Builder(nonce)
@@ -79,7 +79,7 @@ public class TxDelegateTest {
     @Test
     public void testDecode() {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88f01018a4d4e540000000000000007b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ca07d7e28a5dc1e5ceca0c0b52c22331d813b9eed8a4a6bfad8b8a3c96cad72eddfa020358b98ceceaca7b36d034b738916a410af531a88c1a4cb7c95990b9a0c703e";
+	    final String validTx = "f8900102018a4d4e540000000000000007b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ba01c2c8f702d80cf64da1e9bf1f07a52e2fee8721aebe419aa9f62260a98983f89a07ed297d71d9dc37a57ffe9bb16915dccc703d8c09f30da8aadb9d5dbab8c7da9";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);
