@@ -48,23 +48,6 @@ import network.minter.core.crypto.MinterPublicKey;
  */
 @Parcel
 public class HistoryTransaction {
-    /*
-"data": {
-"coin": "MNT",
-"to": "Mx184ac726059e43643e67290666f7b3195093f870",
-"value": "100000000000000000000"
-},
-
-    @SerializedName("12")
-    CreateMultisigAddress((byte) 0x0C, null, 100D),
-
-    @SerializedName("13")
-    Multisend((byte) 0x0D, TxMultisend.class, /*commission: 10+(n-1)*5 units 0D),
-
-    @SerializedName("14")
-    EditCandidate((byte) 0x0E, TxEditCandidateTransaction.class, 10000D),
-     */
-
     public BytesData hash;
     @SerializedName("raw_tx")
     public BytesData rawTx;

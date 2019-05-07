@@ -31,7 +31,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.4.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
@@ -58,14 +58,14 @@ apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '0.6.1'
+version = '0.6.2'
 
 ext {
     minterMinSdk = 16
     minterMaxSdk = 28
     minterBuildTools = "28.0.3"
     minterLibSupport = "28.0.0"
-    minterCoreVers = "0.2.4"
+    minterCoreVers = "0.2.5"
 
 
     buildArtifactName = project.name
@@ -167,8 +167,7 @@ android {
         // can't use name starts with 'test'
         netMain {
             dimension "env"
-            //@TODO
-            buildConfigField "String", "BASE_NODE_URL", '"https://minter-node-1.testnet.minter.network:8841"'
+            buildConfigField "String", "BASE_NODE_URL", '"https://minter-node.apps.minter.network"'
             buildConfigField "network.minter.blockchain.models.operational.BlockchainID", "BLOCKCHAIN_ID", "network.minter.blockchain.models.operational.BlockchainID.MainNet"
         }
         netTest {

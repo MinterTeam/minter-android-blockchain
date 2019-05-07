@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.6.2
+ - MainNet urls, cleanup
+
 ## 0.6.1
  - Update commissions
  - Fix serialization for Validator
