@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -40,6 +40,7 @@ import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
 
+import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
 import static network.minter.core.internal.helpers.StringHelper.bytesToString;
 
@@ -117,7 +118,7 @@ public final class TxUnbound extends Operation {
     }
 
     public BigDecimal getValue() {
-        return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(mValue));
+        return new BigDecimal(mValue).divide(Transaction.VALUE_MUL_DEC);
     }
 
     public TxUnbound setValue(BigDecimal stakeDecimal) {
@@ -130,9 +131,9 @@ public final class TxUnbound extends Operation {
         return this;
     }
 
-    public TxUnbound setValue(String stakeBigInteger) {
-        mValue = new BigInteger(stakeBigInteger);
-        return this;
+    public TxUnbound setValue(CharSequence decimalValue) {
+        checkNotNull(decimalValue);
+        return setValue(new BigDecimal(decimalValue.toString()));
     }
 
     @Override

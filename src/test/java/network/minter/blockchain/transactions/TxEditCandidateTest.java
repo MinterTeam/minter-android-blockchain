@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 
+import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
@@ -57,17 +58,30 @@ public class TxEditCandidateTest {
         }
     }
 
+    @Test
+    public void testPK() {
+        String mnem = "original expand list pencil blade ivory express achieve inside stool apple truck";
+        PrivateKey pk = PrivateKey.fromMnemonic(mnem);
+
+
+        System.out.println(pk.toHexString());
+        System.out.println(pk.getPublicKey(false).toHexString());
+        System.out.println(pk.getPublicKey(true).toHexString());
+        System.out.println(pk.getPublicKey().toMinter().toHexString());
+    }
+
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
         //original expand list pencil blade ivory express achieve inside stool apple truck
         PrivateKey privateKey = PrivateKey.fromMnemonic("original expand list pencil blade ivory express achieve inside stool apple truck");
         MinterAddress address = privateKey.getPublicKey().toMinter();
-        String validTx = "f8a701018a4d4e54000000000000000eb84df84ba00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a439442516215b2dd72187d3ef6adb19fc3aabbbced239442516215b2dd72187d3ef6adb19fc3aabbbced23808001b845f8431ba028318a4a40c2c2ebcfb46e1e05ad8dbdb7913116544ad59beb4938331c6b552ba066e6ac70ed90f5beef6c2970527e0e3963175c07fc7bc0218b8dff4988dd916f";
+        String validTx = "f8a80102018a4d4e54000000000000000eb84df84ba00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a439442516215b2dd72187d3ef6adb19fc3aabbbced239442516215b2dd72187d3ef6adb19fc3aabbbced23808001b845f8431ba005b789fdca2d6a08ae47d62d60cfd442aad3eb7ed110373aba348ec687c15a28a035a7f223ab8d2675419f036445aac07b537882b1f3e10dd9e4d06cdb5ac44a38";
 
         BigInteger nonce = new BigInteger("1");
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoin("MNT")
+                .setBlockchainId(BlockchainID.TestNet)
                 .editCandidate()
                 .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
                 .setRewardAddress(address)
@@ -82,7 +96,7 @@ public class TxEditCandidateTest {
     public void testDecodeSingle() {
         PrivateKey privateKey = PrivateKey.fromMnemonic("original expand list pencil blade ivory express achieve inside stool apple truck");
         MinterAddress address = privateKey.getPublicKey().toMinter();
-        String validTx = "f8a701018a4d4e54000000000000000eb84df84ba00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a439442516215b2dd72187d3ef6adb19fc3aabbbced239442516215b2dd72187d3ef6adb19fc3aabbbced23808001b845f8431ba028318a4a40c2c2ebcfb46e1e05ad8dbdb7913116544ad59beb4938331c6b552ba066e6ac70ed90f5beef6c2970527e0e3963175c07fc7bc0218b8dff4988dd916f";
+        String validTx = "f8a80102018a4d4e54000000000000000eb84df84ba00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a439442516215b2dd72187d3ef6adb19fc3aabbbced239442516215b2dd72187d3ef6adb19fc3aabbbced23808001b845f8431ba005b789fdca2d6a08ae47d62d60cfd442aad3eb7ed110373aba348ec687c15a28a035a7f223ab8d2675419f036445aac07b537882b1f3e10dd9e4d06cdb5ac44a38";
 
         BigInteger nonce = new BigInteger("1");
         Transaction tx = Transaction.fromEncoded(validTx);
