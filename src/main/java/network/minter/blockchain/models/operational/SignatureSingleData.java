@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,10 +30,9 @@ import android.os.Parcel;
 
 import com.edwardstock.secp256k1.NativeSecp256k1;
 
-import java.math.BigInteger;
-
 import javax.annotation.Nonnull;
 
+import network.minter.core.crypto.BytesData;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
 
@@ -55,17 +54,17 @@ public final class SignatureSingleData extends SignatureData {
             return new SignatureSingleData[size];
         }
     };
-    private BigInteger mV;
-    private BigInteger mR;
-    private BigInteger mS;
+    private BytesData mV;
+    private BytesData mR;
+    private BytesData mS;
 
     public SignatureSingleData() {
     }
 
     protected SignatureSingleData(Parcel in) {
-        mV = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mR = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mS = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+        mV = (BytesData) in.readValue(BytesData.class.getClassLoader());
+        mR = (BytesData) in.readValue(BytesData.class.getClassLoader());
+        mS = (BytesData) in.readValue(BytesData.class.getClassLoader());
     }
 
     @Override
@@ -80,28 +79,28 @@ public final class SignatureSingleData extends SignatureData {
         dest.writeValue(mS);
     }
 
-    public BigInteger getR() {
+    public BytesData getR() {
         return mR;
     }
 
-    public BigInteger getS() {
+    public BytesData getS() {
         return mS;
     }
 
-    public BigInteger getV() {
+    public BytesData getV() {
         return mV;
     }
 
     protected void setSign(NativeSecp256k1.RecoverableSignature signature) {
-        mV = new BigInteger(signature.v);
-        mR = new BigInteger(signature.r);
-        mS = new BigInteger(signature.s);
+        mV = new BytesData(signature.v, true);
+        mR = new BytesData(signature.r, true);
+        mS = new BytesData(signature.s, true);
     }
 
     protected void decodeRaw(byte[][] vrs) {
-        mV = new BigInteger(vrs[0]);
-        mR = new BigInteger(vrs[1]);
-        mS = new BigInteger(vrs[2]);
+        mV = new BytesData(vrs[0]);
+        mR = new BytesData(vrs[1]);
+        mS = new BytesData(vrs[2]);
     }
 
     /**
@@ -113,16 +112,16 @@ public final class SignatureSingleData extends SignatureData {
     protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
         final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        mV = new BigInteger(fromRawRlp(0, decoded));
-        mR = new BigInteger(fromRawRlp(1, decoded));
-        mS = new BigInteger(fromRawRlp(2, decoded));
+        mV = new BytesData(fromRawRlp(0, decoded));
+        mR = new BytesData(fromRawRlp(1, decoded));
+        mS = new BytesData(fromRawRlp(2, decoded));
     }
 
     @Nonnull
     @Override
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
-                mV, mR, mS
+                mV.getData(), mR.getData(), mS.getData()
         });
     }
 }
