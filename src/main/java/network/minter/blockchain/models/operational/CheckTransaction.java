@@ -31,6 +31,7 @@ import com.edwardstock.secp256k1.NativeSecp256k1;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import network.minter.blockchain.BuildConfig;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.HashUtil;
@@ -49,6 +50,7 @@ import static network.minter.core.internal.helpers.StringHelper.strrpad;
 public class CheckTransaction {
     private String mPassphrase;
     private BigInteger mNonce;
+    private BlockchainID mChainId;
     private BigInteger mDueBlock;
     private String mCoin = MinterSDK.DEFAULT_COIN;
     private BigInteger mValue;
@@ -60,8 +62,12 @@ public class CheckTransaction {
         mPassphrase = passphrase;
     }
 
+    public static BytesData makeProof(String address, String passphrase) {
+        return makeProof(new MinterAddress(address), passphrase);
+    }
+
     /**
-     * Create check proff
+     * Create check proof
      * @param address minter address
      * @param passphrase check password
      * @return proof bytes data
@@ -167,6 +173,7 @@ public class CheckTransaction {
         if (forSigning) {
             return RLP.encode(new Object[]{
                     mNonce,
+                    BigInteger.valueOf(mChainId.getId()),
                     mDueBlock,
                     mCoin,
                     mValue
@@ -177,18 +184,20 @@ public class CheckTransaction {
         if (mSignature != null && mSignature.getV() != null && mSignature.getR() != null && mSignature.getS() != null) {
             return RLP.encode(new Object[]{
                     mNonce,
+                    BigInteger.valueOf(mChainId.getId()),
                     mDueBlock,
                     mCoin,
                     mValue,
                     lock,
-                    mSignature.getV(),
-                    mSignature.getR(),
-                    mSignature.getS(),
+                    mSignature.getV().getData(),
+                    mSignature.getR().getData(),
+                    mSignature.getS().getData(),
             });
         }
 
         return RLP.encode(new Object[]{
                 mNonce,
+                BigInteger.valueOf(mChainId.getId()),
                 mDueBlock,
                 mCoin,
                 mValue,
@@ -201,6 +210,12 @@ public class CheckTransaction {
 
         public Builder(BigInteger nonce, String passphrase) {
             mCheck = new CheckTransaction(nonce, passphrase);
+            mCheck.mChainId = BuildConfig.BLOCKCHAIN_ID;
+        }
+
+        public Builder setChainId(BlockchainID id) {
+            mCheck.mChainId = id;
+            return this;
         }
 
         public Builder setCoin(String coin) {

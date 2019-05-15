@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -143,8 +143,8 @@ public final class TxRedeemCheck extends Operation {
     @Override
     protected byte[] encodeRLP() {
         return RLP.encode(new Object[]{
-                mRawCheck,
-                mProof
+                mRawCheck.getData(),
+                mProof.getData()
         });
     }
 

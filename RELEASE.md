@@ -1,5 +1,9 @@
 # Release notes
 
+## 0.6.4
+ - Fixed leading zeroes wrong signature
+ - Fixed check transactions
+
 ## 0.6.2
  - MainNet urls, cleanup
 

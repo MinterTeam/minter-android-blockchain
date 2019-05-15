@@ -33,6 +33,7 @@ import com.edwardstock.secp256k1.NativeSecp256k1;
 import javax.annotation.Nonnull;
 
 import network.minter.core.crypto.BytesData;
+import network.minter.core.internal.helpers.BytesHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLP;
 
@@ -120,8 +121,10 @@ public final class SignatureSingleData extends SignatureData {
     @Nonnull
     @Override
     protected byte[] encodeRLP() {
-        return RLP.encode(new Object[]{
-                mV.getData(), mR.getData(), mS.getData()
-        });
+        byte[] v = mV.getData();
+        byte[] r = BytesHelper.dropFirstZeroes(mR.getData());
+        byte[] s = BytesHelper.dropFirstZeroes(mS.getData());
+
+        return RLP.encode(new Object[]{v, r, s});
     }
 }
