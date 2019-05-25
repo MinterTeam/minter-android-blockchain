@@ -37,14 +37,13 @@ import javax.annotation.Nullable;
 
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.bytesToString;
+import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxCoinBuy extends Operation {
@@ -125,19 +124,10 @@ public final class TxCoinBuy extends Operation {
         return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(mValueToBuy));
     }
 
-    /**
-     * Use double value carefuly, only on a not a big numbers, otherwise number will be overflowed
-     * @return double value
-     */
-    public double getValueToBuyDouble() {
-        return getValueToBuy().doubleValue();
-    }
-
     public TxCoinBuy setValueToBuy(BigInteger amount) {
         mValueToBuy = amount;
         return this;
     }
-
 
     public TxCoinBuy setValueToBuy(double amount) {
         return setValueToBuy(new BigDecimal(String.valueOf(amount)));
@@ -146,6 +136,15 @@ public final class TxCoinBuy extends Operation {
     public TxCoinBuy setValueToBuy(BigDecimal amount) {
         return setValueToBuy(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
     }
+
+	/**
+	 * Use double value carefuly, only on a not a big numbers, otherwise number will be overflowed
+	 *
+	 * @return double value
+	 */
+	public double getValueToBuyDouble() {
+		return getValueToBuy().doubleValue();
+	}
 
     public TxCoinBuy setMaxValueToSell(double amount) {
         return setMaxValueToSell(new BigDecimal(String.valueOf(amount)));
@@ -177,8 +176,8 @@ public final class TxCoinBuy extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
-        return RLP.encode(new Object[]{
+    protected char[] encodeRLP() {
+	    return RLPBoxed.encode(new Object[]{
                 mCoinToBuy,
                 mValueToBuy,
                 mCoinToSell,
@@ -187,13 +186,13 @@ public final class TxCoinBuy extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-        mCoinToBuy = bytesToString(fromRawRlp(0, decoded));
+	    mCoinToBuy = charsToString(fromRawRlp(0, decoded));
         mValueToBuy = fixBigintSignedByte(fromRawRlp(1, decoded));
-        mCoinToSell = bytesToString(fromRawRlp(2, decoded));
+	    mCoinToSell = charsToString(fromRawRlp(2, decoded));
         mMaxValueToSell = fixBigintSignedByte(fromRawRlp(3, decoded));
     }
 }

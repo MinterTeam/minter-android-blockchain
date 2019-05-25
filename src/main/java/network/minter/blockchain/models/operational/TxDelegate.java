@@ -38,10 +38,10 @@ import javax.annotation.Nullable;
 import network.minter.core.crypto.PublicKey;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.bytesToString;
+import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
@@ -159,8 +159,8 @@ public final class TxDelegate extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
-        return RLP.encode(new Object[]{
+    protected char[] encodeRLP() {
+	    return RLPBoxed.encode(new Object[]{
                 mPubKey.getData(),
                 mCoin,
                 mStake
@@ -168,11 +168,11 @@ public final class TxDelegate extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mPubKey = new PublicKey(fromRawRlp(0, decoded));
-        mCoin = bytesToString(fromRawRlp(1, decoded));
+	    mCoin = charsToString(fromRawRlp(1, decoded));
         mStake = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 

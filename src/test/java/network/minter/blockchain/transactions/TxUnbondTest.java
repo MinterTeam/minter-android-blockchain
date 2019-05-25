@@ -63,7 +63,7 @@ public class TxUnbondTest {
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f8900102018a4d4e540000000000000008b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ca0ff5766c85847b37a276f3f9d027fb7c99745920fa395c7bd399cedd8265c5e1da000791bcdfe4d1bc1e73ada7bf833103c828f22d83189dad2b22ad28a54aacf2a";
+	    final String validTx = "f88f0102018a4d4e540000000000000008b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b844f8421ca0ff5766c85847b37a276f3f9d027fb7c99745920fa395c7bd399cedd8265c5e1d9f791bcdfe4d1bc1e73ada7bf833103c828f22d83189dad2b22ad28a54aacf2a";
         final PrivateKey privateKey = new PrivateKey("6e1df6ec69638d152f563c5eca6c13cdb5db4055861efc11ec1cdd578afd96bf");
 
         Transaction tx = new Transaction.Builder(nonce)
@@ -86,7 +86,7 @@ public class TxUnbondTest {
     @Test
     public void testDecodeSingle() {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f8900102018a4d4e540000000000000008b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ca0ff5766c85847b37a276f3f9d027fb7c99745920fa395c7bd399cedd8265c5e1da000791bcdfe4d1bc1e73ada7bf833103c828f22d83189dad2b22ad28a54aacf2a";
+	    final String validTx = "f88f0102018a4d4e540000000000000008b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b844f8421ca0ff5766c85847b37a276f3f9d027fb7c99745920fa395c7bd399cedd8265c5e1d9f791bcdfe4d1bc1e73ada7bf833103c828f22d83189dad2b22ad28a54aacf2a";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);

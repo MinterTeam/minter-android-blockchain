@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.api.converters.MinterAddressDeserializer;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
 
@@ -122,16 +122,16 @@ public class TxCreateMultisigAddress extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mThreshold = fixBigintSignedByte(fromRawRlp(0, decoded));
 
         Object[] weights = (Object[]) decoded[1];
         mWeights = new LinkedList<>();
         for (Object weightsEncoded : weights) {
-            final byte[][] weightsBytes = objArrToByteArrArr((Object[]) weightsEncoded);
-            for (byte[] weight : weightsBytes) {
+	        final char[][] weightsBytes = objArrToByteArrArr((Object[]) weightsEncoded);
+	        for (char[] weight : weightsBytes) {
                 mWeights.add(fixBigintSignedByte(weight));
             }
         }
@@ -139,8 +139,8 @@ public class TxCreateMultisigAddress extends Operation {
         Object[] addresses = (Object[]) decoded[2];
         mAddresses = new LinkedList<>();
         for (Object address : addresses) {
-            byte[][] ws = objArrToByteArrArr((Object[]) address);
-            for (byte[] w : ws) {
+	        char[][] ws = objArrToByteArrArr((Object[]) address);
+	        for (char[] w : ws) {
                 mAddresses.add(new MinterAddress(w));
             }
         }
@@ -148,15 +148,15 @@ public class TxCreateMultisigAddress extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
+    protected char[] encodeRLP() {
         final BigInteger[] weights = mWeights.toArray(new BigInteger[mWeights.size()]);
         final byte[][] addresses = new byte[mAddresses.size()][];
         for (int i = 0; i < mAddresses.size(); i++) {
             addresses[i] = mAddresses.get(i).getData();
         }
 
-        return RLP.encode(new Object[]{
-                mThreshold,
+	    return RLPBoxed.encode(new Object[]{
+			    mThreshold.toByteArray(),
                 weights,
                 addresses
         });

@@ -39,15 +39,14 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PublicKey;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.bytesToString;
+import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxDeclareCandidacy extends Operation {
@@ -133,7 +132,6 @@ public final class TxDeclareCandidacy extends Operation {
 
     /**
      * Get commission in percents
-     *
      * @return percent int value
      */
     public int getCommission() {
@@ -157,7 +155,6 @@ public final class TxDeclareCandidacy extends Operation {
 
     /**
      * Get normalized value
-     *
      * @return big decimal value
      */
     public BigDecimal getStake() {
@@ -167,16 +164,6 @@ public final class TxDeclareCandidacy extends Operation {
     public TxDeclareCandidacy setStake(String stakeBigInteger) {
         mStake = new BigInteger(stakeBigInteger);
         return this;
-    }
-
-    /**
-     * Get normalized value in double value
-     * Be carefully! Value can be overflowed
-     *
-     * @return normalized double value
-     */
-    public double getStakeDouble() {
-        return getStake().doubleValue();
     }
 
     public TxDeclareCandidacy setStake(BigDecimal stakeDecimal) {
@@ -192,6 +179,16 @@ public final class TxDeclareCandidacy extends Operation {
     public TxDeclareCandidacy setStake(double amount) {
         return setStake(new BigDecimal(String.valueOf(amount)));
     }
+
+	/**
+	 * Get normalized value in double value
+	 * Be carefully! Value can be overflowed
+	 *
+	 * @return normalized double value
+	 */
+	public double getStakeDouble() {
+		return getStake().doubleValue();
+	}
 
     @Override
     public OperationType getType() {
@@ -211,8 +208,8 @@ public final class TxDeclareCandidacy extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
-        return RLP.encode(new Object[]{
+    protected char[] encodeRLP() {
+	    return RLPBoxed.encode(new Object[]{
                 mAddress.getData(),
                 mPubKey.getData(),
                 mCommission,
@@ -222,13 +219,13 @@ public final class TxDeclareCandidacy extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mAddress = new MinterAddress(fromRawRlp(0, decoded));
         mPubKey = new PublicKey(fromRawRlp(1, decoded));
         mCommission = fixBigintSignedByte(fromRawRlp(2, decoded)).intValue();
-        mCoin = bytesToString(fromRawRlp(3, decoded));
+	    mCoin = charsToString(fromRawRlp(3, decoded));
         mStake = fixBigintSignedByte(fromRawRlp(4, decoded));
     }
 }

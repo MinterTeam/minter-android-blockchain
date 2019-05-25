@@ -37,12 +37,12 @@ import javax.annotation.Nullable;
 
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 import static network.minter.blockchain.models.operational.Transaction.VALUE_MUL_DEC;
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.bytesToString;
+import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
@@ -249,8 +249,8 @@ public final class TxCreateCoin extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
-        return RLP.encode(new Object[]{
+    protected char[] encodeRLP() {
+	    return RLPBoxed.encode(new Object[]{
                 mName,
                 mSymbol,
                 mInitialAmount,
@@ -260,11 +260,11 @@ public final class TxCreateCoin extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        mName = bytesToString(fromRawRlp(0, decoded));
-        mSymbol = bytesToString(fromRawRlp(1, decoded));
+	    mName = charsToString(fromRawRlp(0, decoded));
+	    mSymbol = charsToString(fromRawRlp(1, decoded));
         mInitialAmount = fixBigintSignedByte(fromRawRlp(2, decoded));
         mInitialReserve = fixBigintSignedByte(fromRawRlp(3, decoded));
         mConstantReserveRatio = fixBigintSignedByte(fromRawRlp(4, decoded)).intValue();

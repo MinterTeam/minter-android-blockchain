@@ -35,7 +35,7 @@ import javax.annotation.Nullable;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PublicKey;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 /**
  * minter-android-blockchain. 2019
@@ -125,8 +125,8 @@ public class TxEditCandidateTransaction extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mPubKey = new PublicKey(fromRawRlp(0, decoded));
         mRewardAddress = new MinterAddress(fromRawRlp(1, decoded));
@@ -135,8 +135,8 @@ public class TxEditCandidateTransaction extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
-        return RLP.encode(new Object[]{
+    protected char[] encodeRLP() {
+	    return RLPBoxed.encode(new Object[]{
                 mPubKey.getData(),
                 mRewardAddress.getData(),
                 mOwnerAddress.getData()

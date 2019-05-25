@@ -40,15 +40,15 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.helpers.BytesHelper;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.helpers.BytesHelper.lpad;
+import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxSendCoin extends Operation {
@@ -83,13 +83,8 @@ public final class TxSendCoin extends Operation {
         return new BigDecimal(mValue).divide(Transaction.VALUE_MUL_DEC).doubleValue();
     }
 
-    public String getCoinRaw() {
-        return mCoin;
-    }
-
     /**
      * Set double value
-     *
      * @param value double value
      * @return self
      * @see #setValue(BigDecimal)
@@ -100,7 +95,6 @@ public final class TxSendCoin extends Operation {
 
     /**
      * Set string value
-     *
      * @param decimalValue Floating point string value. Precision up to 18 digits: 0.10203040506078090
      * @return self
      */
@@ -111,7 +105,6 @@ public final class TxSendCoin extends Operation {
 
     /**
      * Set big decimal value
-     *
      * @param value big decimal value with scale up to 18
      * @return self
      * @see Transaction#VALUE_MUL
@@ -120,6 +113,15 @@ public final class TxSendCoin extends Operation {
         mValue = value.multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
         return this;
     }
+
+	private TxSendCoin setValue(BigInteger value) {
+		mValue = value.multiply(Transaction.VALUE_MUL);
+		return this;
+	}
+
+	public String getCoinRaw() {
+		return mCoin;
+	}
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -163,7 +165,6 @@ public final class TxSendCoin extends Operation {
 
     /**
      * You MUST multiply this rawValue on {@link Transaction#VALUE_MUL} by yourself
-     *
      * @param rawValue
      * @param radix
      * @return
@@ -189,31 +190,26 @@ public final class TxSendCoin extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
+    protected char[] encodeRLP() {
         byte[] to = this.mTo.getData();
         to = lpad(20, to);
-        return RLP.encode(new Object[]{mCoin, to, mValue});
+	    return RLPBoxed.encode(new Object[]{mCoin, to, mValue});
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-        mCoin = StringHelper.bytesToString(fromRawRlp(0, decoded));
+	    mCoin = charsToString(fromRawRlp(0, decoded));
         mTo = new MinterAddress(fromRawRlp(1, decoded));
         mValue = BytesHelper.fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 
-    protected void decodeRaw(byte[][] vrs) {
+	protected void decodeRaw(char[][] vrs) {
         mCoin = new String(vrs[0]);
         mTo = new MinterAddress(vrs[1]);
         mValue = BytesHelper.fixBigintSignedByte(vrs[2]);
-    }
-
-    private TxSendCoin setValue(BigInteger value) {
-        mValue = value.multiply(Transaction.VALUE_MUL);
-        return this;
     }
 
 

@@ -40,7 +40,7 @@ import javax.annotation.Nullable;
 
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.helpers.BytesHelper.lpad;
 
@@ -165,8 +165,8 @@ public class TxMultisend extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
         Object[] items = (Object[]) decoded[0];
@@ -181,7 +181,7 @@ public class TxMultisend extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
+    protected char[] encodeRLP() {
         final Object[][] items = new Object[mItems.size()][3];
         for (int i = 0; i < mItems.size(); i++) {
             byte[] to = mItems.get(i).getTo().getData();
@@ -189,7 +189,7 @@ public class TxMultisend extends Operation {
             items[i] = new Object[]{mItems.get(i).getCoinRaw(), to, mItems.get(i).getValueBigInteger()};
         }
 
-        return RLP.encode(new Object[]{items});
+	    return RLPBoxed.encode(new Object[]{items});
 
     }
 }

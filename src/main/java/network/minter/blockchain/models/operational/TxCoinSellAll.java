@@ -37,10 +37,10 @@ import javax.annotation.Nullable;
 
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.bytesToString;
+import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
@@ -100,6 +100,14 @@ public final class TxCoinSellAll extends Operation {
         return this;
     }
 
+	public BigInteger getMinValueToBuyBigInteger() {
+		return mMinValueToBuy;
+	}
+
+	public BigDecimal getMinValueToBuy() {
+		return new BigDecimal(mMinValueToBuy).divide(Transaction.VALUE_MUL_DEC);
+	}
+
     public TxCoinSellAll setMinValueToBuy(BigInteger amount) {
         mMinValueToBuy = amount;
         return this;
@@ -107,14 +115,6 @@ public final class TxCoinSellAll extends Operation {
 
     public TxCoinSellAll setMinValueToBuy(BigDecimal amount) {
         return setMinValueToBuy(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
-    }
-
-    public BigInteger getMinValueToBuyBigInteger() {
-        return mMinValueToBuy;
-    }
-
-    public BigDecimal getMinValueToBuy() {
-        return new BigDecimal(mMinValueToBuy).divide(Transaction.VALUE_MUL_DEC);
     }
 
     public TxCoinSellAll setMinValueToBuy(double amount) {
@@ -141,8 +141,8 @@ public final class TxCoinSellAll extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
-        return RLP.encode(new Object[]{
+    protected char[] encodeRLP() {
+	    return RLPBoxed.encode(new Object[]{
                 mCoinToSell,
                 mCoinToBuy,
                 mMinValueToBuy
@@ -150,12 +150,12 @@ public final class TxCoinSellAll extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-        mCoinToSell = bytesToString(fromRawRlp(0, decoded));
-        mCoinToBuy = bytesToString(fromRawRlp(1, decoded));
+	    mCoinToSell = charsToString(fromRawRlp(0, decoded));
+	    mCoinToBuy = charsToString(fromRawRlp(1, decoded));
         mMinValueToBuy = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 }

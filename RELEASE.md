@@ -1,8 +1,9 @@
 # Release notes
 
-## 0.6.4
- - Fixed leading zeroes wrong signature
- - Fixed check transactions
+## 0.7.0
+ - BREAKING CHANGES:
+    - Fixed RLP decoding/encoding for uint64_t-like values, `nonce` for example
+    - In most places `byte[]` was replaced with `char[]`, `BytesData` to `UnsignedBytesData`
 
 ## 0.6.2
  - MainNet urls, cleanup

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -34,11 +34,10 @@ import javax.annotation.Nullable;
 
 import network.minter.core.crypto.PublicKey;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxSetCandidateOffline extends Operation {
@@ -97,8 +96,8 @@ public final class TxSetCandidateOffline extends Operation {
 
     @Nonnull
     @Override
-    protected byte[] encodeRLP() {
-        return RLP.encode(new Object[]{
+    protected char[] encodeRLP() {
+	    return RLPBoxed.encode(new Object[]{
                 mPubKey.getData()
         });
     }
@@ -111,8 +110,8 @@ public final class TxSetCandidateOffline extends Operation {
     }
 
     @Override
-    protected void decodeRLP(@Nonnull byte[] rlpEncodedData) {
-        final DecodeResult rlp = RLP.decode(rlpEncodedData, 0);/**/
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mPubKey = new PublicKey(fromRawRlp(0, decoded));
     }

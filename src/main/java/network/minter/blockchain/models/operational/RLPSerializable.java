@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -39,29 +39,29 @@ public abstract class RLPSerializable {
      * Decode data from encoded RLP
      * @param rlpEncodedData
      */
-    protected abstract void decodeRLP(@Nonnull byte[] rlpEncodedData);
+    protected abstract void decodeRLP(@Nonnull char[] rlpEncodedData);
     /**
      * Encodes all create fields via RLP
      * @return encoded byte[]
      * @see RLP
      */
     @Nonnull
-    protected abstract byte[] encodeRLP();
+    protected abstract char[] encodeRLP();
 
-    protected byte[][] objArrToByteArrArr(Object[] input) {
-        byte[][] out = new byte[input.length][];
+	protected char[][] objArrToByteArrArr(Object[] input) {
+		char[][] out = new char[input.length][];
         for (int i = 0; i < input.length; i++) {
-            out[i] = (byte[]) input[i];
+	        out[i] = (char[]) input[i];
         }
 
         return out;
     }
 
-    protected byte[] fromRawRlp(int idx, Object[] raw) {
-        return (byte[]) raw[idx];
+	protected char[] fromRawRlp(int idx, Object[] raw) {
+		return (char[]) raw[idx];
     }
 
-    protected byte[] fromRawRlp(int idx, byte[][] raw) {
+	protected char[] fromRawRlp(int idx, char[][] raw) {
         return raw[idx];
     }
 }
