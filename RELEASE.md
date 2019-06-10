@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.7.1
+ - Fixed check
+
 ## 0.7.0
  - BREAKING CHANGES:
     - Fixed RLP decoding/encoding for uint64_t-like values, `nonce` for example
