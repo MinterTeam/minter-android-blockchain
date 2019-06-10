@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,12 +30,13 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 
+import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.CheckTransaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
-import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
+import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static org.junit.Assert.assertEquals;
@@ -59,11 +60,12 @@ public class CheckTransactionTest {
         PrivateKey privateKey = new PrivateKey("64e27afaab363f21eec05291084367f6f1297a7b280d69d672febecda94a09ea");
         MinterAddress address = new MinterAddress("Mxa7bc33954f1ce855ed1a8c768fdd32ed927def47");
         String pass = "pass";
-        String validCheck = "Mcf89f01830f423f8a4d4e5400000000000000888ac7230489e80000b841ada7ad273bef8a1d22f3e314fdfad1e19b90b1fe8dc7eeb30bd1d391e89af8642af029c138c2e379b95d6bc71b26c531ea155d9435e156a3d113a14c912dfebf001ba0eb3d47f227c3da3b29e09234ad24c49296f177234f3c9700d780712a656c338ba05726e0ed31ab98c07869a99f22e84165fe4a777b0bac7bcf287532210cae1bba";
+	    String validCheck = "Mcf8a00102830f423f8a4d4e5400000000000000888ac7230489e80000b8419200e3c947484ced3268eebd1810d640ac0d6c6a099e4d87e074bab6a5751a324540e1e53907a10c9fb73f944490a737034de4a8bae96e707b5acbf8015dd8cb001ba0cbbc87bc7018f2c3bcaea67968713389addc3bf72f698b8b44ffddc384fca230a07ff35524aaca365fdac2eb25d29e9ba8431484fcb2b890d6d940d2527daeca22";
         String validProof = "da021d4f84728e0d3d312a18ec84c21768e0caa12a53cb0a1452771f72b0d1a91770ae139fd6c23bcf8cec50f5f2e733eabb8482cf29ee540e56c6639aac469600";
 
         CheckTransaction check = new CheckTransaction.Builder(new BigInteger("1"), pass)
                 .setCoin("MNT")
+		        .setChainId(BlockchainID.TestNet)
                 .setDueBlock(new BigInteger("999999"))
                 .setValue(10d)
                 .build();
@@ -72,7 +74,7 @@ public class CheckTransactionTest {
 
         assertEquals(validCheck, sign.getTxSign());
 
-        BytesData proof = CheckTransaction.makeProof(address, pass);
+	    UnsignedBytesData proof = CheckTransaction.makeProof(address, pass);
         assertEquals(validProof, proof.toHexString());
 
     }

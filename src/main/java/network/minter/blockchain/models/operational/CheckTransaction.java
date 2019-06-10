@@ -37,7 +37,9 @@ import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.HashUtil;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
+import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.util.RLP;
+import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
@@ -54,7 +56,7 @@ public class CheckTransaction {
     private BigInteger mDueBlock;
     private String mCoin = MinterSDK.DEFAULT_COIN;
     private BigInteger mValue;
-    private BytesData mLock;
+	private UnsignedBytesData mLock;
     private SignatureSingleData mSignature;
 
     CheckTransaction(BigInteger nonce, String passphrase) {
@@ -62,7 +64,7 @@ public class CheckTransaction {
         mPassphrase = passphrase;
     }
 
-    public static BytesData makeProof(String address, String passphrase) {
+	public static UnsignedBytesData makeProof(String address, String passphrase) {
         return makeProof(new MinterAddress(address), passphrase);
     }
 
@@ -72,7 +74,7 @@ public class CheckTransaction {
      * @param passphrase check password
      * @return proof bytes data
      */
-    public static BytesData makeProof(MinterAddress address, String passphrase) {
+    public static UnsignedBytesData makeProof(MinterAddress address, String passphrase) {
         BytesData key = new BytesData(HashUtil.sha256(passphrase.getBytes()));
         BytesData encodedAddress = new BytesData(RLP.encode(new Object[]{address.getData()})).sha3Mutable();
 
@@ -89,7 +91,7 @@ public class CheckTransaction {
             signature.v[0] = 0;
         }
 
-        return new BytesData(signature.r, signature.s, signature.v);
+	    return new UnsignedBytesData(signature.r, signature.s, signature.v);
     }
 
     /**
@@ -149,7 +151,7 @@ public class CheckTransaction {
             lockSig.v[0] = 0;
         }
 
-        mLock = new BytesData(lockSig.r, lockSig.s, lockSig.v);
+	    mLock = new UnsignedBytesData(lockSig.r, lockSig.s, lockSig.v);
 
         BytesData withLock = new BytesData(encode(false)).sha3Mutable();
 
@@ -169,9 +171,9 @@ public class CheckTransaction {
         return new TransactionSign(signedCheck);
     }
 
-    private byte[] encode(boolean forSigning) {
+	private char[] encode(boolean forSigning) {
         if (forSigning) {
-            return RLP.encode(new Object[]{
+	        return RLPBoxed.encode(new Object[]{
                     mNonce,
                     BigInteger.valueOf(mChainId.getId()),
                     mDueBlock,
@@ -180,9 +182,9 @@ public class CheckTransaction {
             });
         }
 
-        final byte[] lock = mLock.getData();
+		final char[] lock = mLock.getData();
         if (mSignature != null && mSignature.getV() != null && mSignature.getR() != null && mSignature.getS() != null) {
-            return RLP.encode(new Object[]{
+	        return RLPBoxed.encode(new Object[]{
                     mNonce,
                     BigInteger.valueOf(mChainId.getId()),
                     mDueBlock,
@@ -195,7 +197,7 @@ public class CheckTransaction {
             });
         }
 
-        return RLP.encode(new Object[]{
+		return RLPBoxed.encode(new Object[]{
                 mNonce,
                 BigInteger.valueOf(mChainId.getId()),
                 mDueBlock,
