@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.7.2
+ - Updated blockchain SDK, re-verified tests
+
 ## 0.7.1
  - Fixed check
 
