@@ -137,9 +137,9 @@ public class TxEditCandidateTransaction extends Operation {
     @Override
     protected char[] encodeRLP() {
 	    return RLPBoxed.encode(new Object[]{
-                mPubKey.getData(),
-                mRewardAddress.getData(),
-                mOwnerAddress.getData()
+			    mPubKey,
+			    mRewardAddress,
+			    mOwnerAddress
         });
     }
 }

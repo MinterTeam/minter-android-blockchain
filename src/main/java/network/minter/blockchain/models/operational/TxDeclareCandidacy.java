@@ -210,8 +210,8 @@ public final class TxDeclareCandidacy extends Operation {
     @Override
     protected char[] encodeRLP() {
 	    return RLPBoxed.encode(new Object[]{
-                mAddress.getData(),
-                mPubKey.getData(),
+			    mAddress,
+			    mPubKey,
                 mCommission,
                 mCoin,
                 mStake

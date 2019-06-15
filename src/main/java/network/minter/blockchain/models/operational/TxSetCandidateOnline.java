@@ -98,9 +98,7 @@ public final class TxSetCandidateOnline extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{
-                mPubKey.getData()
-        });
+	    return RLPBoxed.encode(new Object[]{mPubKey});
     }
 
     @Nullable

@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.7.3
+ - Now `MinterPublicKey` and `MinterAddress` encodes with fixed bytes length
+
 ## 0.7.2
  - Updated blockchain SDK, re-verified tests
 

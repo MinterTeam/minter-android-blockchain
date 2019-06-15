@@ -161,7 +161,7 @@ public final class TxDelegate extends Operation {
     @Override
     protected char[] encodeRLP() {
 	    return RLPBoxed.encode(new Object[]{
-                mPubKey.getData(),
+			    mPubKey,
                 mCoin,
                 mStake
         });

@@ -44,7 +44,6 @@ import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
-import static network.minter.core.internal.helpers.BytesHelper.lpad;
 import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
@@ -191,9 +190,7 @@ public final class TxSendCoin extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-        byte[] to = this.mTo.getData();
-        to = lpad(20, to);
-	    return RLPBoxed.encode(new Object[]{mCoin, to, mValue});
+	    return RLPBoxed.encode(new Object[]{mCoin, mTo, mValue});
     }
 
     @Override

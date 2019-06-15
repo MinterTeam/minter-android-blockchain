@@ -153,11 +153,7 @@ public final class TxUnbound extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{
-                mPubKey.getData(),
-                mCoin,
-                mValue
-        });
+	    return RLPBoxed.encode(new Object[]{mPubKey, mCoin, mValue});
     }
 
     @Override

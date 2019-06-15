@@ -150,9 +150,9 @@ public class TxCreateMultisigAddress extends Operation {
     @Override
     protected char[] encodeRLP() {
         final BigInteger[] weights = mWeights.toArray(new BigInteger[mWeights.size()]);
-        final byte[][] addresses = new byte[mAddresses.size()][];
+	    final MinterAddress[] addresses = new MinterAddress[mAddresses.size()];
         for (int i = 0; i < mAddresses.size(); i++) {
-            addresses[i] = mAddresses.get(i).getData();
+	        addresses[i] = mAddresses.get(i);
         }
 
 	    return RLPBoxed.encode(new Object[]{
