@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.7.4
+ - Fixed Multisend address encoding
+
 ## 0.7.3
  - Now `MinterPublicKey` and `MinterAddress` encodes with fixed bytes length
 

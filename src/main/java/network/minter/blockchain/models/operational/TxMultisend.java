@@ -42,8 +42,6 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
-import static network.minter.core.internal.helpers.BytesHelper.lpad;
-
 /**
  * Transaction for sending coins to multiple addresses.
  * <p>
@@ -184,9 +182,7 @@ public class TxMultisend extends Operation {
     protected char[] encodeRLP() {
         final Object[][] items = new Object[mItems.size()][3];
         for (int i = 0; i < mItems.size(); i++) {
-            byte[] to = mItems.get(i).getTo().getData();
-            to = lpad(20, to);
-            items[i] = new Object[]{mItems.get(i).getCoinRaw(), to, mItems.get(i).getValueBigInteger()};
+            items[i] = new Object[]{mItems.get(i).getCoinRaw(), mItems.get(i).getTo(), mItems.get(i).getValueBigInteger()};
         }
 
 	    return RLPBoxed.encode(new Object[]{items});
