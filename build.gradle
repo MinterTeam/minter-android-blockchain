@@ -58,14 +58,14 @@ apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '0.7.4'
+version = '0.7.5'
 
 ext {
     minterMinSdk = 16
     minterMaxSdk = 28
     minterBuildTools = "28.0.3"
     minterLibSupport = "28.0.0"
-    minterCoreVers = "0.3.2"
+    minterCoreVers = "0.4.0"
 
 
     buildArtifactName = project.name

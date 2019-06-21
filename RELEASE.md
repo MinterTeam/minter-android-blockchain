@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.7.5
+ - Updated core SDK
+
 ## 0.7.4
  - Fixed Multisend address encoding
 
