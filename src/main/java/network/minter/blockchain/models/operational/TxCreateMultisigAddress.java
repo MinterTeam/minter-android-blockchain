@@ -66,6 +66,9 @@ public class TxCreateMultisigAddress extends Operation {
     private List<BigInteger> mWeights = new LinkedList<>();
     private List<MinterAddress> mAddresses = new LinkedList<>();
 
+    public TxCreateMultisigAddress() {
+    }
+
     public TxCreateMultisigAddress(@Nonnull Transaction rawTx) {
         super(rawTx);
     }

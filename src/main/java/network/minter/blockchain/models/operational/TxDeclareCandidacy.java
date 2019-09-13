@@ -69,6 +69,9 @@ public final class TxDeclareCandidacy extends Operation {
     private String mCoin;
     private BigInteger mStake;
 
+    public TxDeclareCandidacy() {
+    }
+
     public TxDeclareCandidacy(Transaction rawTx) {
         super(rawTx);
     }

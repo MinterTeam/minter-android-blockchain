@@ -56,6 +56,9 @@ public final class TxSetCandidateOnline extends Operation {
     };
     private PublicKey mPubKey;
 
+    public TxSetCandidateOnline() {
+    }
+
     public TxSetCandidateOnline(Transaction rawTx) {
         super(rawTx);
     }

@@ -65,6 +65,9 @@ public final class TxUnbound extends Operation {
     private String mCoin;
     private BigInteger mValue;
 
+    public TxUnbound() {
+    }
+
     public TxUnbound(Transaction rawTx) {
         super(rawTx);
     }

@@ -64,6 +64,9 @@ public class TxMultisend extends Operation {
     };
     private List<TxSendCoin> mItems = new ArrayList<>();
 
+    public TxMultisend() {
+    }
+
     public TxMultisend(@Nonnull Transaction rawTx) {
         super(rawTx);
     }

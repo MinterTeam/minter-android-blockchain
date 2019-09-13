@@ -7,3 +7,5 @@
 /captures
 .externalNativeBuild
 gradle/wrapper/gradle-wrapper.jar
+src/main/java/network/minter/blockchain/samples
+src/test/java/network/minter/blockchain/repos/SendTest.java

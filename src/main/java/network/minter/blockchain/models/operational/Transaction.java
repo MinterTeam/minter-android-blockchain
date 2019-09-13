@@ -78,18 +78,18 @@ public class Transaction implements Parcelable {
             return new Transaction[size];
         }
     };
-    private BigInteger mNonce;
-    private BlockchainID mChainId;
-    private BigInteger mGasPrice = new BigInteger("1");
-    private String mGasCoin = MinterSDK.DEFAULT_COIN;
-    private OperationType mType = OperationType.SendCoin;
-    private Operation mOperationData;
+    BigInteger mNonce;
+    BlockchainID mChainId;
+    BigInteger mGasPrice = new BigInteger("1");
+    String mGasCoin = MinterSDK.DEFAULT_COIN;
+    OperationType mType = OperationType.SendCoin;
+    Operation mOperationData;
 
     // max - 1024 bytes (1 kilobyte)
-    private UnsignedBytesData mPayload = new UnsignedBytesData(new char[0]);
-	private UnsignedBytesData mServiceData = new UnsignedBytesData(new char[0]);
-    private SignatureType mSignatureType = Single;
-    private SignatureData mSignatureData;
+    UnsignedBytesData mPayload = new UnsignedBytesData(new char[0]);
+    UnsignedBytesData mServiceData = new UnsignedBytesData(new char[0]);
+    SignatureType mSignatureType = Single;
+    SignatureData mSignatureData;
 
     public enum SignatureType {
         Single((byte) 0x01, SignatureSingleData.class),

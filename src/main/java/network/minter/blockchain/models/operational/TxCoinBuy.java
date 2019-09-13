@@ -64,6 +64,9 @@ public final class TxCoinBuy extends Operation {
     private String mCoinToSell;
     private BigInteger mMaxValueToSell;
 
+    public TxCoinBuy() {
+    }
+
     public TxCoinBuy(Transaction rawTx) {
         super(rawTx);
     }

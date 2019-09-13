@@ -59,6 +59,9 @@ public class TxEditCandidateTransaction extends Operation {
     private MinterAddress mRewardAddress;
     private MinterAddress mOwnerAddress;
 
+    public TxEditCandidateTransaction() {
+    }
+
     public TxEditCandidateTransaction(@Nonnull Transaction rawTx) {
         super(rawTx);
     }

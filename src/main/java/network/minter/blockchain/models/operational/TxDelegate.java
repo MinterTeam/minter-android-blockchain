@@ -65,6 +65,9 @@ public final class TxDelegate extends Operation {
     private String mCoin;
     private BigInteger mStake;
 
+    public TxDelegate() {
+    }
+
     public TxDelegate(Transaction rawTx) {
         super(rawTx);
     }

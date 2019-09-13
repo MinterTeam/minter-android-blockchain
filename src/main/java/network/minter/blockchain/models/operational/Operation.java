@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2019
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,10 +29,11 @@ package network.minter.blockchain.models.operational;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Collections;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.common.Preconditions.firstNonNull;
 
 /**
@@ -43,8 +44,12 @@ import static network.minter.core.internal.common.Preconditions.firstNonNull;
 public abstract class Operation extends RLPSerializable implements Parcelable {
     private final Transaction mTx;
 
+    public Operation() {
+        mTx = null;
+    }
+
     public Operation(@Nonnull Transaction rawTx) {
-        mTx = checkNotNull(rawTx, "Transaction must be set");
+        mTx = rawTx;
     }
 
     protected Operation(Parcel in) {
@@ -52,6 +57,9 @@ public abstract class Operation extends RLPSerializable implements Parcelable {
     }
 
     public Transaction build() throws OperationInvalidDataException {
+        if (mTx == null) {
+            throw new OperationInvalidDataException("Can't build operation, because transaction isn't passed", Collections.emptyList());
+        }
         final Transaction tx = mTx.setData(this);
         FieldsValidationResult validated = validate();
         if (validated == null) {

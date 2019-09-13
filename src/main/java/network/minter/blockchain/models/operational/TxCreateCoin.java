@@ -69,6 +69,8 @@ public final class TxCreateCoin extends Operation {
     // unsigned!!!
     private Integer mConstantReserveRatio;
 
+    public TxCreateCoin() {
+    }
 
     public TxCreateCoin(Transaction rawTx) {
         super(rawTx);

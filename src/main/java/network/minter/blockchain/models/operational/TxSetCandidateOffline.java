@@ -55,6 +55,9 @@ public final class TxSetCandidateOffline extends Operation {
     };
     private PublicKey mPubKey;
 
+    public TxSetCandidateOffline() {
+    }
+
     public TxSetCandidateOffline(Transaction rawTx) {
         super(rawTx);
     }

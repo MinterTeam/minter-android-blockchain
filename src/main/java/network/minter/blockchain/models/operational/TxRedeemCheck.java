@@ -62,6 +62,9 @@ public final class TxRedeemCheck extends Operation {
 	private UnsignedBytesData mRawCheck;
 	private UnsignedBytesData mProof;
 
+    public TxRedeemCheck() {
+    }
+
     public TxRedeemCheck(Transaction rawTx) {
         super(rawTx);
     }

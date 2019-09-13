@@ -1,5 +1,11 @@
 # Release notes
 
+## 0.8.0
+ - Added ability to create simple transaction-based structure encoded with RLP to share transaction data
+ - `TxSendCoin#getValue()` not returns `BigDecimal` instead of `double`. For double value, added method `TxSendCoin#getValueDouble()`
+ - Added empty constructors for operation data objects. It quite breaks the builder logic but gives you ability to use this data for your own implementations. Also, #build() method now will throw exception if object were constructed without or with null `Transaction`
+ - Migrate to androidx
+
 ## 0.7.5
  - Updated core SDK
 
