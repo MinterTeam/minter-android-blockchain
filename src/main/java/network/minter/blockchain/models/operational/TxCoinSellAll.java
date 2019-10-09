@@ -120,12 +120,8 @@ public final class TxCoinSellAll extends Operation {
         return setMinValueToBuy(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
     }
 
-    public TxCoinSellAll setMinValueToBuy(double amount) {
-        return setMinValueToBuy(new BigDecimal(String.valueOf(amount)));
-    }
-
-    public double getMinValueToBuyDouble() {
-        return getMinValueToBuy().doubleValue();
+    public TxCoinSellAll setMinValueToBuy(@Nonnull final CharSequence decimalValue) {
+        return setMinValueToBuy(new BigDecimal(decimalValue.toString()));
     }
 
     @Override

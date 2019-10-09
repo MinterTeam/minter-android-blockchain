@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import network.minter.core.crypto.MinterAddress;
-import network.minter.core.crypto.PublicKey;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
@@ -41,44 +41,44 @@ import network.minter.core.util.RLPBoxed;
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class TxEditCandidateTransaction extends Operation {
+public class TxEditCandidate extends Operation {
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxEditCandidateTransaction> CREATOR = new Parcelable.Creator<TxEditCandidateTransaction>() {
+    public static final Parcelable.Creator<TxEditCandidate> CREATOR = new Parcelable.Creator<TxEditCandidate>() {
         @Override
-        public TxEditCandidateTransaction createFromParcel(Parcel in) {
-            return new TxEditCandidateTransaction(in);
+        public TxEditCandidate createFromParcel(Parcel in) {
+            return new TxEditCandidate(in);
         }
 
         @Override
-        public TxEditCandidateTransaction[] newArray(int size) {
-            return new TxEditCandidateTransaction[size];
+        public TxEditCandidate[] newArray(int size) {
+            return new TxEditCandidate[size];
         }
     };
-    private PublicKey mPubKey;
+    private MinterPublicKey mPubKey;
     private MinterAddress mRewardAddress;
     private MinterAddress mOwnerAddress;
 
-    public TxEditCandidateTransaction() {
+    public TxEditCandidate() {
     }
 
-    public TxEditCandidateTransaction(@Nonnull Transaction rawTx) {
+    public TxEditCandidate(@Nonnull Transaction rawTx) {
         super(rawTx);
     }
 
-    protected TxEditCandidateTransaction(Parcel in) {
+    protected TxEditCandidate(Parcel in) {
         super(in);
-        mPubKey = (PublicKey) in.readValue(PublicKey.class.getClassLoader());
+        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
         mRewardAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
         mOwnerAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
     }
 
-    public TxEditCandidateTransaction setPublicKey(PublicKey key) {
+    public TxEditCandidate setPublicKey(MinterPublicKey key) {
         mPubKey = key;
         return this;
     }
 
-    public PublicKey getPubKey() {
+    public MinterPublicKey getPubKey() {
         return mPubKey;
     }
 
@@ -86,7 +86,7 @@ public class TxEditCandidateTransaction extends Operation {
         return mRewardAddress;
     }
 
-    public TxEditCandidateTransaction setRewardAddress(MinterAddress address) {
+    public TxEditCandidate setRewardAddress(MinterAddress address) {
         mRewardAddress = address;
         return this;
     }
@@ -95,7 +95,7 @@ public class TxEditCandidateTransaction extends Operation {
         return mOwnerAddress;
     }
 
-    public TxEditCandidateTransaction setOwnerAddress(MinterAddress address) {
+    public TxEditCandidate setOwnerAddress(MinterAddress address) {
         mOwnerAddress = address;
         return this;
     }
@@ -129,9 +129,9 @@ public class TxEditCandidateTransaction extends Operation {
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        mPubKey = new PublicKey(fromRawRlp(0, decoded));
+        mPubKey = new MinterPublicKey(fromRawRlp(0, decoded));
         mRewardAddress = new MinterAddress(fromRawRlp(1, decoded));
         mOwnerAddress = new MinterAddress(fromRawRlp(2, decoded));
     }
@@ -139,10 +139,10 @@ public class TxEditCandidateTransaction extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{
-			    mPubKey,
-			    mRewardAddress,
-			    mOwnerAddress
+        return RLPBoxed.encode(new Object[]{
+                mPubKey,
+                mRewardAddress,
+                mOwnerAddress
         });
     }
 }

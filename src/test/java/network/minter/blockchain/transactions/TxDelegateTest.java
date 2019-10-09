@@ -68,7 +68,7 @@ public class TxDelegateTest {
                 .delegate()
                 .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
                 .setCoin("MNT")
-                .setStake(10)
+                .setStake("10")
                 .build();
 
         assertNotNull(tx);
@@ -93,7 +93,7 @@ public class TxDelegateTest {
 	    assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), data.getPublicKey());
 	    assertEquals("MNT", data.getCoin());
 	    assertEquals(new BigDecimal(10), data.getStake());
-	    assertEquals(10D, data.getStakeDouble(), 0);
+        assertEquals(new BigDecimal("10"), data.getStake());
     }
 
 	@Test
@@ -108,7 +108,7 @@ public class TxDelegateTest {
 				.delegate()
 				.setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
 				.setCoin("MNT")
-				.setStake(10)
+                .setStake("10")
 				.build();
 
 		assertNotNull(tx);
@@ -133,6 +133,6 @@ public class TxDelegateTest {
 		assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), data.getPublicKey());
 		assertEquals("MNT", data.getCoin());
 		assertEquals(new BigDecimal(10), data.getStake());
-		assertEquals(10D, data.getStakeDouble(), 0);
+        assertEquals(new BigDecimal("10"), data.getStake());
 	}
 }

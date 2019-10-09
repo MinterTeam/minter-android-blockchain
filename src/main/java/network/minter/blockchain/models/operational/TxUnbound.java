@@ -35,7 +35,7 @@ import java.math.BigInteger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import network.minter.core.crypto.PublicKey;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
@@ -61,7 +61,7 @@ public final class TxUnbound extends Operation {
             return new TxUnbound[size];
         }
     };
-    private PublicKey mPubKey;
+    private MinterPublicKey mPubKey;
     private String mCoin;
     private BigInteger mValue;
 
@@ -74,7 +74,7 @@ public final class TxUnbound extends Operation {
 
     protected TxUnbound(Parcel in) {
         super(in);
-        mPubKey = (PublicKey) in.readValue(PublicKey.class.getClassLoader());
+        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
         mCoin = in.readString();
         mValue = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
@@ -87,22 +87,22 @@ public final class TxUnbound extends Operation {
         dest.writeValue(mValue);
     }
 
-    public PublicKey getPublicKey() {
+    public MinterPublicKey getPublicKey() {
         return mPubKey;
     }
 
     public TxUnbound setPublicKey(byte[] publicKey) {
-        mPubKey = new PublicKey(publicKey);
+        mPubKey = new MinterPublicKey(publicKey);
         return this;
     }
 
-    public TxUnbound setPublicKey(PublicKey publicKey) {
+    public TxUnbound setPublicKey(MinterPublicKey publicKey) {
         mPubKey = publicKey;
         return this;
     }
 
     public TxUnbound setPublicKey(String hexPubKey) {
-        mPubKey = new PublicKey(hexPubKey);
+        mPubKey = new MinterPublicKey(hexPubKey);
         return this;
     }
 
@@ -133,7 +133,7 @@ public final class TxUnbound extends Operation {
         return this;
     }
 
-    public TxUnbound setValue(CharSequence decimalValue) {
+    public TxUnbound setValue(@Nonnull final CharSequence decimalValue) {
         checkNotNull(decimalValue);
         return setValue(new BigDecimal(decimalValue.toString()));
     }
@@ -156,15 +156,15 @@ public final class TxUnbound extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{mPubKey, mCoin, mValue});
+        return RLPBoxed.encode(new Object[]{mPubKey, mCoin, mValue});
     }
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        mPubKey = new PublicKey(fromRawRlp(0, decoded));
-	    mCoin = charsToString(fromRawRlp(1, decoded), 10);
+        mPubKey = new MinterPublicKey(fromRawRlp(0, decoded));
+        mCoin = charsToString(fromRawRlp(1, decoded), 10);
         mValue = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 

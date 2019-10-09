@@ -67,7 +67,7 @@ public enum OperationType {
     @SerializedName("13")
     Multisend((byte) 0x0D, TxMultisend.class, /*commission: 10+(n-1)*5 units*/ 0D),
     @SerializedName("14")
-    EditCandidate((byte) 0x0E, TxEditCandidateTransaction.class, 10000D),
+    EditCandidate((byte) 0x0E, TxEditCandidate.class, 10000D),
 
     ;
 

@@ -32,13 +32,12 @@ import android.os.Parcelable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import network.minter.core.crypto.PublicKey;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxSetCandidateOnline extends Operation {
@@ -54,7 +53,7 @@ public final class TxSetCandidateOnline extends Operation {
             return new TxSetCandidateOnline[size];
         }
     };
-    private PublicKey mPubKey;
+    private MinterPublicKey mPubKey;
 
     public TxSetCandidateOnline() {
     }
@@ -65,20 +64,25 @@ public final class TxSetCandidateOnline extends Operation {
 
     protected TxSetCandidateOnline(Parcel in) {
         super(in);
-        mPubKey = (PublicKey) in.readValue(PublicKey.class.getClassLoader());
+        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
     }
 
-    public PublicKey getPublicKey() {
+    public MinterPublicKey getPublicKey() {
         return mPubKey;
     }
 
     public TxSetCandidateOnline setPublicKey(byte[] publicKey) {
-        mPubKey = new PublicKey(publicKey);
+        mPubKey = new MinterPublicKey(publicKey);
         return this;
     }
 
-    public TxSetCandidateOnline setPublicKey(PublicKey publicKey) {
+    public TxSetCandidateOnline setPublicKey(MinterPublicKey publicKey) {
         mPubKey = publicKey;
+        return this;
+    }
+
+    public TxSetCandidateOnline setPublicKey(String hexPubKey) {
+        mPubKey = new MinterPublicKey(hexPubKey);
         return this;
     }
 
@@ -86,11 +90,6 @@ public final class TxSetCandidateOnline extends Operation {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeValue(mPubKey);
-    }
-
-    public TxSetCandidateOnline setPublicKey(String hexPubKey) {
-        mPubKey = new PublicKey(hexPubKey);
-        return this;
     }
 
     @Override
@@ -101,7 +100,7 @@ public final class TxSetCandidateOnline extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{mPubKey});
+        return RLPBoxed.encode(new Object[]{mPubKey});
     }
 
     @Nullable
@@ -113,9 +112,9 @@ public final class TxSetCandidateOnline extends Operation {
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        mPubKey = new PublicKey(fromRawRlp(0, decoded));
+        mPubKey = new MinterPublicKey(fromRawRlp(0, decoded));
     }
 
 

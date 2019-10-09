@@ -89,7 +89,7 @@ public class TxMultisend extends Operation {
         return mItems.size() > index && index > -1 ? mItems.get(index) : null;
     }
 
-    public TxMultisend addItem(String coin, MinterAddress recipient, double value) {
+    public TxMultisend addItem(String coin, MinterAddress recipient, BigDecimal value) {
         mItems.add(new TxSendCoin(getTx())
                 .setCoin(coin)
                 .setTo(recipient)
@@ -98,7 +98,7 @@ public class TxMultisend extends Operation {
         return this;
     }
 
-    public TxMultisend addItem(String coin, MinterAddress recipient, BigDecimal value) {
+    public TxMultisend addItem(String coin, MinterAddress recipient, CharSequence value) {
         mItems.add(new TxSendCoin(getTx())
                 .setCoin(coin)
                 .setTo(recipient)
@@ -113,26 +113,11 @@ public class TxMultisend extends Operation {
      * @param value Floating point string value. Precision up to 18 digits: 0.10203040506078090
      * @return
      */
-    public TxMultisend addItem(String coin, String recipient, String value) {
+    public TxMultisend addItem(String coin, String recipient, @Nonnull final CharSequence decimalValue) {
         mItems.add(new TxSendCoin(getTx())
                 .setCoin(coin)
                 .setTo(recipient)
-                .setValue(value));
-
-        return this;
-    }
-
-    /**
-     * @param coin coin name to send
-     * @param recipient String address
-     * @param value
-     * @return
-     */
-    public TxMultisend addItem(String coin, String recipient, double value) {
-        mItems.add(new TxSendCoin(getTx())
-                .setCoin(coin)
-                .setTo(recipient)
-                .setValue(value));
+                .setValue(decimalValue));
 
         return this;
     }

@@ -54,6 +54,7 @@ import static network.minter.blockchain.models.operational.Transaction.Signature
 import static network.minter.blockchain.models.operational.Transaction.SignatureType.Single;
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
+import static network.minter.core.internal.common.Preconditions.firstNonNull;
 import static network.minter.core.internal.helpers.BytesHelper.charsToBytes;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
 import static network.minter.core.internal.helpers.StringHelper.charsToString;
@@ -436,14 +437,46 @@ public class Transaction implements Parcelable {
 
     public static class Builder {
         private final Transaction mTx;
+        private ExternalTransaction mExtTx = null;
+
+        public Builder(BigInteger nonce, ExternalTransaction externalTransaction) {
+            this(nonce);
+            checkArgument(externalTransaction.getType() != null, "Transaction type must be set");
+            checkArgument(externalTransaction.mOperationData != null, "Transaction data must be set");
+            mTx.mType = externalTransaction.getType();
+            mTx.mOperationData = externalTransaction.mOperationData;
+            mTx.mPayload = firstNonNull(externalTransaction.getPayload(), new UnsignedBytesData(new char[0]));
+            if (externalTransaction.getGasCoin() == null || externalTransaction.getGasCoin().equals("")) {
+                mTx.mGasCoin = MinterSDK.DEFAULT_COIN;
+            } else {
+                mTx.mGasCoin = strrpad(10, externalTransaction.getGasCoin());
+            }
+
+            if (externalTransaction.getGasPrice() == null || externalTransaction.getGasPrice().equals(BigInteger.ZERO)) {
+                mTx.mGasPrice = BigInteger.ONE;
+            } else {
+                mTx.mGasPrice = externalTransaction.getGasPrice();
+            }
+
+            mExtTx = externalTransaction;
+        }
 
         /**
          * Init builder with transaction nonce. If you don't have it yet, set it later using {@link #setNonce(BigInteger)}
          * @param nonce transaction nonce
          */
         public Builder(BigInteger nonce) {
+            checkArgument(nonce != null, "Nonce must be set");
             mTx = new Transaction(nonce);
             mTx.mChainId = BuildConfig.BLOCKCHAIN_ID;
+        }
+
+        public Transaction buildFromExternal() {
+            if (mExtTx == null) {
+                throw new IllegalStateException("Unable to build network tx without external transaction. Or build by yourself normal transaction.");
+            }
+
+            return mTx;
         }
 
         /**
@@ -497,6 +530,17 @@ public class Transaction implements Parcelable {
         public Builder setPayload(BytesData data) {
             checkArgument(data.size() <= 1024, "Payload maximum size: 1024 bytes");
 	        mTx.mPayload = new UnsignedBytesData(data.getData(), true);
+            return this;
+        }
+
+        /**
+         * Set arbitrary user-defined bytes
+         * @param data max size: 1024 bytes
+         * @return {@link Builder}
+         */
+        public Builder setPayload(UnsignedBytesData data) {
+            checkArgument(data.size() <= 1024, "Payload maximum size: 1024 bytes");
+            mTx.mPayload = new UnsignedBytesData(data, true);
             return this;
         }
 
@@ -637,10 +681,10 @@ public class Transaction implements Parcelable {
 
         /**
          * Create "Validator candidate editing" transaction builder
-         * @return {@link TxEditCandidateTransaction}
+         * @return {@link TxEditCandidate}
          */
-        public TxEditCandidateTransaction editCandidate() {
-            return new TxEditCandidateTransaction(mTx);
+        public TxEditCandidate editCandidate() {
+            return new TxEditCandidate(mTx);
         }
 
         /**

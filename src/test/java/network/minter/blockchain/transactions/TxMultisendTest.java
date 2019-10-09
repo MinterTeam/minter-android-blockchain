@@ -28,6 +28,7 @@ package network.minter.blockchain.transactions;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.BlockchainID;
@@ -72,8 +73,8 @@ public class TxMultisendTest {
                 .setBlockchainId(BlockchainID.TestNet)
                 .setPayload(payload)
                 .multiSend()
-                .addItem("MNT", "Mxfe60014a6e9ac91618f5d1cab3fd58cded61ee99", 0.1)
-                .addItem("MNT", "Mxddab6281766ad86497741ff91b6b48fe85012e3c", 0.2)
+                .addItem("MNT", "Mxfe60014a6e9ac91618f5d1cab3fd58cded61ee99", "0.1")
+                .addItem("MNT", "Mxddab6281766ad86497741ff91b6b48fe85012e3c", "0.2")
                 .build();
 
         assertNotNull(tx);
@@ -109,12 +110,12 @@ public class TxMultisendTest {
         assertEquals(2, data.getItems().size());
         TxSendCoin item1 = data.getItem(0);
         assertEquals("MNT", item1.getCoin());
-        assertEquals(0.1d, item1.getValue());
+        assertEquals(new BigDecimal("0.1"), item1.getValue());
         assertEquals("Mxfe60014a6e9ac91618f5d1cab3fd58cded61ee99", item1.getTo().toString());
 
         TxSendCoin item2 = data.getItem(1);
         assertEquals("MNT", item2.getCoin());
-        assertEquals(0.2d, item2.getValue());
+        assertEquals(new BigDecimal("0.2"), item2.getValue());
         assertEquals("Mxddab6281766ad86497741ff91b6b48fe85012e3c", item2.getTo().toString());
     }
 

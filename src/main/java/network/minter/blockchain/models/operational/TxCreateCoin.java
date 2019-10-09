@@ -162,6 +162,10 @@ public final class TxCreateCoin extends Operation {
         return new BigDecimal(mInitialAmount).divide(Transaction.VALUE_MUL_DEC);
     }
 
+    public TxCreateCoin setInitialAmount(String amountDecimal) {
+        return setInitialAmount(new BigDecimal(amountDecimal));
+    }
+
     public TxCreateCoin setInitialAmount(BigDecimal amount) {
         return setInitialAmount(amount.multiply(VALUE_MUL_DEC).toBigInteger());
     }
@@ -169,20 +173,6 @@ public final class TxCreateCoin extends Operation {
     public TxCreateCoin setInitialAmount(BigInteger amount) {
         mInitialAmount = amount;
         return this;
-    }
-
-    /**
-     * Get initial amount as double value
-     * Be carefully, can be overflowed!
-     *
-     * @return double value
-     */
-    public double getInitialAmountDouble() {
-        return getInitialAmount().doubleValue();
-    }
-
-    public TxCreateCoin setInitialAmount(double amount) {
-        return setInitialAmount(new BigDecimal(String.valueOf(amount)));
     }
 
     /**
@@ -203,18 +193,8 @@ public final class TxCreateCoin extends Operation {
         return this;
     }
 
-    /**
-     * Get initial reserve amount as double value
-     * Be carefully, can be overflowed!
-     *
-     * @return normalized double value
-     */
-    public double getInitialReserveDouble() {
-        return getInitialReserve().doubleValue();
-    }
-
-    public TxCreateCoin setInitialReserve(double amount) {
-        return setInitialReserve(new BigDecimal(String.valueOf(amount)));
+    public TxCreateCoin setInitialReserve(String amountDecimal) {
+        return setInitialReserve(new BigDecimal(amountDecimal));
     }
 
     /**

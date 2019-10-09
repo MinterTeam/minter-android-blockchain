@@ -32,7 +32,7 @@ import android.os.Parcelable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import network.minter.core.crypto.PublicKey;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
@@ -53,7 +53,7 @@ public final class TxSetCandidateOffline extends Operation {
             return new TxSetCandidateOffline[size];
         }
     };
-    private PublicKey mPubKey;
+    private MinterPublicKey mPubKey;
 
     public TxSetCandidateOffline() {
     }
@@ -64,25 +64,25 @@ public final class TxSetCandidateOffline extends Operation {
 
     protected TxSetCandidateOffline(Parcel in) {
         super(in);
-        mPubKey = (PublicKey) in.readValue(PublicKey.class.getClassLoader());
+        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
     }
 
-    public PublicKey getPublicKey() {
+    public MinterPublicKey getPublicKey() {
         return mPubKey;
     }
 
     public TxSetCandidateOffline setPublicKey(byte[] publicKey) {
-        mPubKey = new PublicKey(publicKey);
+        mPubKey = new MinterPublicKey(publicKey);
         return this;
     }
 
-    public TxSetCandidateOffline setPublicKey(PublicKey publicKey) {
+    public TxSetCandidateOffline setPublicKey(MinterPublicKey publicKey) {
         mPubKey = publicKey;
         return this;
     }
 
     public TxSetCandidateOffline setPublicKey(String hexPubKey) {
-        mPubKey = new PublicKey(hexPubKey);
+        mPubKey = new MinterPublicKey(hexPubKey);
         return this;
     }
 
@@ -100,7 +100,7 @@ public final class TxSetCandidateOffline extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{mPubKey});
+        return RLPBoxed.encode(new Object[]{mPubKey});
     }
 
     @Nullable
@@ -112,9 +112,9 @@ public final class TxSetCandidateOffline extends Operation {
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        mPubKey = new PublicKey(fromRawRlp(0, decoded));
+        mPubKey = new MinterPublicKey(fromRawRlp(0, decoded));
     }
 
 

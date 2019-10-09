@@ -111,6 +111,10 @@ public final class TxCoinSell extends Operation {
         return this;
     }
 
+    public BigDecimal getMinValueToBuy() {
+        return new BigDecimal(mMinValueToBuy).divide(Transaction.VALUE_MUL_DEC);
+    }
+
     public BigInteger getValueToSellBigInteger() {
         return mValueToSell;
     }
@@ -119,25 +123,21 @@ public final class TxCoinSell extends Operation {
         return new BigDecimal(mValueToSell).divide(Transaction.VALUE_MUL_DEC);
     }
 
-    public TxCoinSell setValueToSell(double amount) {
-        return setValueToSell(new BigDecimal(String.valueOf(amount)));
-    }
-
     public TxCoinSell setValueToSell(BigInteger amount) {
         mValueToSell = amount;
         return this;
+    }
+
+    public TxCoinSell setMinValueToBuy(@Nonnull final CharSequence decimalValue) {
+        return setMinValueToBuy(new BigDecimal(decimalValue.toString()));
     }
 
     public TxCoinSell setValueToSell(BigDecimal amount) {
         return setValueToSell(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
     }
 
-	public double getValueToSellDouble() {
-		return getValueToSell().doubleValue();
-	}
-
-    public TxCoinSell setMinValueToBuy(double amount) {
-        return setMinValueToBuy(new BigDecimal(String.valueOf(amount)));
+    public TxCoinSell setValueToSell(@Nonnull final CharSequence decimalValue) {
+        return setValueToSell(new BigDecimal(decimalValue.toString()));
     }
 
     public TxCoinSell setMinValueToBuy(BigInteger amount) {

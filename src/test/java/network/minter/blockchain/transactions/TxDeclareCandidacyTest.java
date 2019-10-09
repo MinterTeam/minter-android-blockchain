@@ -74,7 +74,7 @@ public class TxDeclareCandidacyTest {
                 .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
                 .setCommission(10)
                 .setCoin("MNT")
-                .setStake(5)
+                .setStake("5")
                 .build();
 
         assertNotNull(tx);
@@ -101,6 +101,6 @@ public class TxDeclareCandidacyTest {
         assertEquals(10, data.getCommission());
         assertEquals("MNT", data.getCoin());
         assertEquals(new BigDecimal(5), data.getStake());
-        assertEquals(5D, data.getStakeDouble());
+        assertEquals(new BigDecimal("5"), data.getStake());
     }
 }

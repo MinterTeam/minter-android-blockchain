@@ -111,6 +111,10 @@ public final class TxCoinBuy extends Operation {
         return this;
     }
 
+    public BigDecimal getMaxValueToSell() {
+        return new BigDecimal(mMaxValueToSell).divide(Transaction.VALUE_MUL_DEC);
+    }
+
     /**
      * Original value in bigint format
      * @return origin value
@@ -119,12 +123,8 @@ public final class TxCoinBuy extends Operation {
         return mValueToBuy;
     }
 
-    /**
-     * Normalized original value in bigdecal format
-     * @return bigdeciaml value
-     */
-    public BigDecimal getValueToBuy() {
-        return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(mValueToBuy));
+    public TxCoinBuy setMaxValueToSell(@Nonnull final CharSequence decimalValue) {
+        return setMaxValueToSell(new BigDecimal(decimalValue.toString()));
     }
 
     public TxCoinBuy setValueToBuy(BigInteger amount) {
@@ -132,25 +132,16 @@ public final class TxCoinBuy extends Operation {
         return this;
     }
 
-    public TxCoinBuy setValueToBuy(double amount) {
-        return setValueToBuy(new BigDecimal(String.valueOf(amount)));
-    }
-
     public TxCoinBuy setValueToBuy(BigDecimal amount) {
         return setValueToBuy(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
     }
 
-	/**
-	 * Use double value carefuly, only on a not a big numbers, otherwise number will be overflowed
-	 *
-	 * @return double value
-	 */
-	public double getValueToBuyDouble() {
-		return getValueToBuy().doubleValue();
-	}
-
-    public TxCoinBuy setMaxValueToSell(double amount) {
-        return setMaxValueToSell(new BigDecimal(String.valueOf(amount)));
+    /**
+     * Normalized original value in BigDecimal format
+     * @return BigDecimal value
+     */
+    public BigDecimal getValueToBuy() {
+        return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(mValueToBuy));
     }
 
     public TxCoinBuy setMaxValueToSell(BigInteger amount) {
@@ -160,6 +151,10 @@ public final class TxCoinBuy extends Operation {
 
     public TxCoinBuy setMaxValueToSell(BigDecimal amount) {
         return setMaxValueToSell(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+    }
+
+    public TxCoinBuy setValueToBuy(@Nonnull final CharSequence decimalValue) {
+        return setValueToBuy(new BigDecimal(decimalValue.toString()));
     }
 
     @Override

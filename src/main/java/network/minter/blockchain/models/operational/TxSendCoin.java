@@ -82,29 +82,11 @@ public final class TxSendCoin extends Operation {
     }
 
     /**
-     * Returns double value representation
-     * @return
-     */
-    public double getValueDouble() {
-        return new BigDecimal(mValue).divide(Transaction.VALUE_MUL_DEC).doubleValue();
-    }
-
-    /**
      * Returns BigDecimal value representation
      * @return
      */
     public BigDecimal getValue() {
         return new BigDecimal(mValue).divide(Transaction.VALUE_MUL_DEC);
-    }
-
-    /**
-     * Set double value
-     * @param value double value
-     * @return self
-     * @see #setValue(BigDecimal)
-     */
-    public TxSendCoin setValue(double value) {
-        return setValue(new BigDecimal(String.valueOf(value)));
     }
 
     /**

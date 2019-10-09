@@ -145,9 +145,9 @@ public class ExternalTransaction implements Parcelable {
                 mOperationData.getType().getValue(),
                 mOperationData.encodeRLP(),
                 mPayload.getData(),
-                firstNonNull(mNonce, new BigInteger("0")),
+                firstNonNull(mNonce, BigInteger.ZERO),
                 firstNonNull(mGasPrice, new BigInteger("1")),
-                firstNonNull(mGasCoin, StringHelper.strrpad(10, "")),
+                firstNonNull(StringHelper.strrpad(10, mGasCoin), ""),
         });
         return new UnsignedBytesData(res);
     }
@@ -159,6 +159,18 @@ public class ExternalTransaction implements Parcelable {
      */
     public OperationType getType() {
         return mType;
+    }
+
+    public String getGasCoin() {
+        return mGasCoin.replace("\0", "");
+    }
+
+    public BigInteger getNonce() {
+        return mNonce;
+    }
+
+    public BigInteger getGasPrice() {
+        return mGasPrice;
     }
 
     /**

@@ -28,6 +28,7 @@ package network.minter.blockchain.transactions;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.BlockchainID;
@@ -70,8 +71,8 @@ public class TxSellCoinTest {
                 .sellCoin()
                 .setCoinToBuy("TEST")
                 .setCoinToSell("MNT")
-                .setValueToSell(1)
-                .setMinValueToBuy(1)
+                .setValueToSell("1")
+                .setMinValueToBuy("1")
                 .build();
 
         assertNotNull(tx);
@@ -91,7 +92,7 @@ public class TxSellCoinTest {
 				.sellAllCoins()
 				.setCoinToBuy("TEST")
 				.setCoinToSell("MNT")
-				.setMinValueToBuy(1)
+                .setMinValueToBuy("1")
 				.build();
 
 		assertNotNull(tx);
@@ -117,7 +118,7 @@ public class TxSellCoinTest {
 		assertNotNull(data);
 		assertEquals("TEST", data.getCoinToBuy());
 		assertEquals("MNT", data.getCoinToSell());
-		assertEquals(1D, data.getMinValueToBuyDouble(), 0);
+        assertEquals(new BigDecimal("1"), data.getMinValueToBuy());
 	}
 
     @Test
@@ -136,6 +137,6 @@ public class TxSellCoinTest {
         assertNotNull(data);
         assertEquals("TEST", data.getCoinToBuy());
         assertEquals("MNT", data.getCoinToSell());
-        assertEquals(1D, data.getValueToSellDouble(), 0);
+        assertEquals(new BigDecimal("1"), data.getValueToSell());
     }
 }

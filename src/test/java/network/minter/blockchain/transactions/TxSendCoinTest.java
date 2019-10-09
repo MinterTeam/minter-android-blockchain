@@ -108,7 +108,7 @@ public class TxSendCoinTest {
         MinterAddress from = new MinterAddress("Mxe176cbf6b307c61c5939a517fd0c09a6f999f1d2");
 	    final String encodedTransaction = "f8880102018a4d4e540000000000000001aae98a4d4e540000000000000094ee81347211c72524338f9680072af90744333146880de0b6b3a764000084746573748001b845f8431ba016c8d27b1038823f87fba01eb97c9b16614e62b64904d923f168e296acbb384ca0754daff93835277e46fcd718d5d0295dda1153183f257db6146c15975099fcf7";
         BigInteger nonce = new BigInteger("1");
-        double valueHuman = 1D;
+        String valueHuman = "1";
         String coin = "MNT";
         String gasCoin = "MNT";
         byte[] payload = "test".getBytes();
@@ -137,7 +137,7 @@ public class TxSendCoinTest {
         MinterAddress toAddress = new MinterAddress("Mxee81347211c72524338f9680072af90744333146");
 	    final String encodedTransaction = "f8880102018a4d4e540000000000000001aae98a4d4e540000000000000094ee81347211c72524338f9680072af90744333146880de0b6b3a764000084746573748001b845f8431ba016c8d27b1038823f87fba01eb97c9b16614e62b64904d923f168e296acbb384ca0754daff93835277e46fcd718d5d0295dda1153183f257db6146c15975099fcf7";
         BigInteger nonce = new BigInteger("1");
-        double valueHuman = 1D;
+        BigDecimal valueHuman = new BigDecimal("1");
         String coin = "MNT";
         String gasCoin = "MNT";
         String payload = "test";

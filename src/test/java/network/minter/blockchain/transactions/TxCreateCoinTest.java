@@ -70,8 +70,8 @@ public class TxCreateCoinTest {
                 .createCoin()
                 .setName("SUPER TEST")
                 .setSymbol("SPRTEST")
-                .setInitialAmount(100)
-                .setInitialReserve(10)
+                .setInitialAmount("100")
+                .setInitialReserve("10")
                 .setConstantReserveRatio(10)
                 .build();
 

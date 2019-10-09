@@ -34,7 +34,7 @@ import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.blockchain.models.operational.TxEditCandidateTransaction;
+import network.minter.blockchain.models.operational.TxEditCandidate;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
@@ -103,7 +103,7 @@ public class TxEditCandidateTest {
         assertNotNull(tx);
         assertEquals(nonce, tx.getNonce());
 
-        TxEditCandidateTransaction data = tx.getData();
+        TxEditCandidate data = tx.getData();
 
         MinterPublicKey pubKey = new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43");
         assertEquals(pubKey, data.getPubKey());

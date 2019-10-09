@@ -35,7 +35,7 @@ import java.math.BigInteger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import network.minter.core.crypto.PublicKey;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
@@ -45,7 +45,6 @@ import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxDelegate extends Operation {
@@ -61,7 +60,7 @@ public final class TxDelegate extends Operation {
             return new TxDelegate[size];
         }
     };
-    private PublicKey mPubKey;
+    private MinterPublicKey mPubKey;
     private String mCoin;
     private BigInteger mStake;
 
@@ -74,7 +73,7 @@ public final class TxDelegate extends Operation {
 
     protected TxDelegate(Parcel in) {
         super(in);
-        mPubKey = (PublicKey) in.readValue(PublicKey.class.getClassLoader());
+        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
         mCoin = in.readString();
         mStake = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
@@ -87,22 +86,22 @@ public final class TxDelegate extends Operation {
         dest.writeValue(mStake);
     }
 
-    public PublicKey getPublicKey() {
+    public MinterPublicKey getPublicKey() {
         return mPubKey;
     }
 
-    public TxDelegate setPublicKey(PublicKey publicKey) {
+    public TxDelegate setPublicKey(MinterPublicKey publicKey) {
         mPubKey = publicKey;
         return this;
     }
 
     public TxDelegate setPublicKey(String hexPubKey) {
-        mPubKey = new PublicKey(hexPubKey);
+        mPubKey = new MinterPublicKey(hexPubKey);
         return this;
     }
 
     public TxDelegate setPublicKey(byte[] publicKey) {
-        mPubKey = new PublicKey(publicKey);
+        mPubKey = new MinterPublicKey(publicKey);
         return this;
     }
 
@@ -123,26 +122,17 @@ public final class TxDelegate extends Operation {
         return new BigDecimal(mStake).divide(Transaction.VALUE_MUL_DEC);
     }
 
-    public TxDelegate setStake(BigInteger stakeBigInteger) {
-        mStake = stakeBigInteger;
+    public TxDelegate setStake(BigInteger amountNormalized) {
+        mStake = amountNormalized;
         return this;
     }
 
-    public double getStakeDouble() {
-        return getStake().doubleValue();
+    public TxDelegate setStake(@Nonnull final CharSequence decimalValue) {
+        return setStake(new BigDecimal(decimalValue.toString()));
     }
 
-    public TxDelegate setStake(double stake) {
-        return setStake(new BigDecimal(String.valueOf(stake)));
-    }
-
-    public TxDelegate setStake(String stakeBigInteger) {
-        mStake = new BigInteger(stakeBigInteger);
-        return this;
-    }
-
-    public TxDelegate setStake(BigDecimal stakeDecimal) {
-        mStake = stakeDecimal.multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+    public TxDelegate setStake(BigDecimal amount) {
+        mStake = amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
         return this;
     }
 
@@ -163,8 +153,8 @@ public final class TxDelegate extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{
-			    mPubKey,
+        return RLPBoxed.encode(new Object[]{
+                mPubKey,
                 mCoin,
                 mStake
         });
@@ -172,10 +162,10 @@ public final class TxDelegate extends Operation {
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        mPubKey = new PublicKey(fromRawRlp(0, decoded));
-	    mCoin = charsToString(fromRawRlp(1, decoded));
+        mPubKey = new MinterPublicKey(fromRawRlp(0, decoded));
+        mCoin = charsToString(fromRawRlp(1, decoded));
         mStake = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 

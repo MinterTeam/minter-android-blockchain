@@ -1,5 +1,11 @@
 # Release notes
 
+## 0.9.0
+ - Added some getters and constructor to `Transaction.Builder` to create it from `ExternalTransaction`
+ - Removed `double` setters and getters where using BigDecimals or BigIntegers, because `double` value have a poor accuracy
+ - Instead of `double` values, added `String` setters to convert it to `BigDecimal`
+ - Renamed `TxEditCandidateTransaction` to `TxEditCandidate`
+
 ## 0.8.0
  - Added ability to create simple transaction-based structure encoded with RLP to share transaction data
  - `TxSendCoin#getValue()` not returns `BigDecimal` instead of `double`. For double value, added method `TxSendCoin#getValueDouble()`
