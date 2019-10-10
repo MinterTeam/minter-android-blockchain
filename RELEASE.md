@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.9.1
+ - Fixed coin creation fee calculator
+
 ## 0.9.0
  - Added some getters and constructor to `Transaction.Builder` to create it from `ExternalTransaction`
  - Removed `double` setters and getters where using BigDecimals or BigIntegers, because `double` value have a poor accuracy

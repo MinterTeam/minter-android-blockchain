@@ -63,13 +63,13 @@ public class OperationTypeTest {
             put("CCCCC", 10000D);
             put("DDDDDD", 1000D);
             put("EEEEEEE", 100D);
-            put("FFFFFFFF", 10D);
-            put("GGGGGGGGG", 0D);
-            put("HHHHHHHHHH", 0D);
+            put("FFFFFFFF", 100D);
+            put("GGGGGGGGG", 100D);
+            put("HHHHHHHHHH", 100D);
         }};
 
         for (Map.Entry<String, Double> entry : coinCosts.entrySet()) {
-            final BigDecimal res = new BigDecimal(String.valueOf(entry.getValue())).add(OperationType.CreateCoin.getFee());
+            final BigDecimal res = new BigDecimal(String.valueOf(entry.getValue()));
             BigDecimal result = TxCreateCoin.calculateCreatingCost(entry.getKey());
             if (!res.setScale(4, BigDecimal.ROUND_DOWN).equals(result.setScale(4, BigDecimal.ROUND_DOWN))) {
                 System.err.println("Invalid fee in coin name: " + entry.getKey());

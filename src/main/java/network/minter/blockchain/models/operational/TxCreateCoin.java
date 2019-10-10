@@ -85,39 +85,29 @@ public final class TxCreateCoin extends Operation {
         mConstantReserveRatio = in.readByte() == 0x00 ? null : in.readInt();
     }
 
-    public static BigInteger calculateCreatingCostBigInteger(String coin) {
-        checkArgument(coin.length() > 2 &&
-                coin.length() < 11, "Coin length must be from 3 to 10 characters");
-        BigInteger out;
+    public static BigDecimal calculateCreatingCost(String coin) {
+        checkArgument(coin.length() >= 3 &&
+                coin.length() <= 10, "Coin length must be from 3 to 10 characters");
+        BigDecimal out;
         switch (coin.length()) {
             case 3:
-                out = Transaction.VALUE_MUL.multiply(new BigInteger("1000000"));
+                out = new BigDecimal("1000000");
                 break;
             case 4:
-                out = Transaction.VALUE_MUL.multiply(new BigInteger("100000"));
+                out = new BigDecimal("100000");
                 break;
             case 5:
-                out = Transaction.VALUE_MUL.multiply(new BigInteger("10000"));
+                out = new BigDecimal("10000");
                 break;
             case 6:
-                out = Transaction.VALUE_MUL.multiply(new BigInteger("1000"));
-                break;
-            case 7:
-                out = Transaction.VALUE_MUL.multiply(new BigInteger("100"));
-                break;
-            case 8:
-                out = Transaction.VALUE_MUL.multiply(new BigInteger("10"));
+                out = new BigDecimal("1000");
                 break;
             default:
-                out = new BigInteger("0");
+                out = new BigDecimal("100");
                 break;
         }
 
-        return out.add(OperationType.CreateCoin.getFee().multiply(VALUE_MUL_DEC).toBigInteger());
-    }
-
-    public static BigDecimal calculateCreatingCost(String coin) {
-        return new BigDecimal(calculateCreatingCostBigInteger(coin)).divide(VALUE_MUL_DEC);
+        return out.multiply(OperationType.CreateCoin.getFee());
     }
 
     @Override
