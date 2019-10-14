@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.9.2
+ - Throwing exception (instead of returning null) if encoded transaction has invalid data length
+
 ## 0.9.1
  - Fixed coin creation fee calculator
 

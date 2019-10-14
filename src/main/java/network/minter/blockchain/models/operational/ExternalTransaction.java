@@ -29,7 +29,6 @@ package network.minter.blockchain.models.operational;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
@@ -39,7 +38,6 @@ import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.internal.helpers.StringHelper;
-import network.minter.core.internal.log.Mint;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
@@ -110,27 +108,18 @@ public class ExternalTransaction implements Parcelable {
         final DecodeResult rlp = RLPBoxed.decode(bd.getData(), 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
+        if (decoded.length < 6) {
+            throw new InvalidEncodedTransactionException("Encoded transaction has invalid data length: expected 6, given %d", decoded.length);
+        }
+
         ExternalTransaction transaction = new ExternalTransaction();
         transaction.decodeRLP(decoded);
 
-        Throwable t = null;
         try {
             transaction.mOperationData = transaction.mType.getOpClass().getDeclaredConstructor().newInstance();
             transaction.mOperationData.decodeRLP(transaction.fromRawRlp(1, decoded));
-
-        } catch (InstantiationException e) {
-            t = e;
-        } catch (IllegalAccessException e) {
-            t = e;
-        } catch (NoSuchMethodException e) {
-            t = e;
-        } catch (InvocationTargetException e) {
-            t = e;
-        }
-
-        if (t != null) {
-            Mint.e(t, "Unable to decode transaction");
-            return null;
+        } catch (Throwable e) {
+            throw new InvalidEncodedTransactionException("Unable to decode transaction data field", e);
         }
 
         return transaction;
