@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.9.5
+ - Fixed gas coin length
+
 ## 0.9.4 
  - Fixed decoding empty string to numeric
 

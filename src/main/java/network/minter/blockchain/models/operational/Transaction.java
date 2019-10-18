@@ -442,7 +442,7 @@ public class Transaction implements Parcelable {
             mTx.mOperationData = externalTransaction.mOperationData;
             mTx.mPayload = firstNonNull(externalTransaction.getPayload(), new UnsignedBytesData(new char[0]));
             if (externalTransaction.getGasCoin() == null || externalTransaction.getGasCoin().equals("")) {
-                mTx.mGasCoin = MinterSDK.DEFAULT_COIN;
+                mTx.mGasCoin = strrpad(10, MinterSDK.DEFAULT_COIN);
             } else {
                 mTx.mGasCoin = strrpad(10, externalTransaction.getGasCoin());
             }
