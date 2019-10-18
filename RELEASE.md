@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.9.3
+ - Updated code SDK to interpret RLP empty object[] as empty char[]
+
 ## 0.9.2
  - Throwing exception (instead of returning null) if encoded transaction has invalid data length
 
