@@ -48,20 +48,23 @@ public abstract class RLPSerializable {
     @Nonnull
     protected abstract char[] encodeRLP();
 
-	protected char[][] objArrToByteArrArr(Object[] input) {
-		char[][] out = new char[input.length][];
+    protected char[][] objArrToByteArrArr(Object[] input) {
+        char[][] out = new char[input.length][];
         for (int i = 0; i < input.length; i++) {
-	        out[i] = (char[]) input[i];
+            out[i] = (char[]) input[i];
         }
 
         return out;
     }
 
-	protected char[] fromRawRlp(int idx, Object[] raw) {
-		return (char[]) raw[idx];
+    protected char[] fromRawRlp(int idx, Object[] raw) {
+        if (raw[idx] instanceof String) {
+            return ((String) raw[idx]).toCharArray();
+        }
+        return (char[]) raw[idx];
     }
 
-	protected char[] fromRawRlp(int idx, char[][] raw) {
+    protected char[] fromRawRlp(int idx, char[][] raw) {
         return raw[idx];
     }
 }

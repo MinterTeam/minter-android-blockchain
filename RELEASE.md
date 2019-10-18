@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.9.4 
+ - Fixed decoding empty string to numeric
+
 ## 0.9.3
  - Updated code SDK to interpret RLP empty object[] as empty char[]
 
