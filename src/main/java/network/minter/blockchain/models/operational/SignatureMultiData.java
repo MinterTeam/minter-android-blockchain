@@ -116,6 +116,23 @@ public final class SignatureMultiData extends SignatureData {
         }
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SignatureMultiData)) {
+            return false;
+        }
+
+        SignatureMultiData md = ((SignatureMultiData) obj);
+
+        if (md.mSignatureAddress != mSignatureAddress) {
+            return false;
+        }
+
+        // this case does not check null values, is it possible?
+        // @todo make test for this
+        return mSignatures.equals(md.mSignatures);
+    }
+
     @Nonnull
     @Override
     protected char[] encodeRLP() {

@@ -35,10 +35,12 @@ import network.minter.blockchain.models.operational.CheckTransaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterCheck;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -56,18 +58,54 @@ public class CheckTransactionTest {
     }
 
     @Test
+    public void testEncodeDecodeNumericNonce() {
+        PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
+        MinterAddress address = new MinterAddress("Mx5f0b55330e289490efa54c92e2120d6ebb6514ca");
+
+        final String validCheckData = "Mcf8a58331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b2000000b8412374f8a8a53c3efe9d8617ad2c0ea8532c71babba55c72e23fff581c96987a233a0ff89affaccbac423b04e1176c4b4fbfbc642c2ef76d2d1f0aafd2250de771011ba05afa84a3971fb430fd3594a0d573a3fa9618299e970912d4754e02c7bf61b343a00e771ed1425dade278f81dd59aed48fccc976294ecbc34b76bce115fa93cea68";
+        CheckTransaction validCheck = CheckTransaction.fromEncoded(validCheckData);
+
+        CheckTransaction check = new CheckTransaction.Builder(new BigInteger("128"), "hello")
+                .setChainId(BlockchainID.TestNet)
+                .setCoin("MNT")
+                .setDueBlock(new BigInteger("999999999"))
+                .setValue("128")
+                .build();
+        TransactionSign sign = check.sign(privateKey);
+
+        MinterCheck checkData = new MinterCheck(sign.getTxSign());
+
+        CheckTransaction decoded = CheckTransaction.fromEncoded(checkData.toString());
+        assertEquals(validCheck.getNonce(), decoded.getNonce());
+        assertEquals(validCheck.getChainId(), decoded.getChainId());
+        assertEquals(validCheck.getCoin(), decoded.getCoin());
+        assertEquals(validCheck.getDueBlock(), decoded.getDueBlock());
+        assertEquals(validCheck.getValue(), decoded.getValue());
+
+        assertEquals("Invalid lock in decoded check", validCheck.getLock(), decoded.getLock());
+        assertEquals("Invalid lock in raw check", validCheck.getLock(), check.getLock());
+
+
+        assertTrue(validCheck.getSignature().equals(decoded.getSignature()));
+        assertTrue(validCheck.getSignature().equals(check.getSignature()));
+
+
+        assertEquals(validCheckData, sign.getTxSign());
+    }
+
+    @Test
     public void testSignCheck() {
         PrivateKey privateKey = new PrivateKey("64e27afaab363f21eec05291084367f6f1297a7b280d69d672febecda94a09ea");
         MinterAddress address = new MinterAddress("Mxa7bc33954f1ce855ed1a8c768fdd32ed927def47");
         String pass = "pass";
-	    String validCheck = "Mcf8a00102830f423f8a4d4e5400000000000000888ac7230489e80000b8419200e3c947484ced3268eebd1810d640ac0d6c6a099e4d87e074bab6a5751a324540e1e53907a10c9fb73f944490a737034de4a8bae96e707b5acbf8015dd8cb001ba0cbbc87bc7018f2c3bcaea67968713389addc3bf72f698b8b44ffddc384fca230a07ff35524aaca365fdac2eb25d29e9ba8431484fcb2b890d6d940d2527daeca22";
+        String validCheck = "Mcf8a38334383002830f423f8a4d4e5400000000000000888ac7230489e80000b841d184caa333fe636288fc68d99dea2c8af5f7db4569a0bb91e03214e7e238f89d2b21f4d2b730ef590fd8de72bd43eb5c6265664df5aa3610ef6c71538d9295ee001ba08bd966fc5a093024a243e62cdc8131969152d21ee9220bc0d95044f54e3dd485a033bc4e03da3ea8a2cd2bd149d16c022ee604298575380db8548b4fd6672a9195";
         String validProof = "da021d4f84728e0d3d312a18ec84c21768e0caa12a53cb0a1452771f72b0d1a91770ae139fd6c23bcf8cec50f5f2e733eabb8482cf29ee540e56c6639aac469600";
 
-        CheckTransaction check = new CheckTransaction.Builder(new BigInteger("1"), pass)
+        CheckTransaction check = new CheckTransaction.Builder(new BigInteger("480"), pass)
                 .setCoin("MNT")
 		        .setChainId(BlockchainID.TestNet)
                 .setDueBlock(new BigInteger("999999"))
-                .setValue(10d)
+                .setValue("10")
                 .build();
 
         TransactionSign sign = check.sign(privateKey);

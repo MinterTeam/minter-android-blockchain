@@ -39,9 +39,7 @@ import network.minter.blockchain.models.operational.TxSendCoin;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.internal.exceptions.NativeLoadException;
-import network.minter.core.util.RLPBoxed;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -59,14 +57,6 @@ public class TxSendCoinTest {
             e.printStackTrace();
         }
     }
-
-	public void testSome() {
-		BigInteger nonce = new BigInteger("128");
-		char[] encoded = RLPBoxed.encode(new Object[]{nonce});
-		UnsignedBytesData bd = new UnsignedBytesData(encoded);
-
-		assertEquals("c28180", bd.toHexString());
-	}
 
 	@Test
 	public void testDecode128Nonce()

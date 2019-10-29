@@ -237,19 +237,6 @@ public class Transaction implements Parcelable {
     }
 
     /**
-     * Sign transaction data with private key
-     * @param privateKey private key data
-     * @return {@link TransactionSign} Raw transaction sign
-     * @deprecated Since we've got multi-signature functional, you should use explicit sign methods:
-     *         {@link #signSingle(PrivateKey)} or {@link #signMulti(MinterAddress, List)}.
-     *         Will be removed in 0.4.0
-     */
-    @Deprecated
-    public TransactionSign sign(@Nonnull final PrivateKey privateKey) {
-        return signSingle(privateKey);
-    }
-
-    /**
      * Sign multi signature transaction data with private keys
      * @param privateKeys private key list to sign with
      * @return {@link TransactionSign} Raw transaction sign
@@ -334,6 +321,14 @@ public class Transaction implements Parcelable {
         mOperationData = operationData;
         mType = operationData.getType();
         return this;
+    }
+
+    /**
+     * Returns network id
+     * @return
+     */
+    public BlockchainID getBlockchainId() {
+        return mChainId;
     }
 
     public String getGasCoin() {

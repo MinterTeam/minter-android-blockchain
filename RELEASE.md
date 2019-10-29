@@ -1,5 +1,10 @@
 # Release notes
 
+## 0.10.0
+ - Added check decoding from **Mc[data]**
+ - More check tests
+ - Fixed check signing
+
 ## 0.9.5
  - Fixed gas coin length
 

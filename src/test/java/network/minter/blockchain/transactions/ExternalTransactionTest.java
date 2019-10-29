@@ -31,6 +31,8 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import network.minter.blockchain.models.operational.BlockchainID;
+import network.minter.blockchain.models.operational.CheckTransaction;
 import network.minter.blockchain.models.operational.ExternalTransaction;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TxCoinBuy;
@@ -41,6 +43,7 @@ import network.minter.blockchain.models.operational.TxDeclareCandidacy;
 import network.minter.blockchain.models.operational.TxDelegate;
 import network.minter.blockchain.models.operational.TxEditCandidate;
 import network.minter.blockchain.models.operational.TxMultisend;
+import network.minter.blockchain.models.operational.TxRedeemCheck;
 import network.minter.blockchain.models.operational.TxSendCoin;
 import network.minter.blockchain.models.operational.TxSetCandidateOffline;
 import network.minter.blockchain.models.operational.TxSetCandidateOnline;
@@ -48,7 +51,9 @@ import network.minter.blockchain.models.operational.TxUnbound;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
+import network.minter.core.crypto.PrivateKey;
 import network.minter.core.crypto.UnsignedBytesData;
+import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -59,6 +64,14 @@ import static org.junit.Assert.assertTrue;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class ExternalTransactionTest {
+
+    static {
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void testSendEncodeDecode() {
@@ -540,6 +553,97 @@ public class ExternalTransactionTest {
 
         System.out.println("EditCandidate");
         System.out.println(data.toHexString());
+    }
+
+    @Test
+    public void testRedeemCheckNoProofEncodeDecode() {
+        PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
+        CheckTransaction check = new CheckTransaction.Builder("wazzap", "pass")
+                .setDueBlock(new BigInteger("999999999"))
+                .setChainId(BlockchainID.TestNet)
+                .setCoin("MNT")
+                .setValue("10")
+                .build();
+
+        String rawCheck = check.sign(privateKey).getTxSign();
+
+        TxRedeemCheck txData = new TxRedeemCheck()
+                .setRawCheck(rawCheck);
+
+        ExternalTransaction tx = new ExternalTransaction.Builder()
+                .setData(txData)
+                .build();
+
+        UnsignedBytesData encodedTxData = tx.encode();
+        String encodedTx = encodedTxData.toHexString();
+        System.out.println("Redeem check (no proof)");
+        System.out.println(encodedTx);
+
+        ExternalTransaction decoded = ExternalTransaction.fromEncoded(encodedTx);
+        assertEquals(new BigInteger("0"), decoded.getNonce());
+        assertEquals("MNT", decoded.getGasCoin());
+        assertEquals(new BigInteger("1"), decoded.getGasPrice());
+
+        TxRedeemCheck data = decoded.getData();
+        assertEquals(new UnsignedBytesData(new char[0]), data.getProof());
+        assertEquals(rawCheck, data.getRawCheck().toString());
+
+        CheckTransaction decCheck = data.getDecodedCheck();
+        assertEquals("wazzap", decCheck.getNonce().toStringASCII());
+        assertEquals(new BigInteger("999999999"), decCheck.getDueBlock());
+        assertEquals("MNT", decCheck.getCoin());
+        assertEquals(new BigDecimal("10"), decCheck.getValue());
+
+        assertEquals(decCheck.getLock(), check.getLock());
+        assertEquals(decCheck.getSignature(), check.getSignature());
+
+    }
+
+    @Test
+    public void testRedeemCheckWithProofEncodeDecode() {
+        PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
+        CheckTransaction check = new CheckTransaction.Builder("wazzap", "pass")
+                .setDueBlock(new BigInteger("999999999"))
+                .setChainId(BlockchainID.TestNet)
+                .setCoin("MNT")
+                .setValue("10")
+                .build();
+
+        String rawCheck = check.sign(privateKey).getTxSign();
+        String proof = CheckTransaction.makeProof(privateKey.getPublicKey().toMinter(), "pass").toHexString();
+
+        TxRedeemCheck txData = new TxRedeemCheck()
+                .setRawCheck(rawCheck)
+                .setProof(proof);
+
+        ExternalTransaction tx = new ExternalTransaction.Builder()
+                .setData(txData)
+                .build();
+
+        UnsignedBytesData encodedTxData = tx.encode();
+        String encodedTx = encodedTxData.toHexString();
+
+        System.out.println("Redeem check (with proof)");
+        System.out.println(encodedTx);
+
+        ExternalTransaction decoded = ExternalTransaction.fromEncoded(encodedTx);
+        assertEquals(new BigInteger("0"), decoded.getNonce());
+        assertEquals("MNT", decoded.getGasCoin());
+        assertEquals(new BigInteger("1"), decoded.getGasPrice());
+
+        TxRedeemCheck data = decoded.getData();
+        assertEquals(new UnsignedBytesData(proof), data.getProof());
+        assertEquals(rawCheck, data.getRawCheck().toString());
+
+        CheckTransaction decCheck = data.getDecodedCheck();
+        assertEquals("wazzap", decCheck.getNonce().toStringASCII());
+        assertEquals(new BigInteger("999999999"), decCheck.getDueBlock());
+        assertEquals("MNT", decCheck.getCoin());
+        assertEquals(new BigDecimal("10"), decCheck.getValue());
+
+        assertEquals(decCheck.getLock(), check.getLock());
+        assertEquals(decCheck.getSignature(), check.getSignature());
+
     }
 
 

@@ -168,6 +168,17 @@ public class ExternalTransaction implements Parcelable {
      * @param <OpType> operation type
      * @return object extends {@link Operation}
      */
+    @SuppressWarnings("unchecked")
+    public <OpType extends Operation> OpType getData() {
+        return (OpType) mOperationData;
+    }
+
+    /**
+     * Get transaction data
+     * @param cls class to cast data object
+     * @param <OpType> operation type
+     * @return object extends {@link Operation}
+     */
     public <OpType extends Operation> OpType getData(Class<OpType> cls) {
         return cls.cast(mOperationData);
     }

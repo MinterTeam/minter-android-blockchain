@@ -124,6 +124,17 @@ public final class SignatureSingleData extends SignatureData {
 	    mS = new UnsignedBytesData(fromRawRlp(2, decoded));
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SignatureSingleData)) {
+            return false;
+        }
+
+        SignatureSingleData sd = ((SignatureSingleData) obj);
+
+        return mV.equals(sd.getV()) && mR.equals(sd.getR()) && mS.equals(sd.getS());
+    }
+
     @Nonnull
     @Override
     protected char[] encodeRLP() {

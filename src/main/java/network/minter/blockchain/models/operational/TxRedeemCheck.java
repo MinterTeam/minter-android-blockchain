@@ -34,6 +34,7 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import network.minter.core.crypto.MinterCheck;
 import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
@@ -59,8 +60,8 @@ public final class TxRedeemCheck extends Operation {
         }
     };
     private final static int PROOF_LENGTH = 65;
-	private UnsignedBytesData mRawCheck;
-	private UnsignedBytesData mProof;
+    private MinterCheck mRawCheck;
+    private UnsignedBytesData mProof = new UnsignedBytesData(new char[0]);
 
     public TxRedeemCheck() {
     }
@@ -71,8 +72,8 @@ public final class TxRedeemCheck extends Operation {
 
     protected TxRedeemCheck(Parcel in) {
         super(in);
-	    mRawCheck = (UnsignedBytesData) in.readValue(UnsignedBytesData.class.getClassLoader());
-	    mProof = (UnsignedBytesData) in.readValue(UnsignedBytesData.class.getClassLoader());
+        mRawCheck = (MinterCheck) in.readValue(UnsignedBytesData.class.getClassLoader());
+        mProof = (UnsignedBytesData) in.readValue(UnsignedBytesData.class.getClassLoader());
     }
 
     @Override
@@ -82,37 +83,37 @@ public final class TxRedeemCheck extends Operation {
         dest.writeValue(mProof);
     }
 
-	public UnsignedBytesData getRawCheck() {
+    public MinterCheck getRawCheck() {
         return mRawCheck;
     }
 
     public TxRedeemCheck setRawCheck(final byte[] data) {
-	    mRawCheck = new UnsignedBytesData(data);
+        mRawCheck = new MinterCheck(data);
         return this;
     }
 
-	public TxRedeemCheck setRawCheck(UnsignedBytesData data) {
-        mRawCheck = data.clone();
+    public TxRedeemCheck setRawCheck(UnsignedBytesData data) {
+        mRawCheck = new MinterCheck(data.getBytes());
         return this;
     }
 
     public TxRedeemCheck setRawCheck(String hexString) {
-	    mRawCheck = new UnsignedBytesData(hexString);
+        mRawCheck = new MinterCheck(hexString);
         return this;
     }
 
-	public UnsignedBytesData getProof() {
+    public UnsignedBytesData getProof() {
         return mProof;
     }
 
     public TxRedeemCheck setProof(final byte[] data) {
         checkArgument(data.length ==
                 PROOF_LENGTH, format(Locale.getDefault(), "Proof must coins exact %d bytes", PROOF_LENGTH));
-	    mProof = new UnsignedBytesData(data);
+        mProof = new UnsignedBytesData(data);
         return this;
     }
 
-	public TxRedeemCheck setProof(UnsignedBytesData data) {
+    public TxRedeemCheck setProof(UnsignedBytesData data) {
         checkArgument(data.size() ==
                 PROOF_LENGTH, format(Locale.getDefault(), "Proof must coins exact %d bytes", PROOF_LENGTH));
         mProof = data.clone();
@@ -123,13 +124,17 @@ public final class TxRedeemCheck extends Operation {
         checkArgument(hexString.length() == PROOF_LENGTH *
                 2, format(Locale.getDefault(), "Proof must coins exact %d bytes (%d hex string len)", PROOF_LENGTH,
                 PROOF_LENGTH * 2));
-	    mProof = new UnsignedBytesData(hexString);
+        mProof = new UnsignedBytesData(hexString);
         return this;
     }
 
     @Override
     public OperationType getType() {
         return OperationType.RedeemCheck;
+    }
+
+    public CheckTransaction getDecodedCheck() {
+        return CheckTransaction.fromEncoded(mRawCheck);
     }
 
     @Nullable
@@ -144,7 +149,7 @@ public final class TxRedeemCheck extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{
+        return RLPBoxed.encode(new Object[]{
                 mRawCheck.getData(),
                 mProof.getData()
         });
@@ -152,10 +157,10 @@ public final class TxRedeemCheck extends Operation {
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-	    mRawCheck = new UnsignedBytesData(fromRawRlp(0, decoded));
-	    mProof = new UnsignedBytesData(fromRawRlp(1, decoded));
+        mRawCheck = new MinterCheck(fromRawRlp(0, decoded));
+        mProof = new UnsignedBytesData(fromRawRlp(1, decoded));
     }
 
 
