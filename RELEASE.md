@@ -1,5 +1,10 @@
 # Release notes
 
+## 0.11.0
+ - Fixes, updated core sdk
+ - Added method to get unsigned transaction hash `Transaction#getUnsignedTxHash`
+ - Added method to sign tx with a signature created outside `Transaction#signExternal`
+
 ## 0.10.0
  - Added check decoding from **Mc[data]**
  - More check tests
@@ -50,7 +55,7 @@
 ## 0.7.0
  - BREAKING CHANGES:
     - Fixed RLP decoding/encoding for uint64_t-like values, `nonce` for example
-    - In most places `byte[]` was replaced with `char[]`, `BytesData` to `UnsignedBytesData`
+    - In most places `byte[]` was replaced with `char[]`, `BytesData` to `BytesData`
 
 ## 0.6.2
  - MainNet urls, cleanup

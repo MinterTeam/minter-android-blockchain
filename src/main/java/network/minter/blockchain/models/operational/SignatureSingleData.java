@@ -32,10 +32,12 @@ import com.edwardstock.secp256k1.NativeSecp256k1;
 
 import javax.annotation.Nonnull;
 
-import network.minter.core.crypto.UnsignedBytesData;
+import network.minter.core.crypto.BytesData;
 import network.minter.core.internal.helpers.BytesHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
+
+import static network.minter.core.internal.common.Preconditions.checkArgument;
 
 /**
  * minter-android-blockchain. 2018
@@ -55,17 +57,37 @@ public final class SignatureSingleData extends SignatureData {
             return new SignatureSingleData[size];
         }
     };
-	private UnsignedBytesData mV;
-	private UnsignedBytesData mR;
-	private UnsignedBytesData mS;
+    private BytesData mV;
+    private BytesData mR;
+    private BytesData mS;
 
     public SignatureSingleData() {
     }
 
+    public SignatureSingleData(char[] r, char[] s, char[] v) {
+        checkArgument(r.length == 32, "R length must be 32");
+        checkArgument(s.length == 32, "S length must be 32");
+        checkArgument(v.length == 1, "V length must be 1");
+
+        mR = new BytesData(r);
+        mS = new BytesData(s);
+        mV = new BytesData(v);
+    }
+
+    public SignatureSingleData(byte[] r, byte[] s, byte[] v) {
+        checkArgument(r.length == 32, "R length must be 32");
+        checkArgument(s.length == 32, "S length must be 32");
+        checkArgument(v.length == 1, "V length must be 1");
+
+        mR = new BytesData(r);
+        mS = new BytesData(s);
+        mV = new BytesData(v);
+    }
+
     protected SignatureSingleData(Parcel in) {
-	    mV = (UnsignedBytesData) in.readValue(UnsignedBytesData.class.getClassLoader());
-	    mR = (UnsignedBytesData) in.readValue(UnsignedBytesData.class.getClassLoader());
-	    mS = (UnsignedBytesData) in.readValue(UnsignedBytesData.class.getClassLoader());
+        mV = (BytesData) in.readValue(BytesData.class.getClassLoader());
+        mR = (BytesData) in.readValue(BytesData.class.getClassLoader());
+        mS = (BytesData) in.readValue(BytesData.class.getClassLoader());
     }
 
     @Override
@@ -80,48 +102,39 @@ public final class SignatureSingleData extends SignatureData {
         dest.writeValue(mS);
     }
 
-	public UnsignedBytesData getR() {
+    public BytesData getR() {
         return mR;
     }
 
-	public UnsignedBytesData getS() {
+    public BytesData getS() {
         return mS;
     }
 
-	public UnsignedBytesData getV() {
+    public BytesData getV() {
         return mV;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s%s%s", mR, mS, mV);
+    }
+
     protected void setSign(NativeSecp256k1.RecoverableSignature signature) {
-	    mV = new UnsignedBytesData(signature.v, true);
-	    mR = new UnsignedBytesData(signature.r, true);
-	    mS = new UnsignedBytesData(signature.s, true);
+        mV = new BytesData(signature.v, true);
+        mR = new BytesData(signature.r, true);
+        mS = new BytesData(signature.s, true);
     }
 
     protected void decodeRaw(byte[][] vrs) {
-	    mV = new UnsignedBytesData(vrs[0]);
-	    mR = new UnsignedBytesData(vrs[1]);
-	    mS = new UnsignedBytesData(vrs[2]);
+        mV = new BytesData(vrs[0]);
+        mR = new BytesData(vrs[1]);
+        mS = new BytesData(vrs[2]);
     }
 
 	protected void decodeRaw(char[][] vrs) {
-		mV = new UnsignedBytesData(vrs[0]);
-		mR = new UnsignedBytesData(vrs[1]);
-		mS = new UnsignedBytesData(vrs[2]);
-    }
-
-    /**
-     * Unused method cause can't decode with base argument type byte[], needs byte[][]
-     * @param rlpEncodedData
-     * @see #decodeRaw(byte[][])
-     */
-    @Override
-    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
-        final Object[] decoded = (Object[]) rlp.getDecoded();
-	    mV = new UnsignedBytesData(fromRawRlp(0, decoded));
-	    mR = new UnsignedBytesData(fromRawRlp(1, decoded));
-	    mS = new UnsignedBytesData(fromRawRlp(2, decoded));
+        mV = new BytesData(vrs[0]);
+        mR = new BytesData(vrs[1]);
+        mS = new BytesData(vrs[2]);
     }
 
     @Override
@@ -143,5 +156,19 @@ public final class SignatureSingleData extends SignatureData {
 	    char[] s = BytesHelper.dropLeadingZeroes(mS.getData());
 
 	    return RLPBoxed.encode(new Object[]{v, r, s});
+    }
+
+    /**
+     * Unused method cause can't decode with base argument type byte[], needs byte[][]
+     * @param rlpEncodedData
+     * @see #decodeRaw(byte[][])
+     */
+    @Override
+    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
+        final Object[] decoded = (Object[]) rlp.getDecoded();
+        mV = new BytesData(fromRawRlp(0, decoded));
+        mR = new BytesData(fromRawRlp(1, decoded));
+        mS = new BytesData(fromRawRlp(2, decoded));
     }
 }

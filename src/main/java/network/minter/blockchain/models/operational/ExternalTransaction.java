@@ -36,7 +36,6 @@ import javax.annotation.Nonnull;
 
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
-import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
@@ -70,7 +69,7 @@ public class ExternalTransaction implements Parcelable {
     OperationType mType = OperationType.SendCoin;
     Operation mOperationData;
     // max - 1024 bytes (1 kilobyte)
-    UnsignedBytesData mPayload = new UnsignedBytesData(new char[0]);
+    BytesData mPayload = new BytesData(new char[0]);
     BigInteger mNonce;
     BigInteger mGasPrice;
     String mGasCoin = MinterSDK.DEFAULT_COIN;
@@ -87,7 +86,7 @@ public class ExternalTransaction implements Parcelable {
     protected ExternalTransaction(Parcel in) {
         mType = (OperationType) in.readValue(OperationType.class.getClassLoader());
         mOperationData = (Operation) in.readValue(Operation.class.getClassLoader());
-        mPayload = (UnsignedBytesData) in.readValue(BytesData.class.getClassLoader());
+        mPayload = (BytesData) in.readValue(BytesData.class.getClassLoader());
         mNonce = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mGasPrice = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mGasCoin = in.readString();
@@ -104,7 +103,7 @@ public class ExternalTransaction implements Parcelable {
     public static ExternalTransaction fromEncoded(@Nonnull String hexEncoded) {
         checkNotNull(hexEncoded, "hexEncoded data can't be null");
         checkArgument(hexEncoded.length() > 0, "Encoded transaction is empty");
-        final UnsignedBytesData bd = new UnsignedBytesData(hexEncoded);
+        final BytesData bd = new BytesData(hexEncoded);
         final DecodeResult rlp = RLPBoxed.decode(bd.getData(), 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
@@ -127,9 +126,9 @@ public class ExternalTransaction implements Parcelable {
 
     /**
      * Create encoded char[]. This value can be transferred to target device to send pre-created transaction.
-     * @return char[] container. Use UnsignedBytesData#toHexString() to get hex string
+     * @return char[] container. Use BytesData#toHexString() to get hex string
      */
-    public UnsignedBytesData encode() {
+    public BytesData encode() {
         char[] res = RLPBoxed.encode(new Object[]{
                 mOperationData.getType().getValue(),
                 mOperationData.encodeRLP(),
@@ -138,7 +137,7 @@ public class ExternalTransaction implements Parcelable {
                 firstNonNull(mGasPrice, new BigInteger("1")),
                 firstNonNull(StringHelper.strrpad(10, mGasCoin), ""),
         });
-        return new UnsignedBytesData(res);
+        return new BytesData(res);
     }
 
     /**
@@ -184,10 +183,10 @@ public class ExternalTransaction implements Parcelable {
     }
 
     /**
-     * Return payload as UnsignedBytesData, this container keep data in char[]
+     * Return payload as BytesData, this container keep data in char[]
      * @return char[] container
      */
-    public UnsignedBytesData getPayload() {
+    public BytesData getPayload() {
         return mPayload;
     }
 
@@ -235,7 +234,7 @@ public class ExternalTransaction implements Parcelable {
 
     void decodeRLP(Object[] raw) {
         mType = OperationType.findByValue(new BigInteger(charsToBytes(fromRawRlp(0, raw))));
-        mPayload = new UnsignedBytesData(fromRawRlp(2, raw));
+        mPayload = new BytesData(fromRawRlp(2, raw));
         mNonce = fixBigintSignedByte(raw[3]);
         mGasPrice = fixBigintSignedByte((raw[4]));
         mGasCoin = charsToString(fromRawRlp(5, raw));
@@ -284,7 +283,7 @@ public class ExternalTransaction implements Parcelable {
          */
         public Builder setPayload(BytesData data) {
             checkArgument(data.size() <= 1024, "Payload maximum size: 1024 bytes");
-            mTx.mPayload = new UnsignedBytesData(data.getData(), true);
+            mTx.mPayload = new BytesData(data.getData(), true);
             return this;
         }
 
@@ -296,7 +295,7 @@ public class ExternalTransaction implements Parcelable {
         public Builder setPayload(@Nonnull String hexString) {
             checkNotNull(hexString, "Hex data string can't be null");
             checkArgument(hexString.length() <= 2048, "Payload maximum size: 1024 bytes (2048 in hex string)");
-            mTx.mPayload = new UnsignedBytesData(hexString);
+            mTx.mPayload = new BytesData(hexString);
             return this;
         }
 

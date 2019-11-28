@@ -28,6 +28,8 @@ package network.minter.blockchain.models.operational;
 
 import org.parceler.Parcel;
 
+import network.minter.core.crypto.BytesData;
+
 /**
  * minter-android-blockchain. 2018
  *
@@ -52,5 +54,20 @@ public final class TransactionSign {
         mSign = null;
     }
 
+    @Override
+    public String toString() {
+        return mSign;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TransactionSign) {
+            return mSign.equals(((TransactionSign) obj).mSign);
+        } else if (obj instanceof String) {
+            return mSign.equals(obj);
+        } else if (obj instanceof BytesData) {
+            return mSign.equals(((BytesData) obj).toHexString());
+        }
+        return super.equals(obj);
+    }
 }

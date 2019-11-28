@@ -40,9 +40,8 @@ import network.minter.core.crypto.HashUtil;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterCheck;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.core.crypto.UnsignedBytesData;
+import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLP;
 import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.common.Preconditions.checkArgument;
@@ -57,24 +56,38 @@ import static network.minter.core.internal.helpers.StringHelper.strrpad;
  */
 public class CheckTransaction {
     private String mPassphrase;
-    private UnsignedBytesData mNonce;
+    private BytesData mNonce;
     private BlockchainID mChainId;
     private BigInteger mDueBlock;
-    private String mCoin = MinterSDK.DEFAULT_COIN;
+    private String mCoin;
     private BigInteger mValue;
-    private UnsignedBytesData mLock;
+    private String mGasCoin;
+    private BytesData mLock;
     private SignatureSingleData mSignature;
 
-    CheckTransaction(UnsignedBytesData nonce, String passphrase) {
+    CheckTransaction(BytesData nonce, String passphrase) {
+        mGasCoin = StringHelper.strrpad(10, MinterSDK.DEFAULT_COIN);
+        mCoin = mGasCoin;
         mNonce = nonce;
         mPassphrase = passphrase;
     }
 
     CheckTransaction() {
+        mGasCoin = StringHelper.strrpad(10, MinterSDK.DEFAULT_COIN);
+        mCoin = mGasCoin;
+        mNonce = new BytesData("1".getBytes());
     }
 
-    public static UnsignedBytesData makeProof(String address, String passphrase) {
+    public static BytesData makeProof(String address, byte[] passphrase) {
         return makeProof(new MinterAddress(address), passphrase);
+    }
+
+    public static BytesData makeProof(String address, String passphrase) {
+        return makeProof(new MinterAddress(address), passphrase.getBytes());
+    }
+
+    public static BytesData makeProof(MinterAddress address, String passphrase) {
+        return makeProof(address, passphrase.getBytes());
     }
 
     /**
@@ -83,21 +96,21 @@ public class CheckTransaction {
      * @param passphrase check password
      * @return proof bytes data
      */
-    public static UnsignedBytesData makeProof(MinterAddress address, String passphrase) {
-        BytesData key = new BytesData(HashUtil.sha256(passphrase.getBytes()));
-        BytesData encodedAddress = new BytesData(RLP.encode(new Object[]{address.getData()})).sha3Mutable();
+    public static BytesData makeProof(MinterAddress address, byte[] passphrase) {
+        BytesData key = new BytesData(HashUtil.sha256(passphrase));
+        BytesData encodedAddress = new BytesData(RLPBoxed.encode(new Object[]{address.getData()})).sha3Mutable();
 
         NativeSecp256k1.RecoverableSignature signature;
         long ctx = NativeSecp256k1.contextCreate();
         try {
-            signature = NativeSecp256k1.signRecoverableSerialized(ctx, encodedAddress.getData(), key.getData());
+            signature = NativeSecp256k1.signRecoverableSerialized(ctx, encodedAddress.getBytes(), key.getBytes());
         } finally {
             NativeSecp256k1.contextCleanup(ctx);
         }
 
         signature.v[0] = signature.v[0] == 27 ? 0x0 : (byte) 0x01;
 
-        return new UnsignedBytesData(signature.r, signature.s, signature.v);
+        return new BytesData(signature.r, signature.s, signature.v);
     }
 
     public static CheckTransaction fromEncoded(@Nonnull MinterCheck check) {
@@ -107,12 +120,12 @@ public class CheckTransaction {
     public static CheckTransaction fromEncoded(@Nonnull String hexEncoded) {
         checkNotNull(hexEncoded, "hexEncoded data can't be null");
         checkArgument(hexEncoded.length() > 0, "Encoded transaction is empty");
-        final UnsignedBytesData bd = new UnsignedBytesData(new MinterCheck(hexEncoded));
+        final BytesData bd = new BytesData(new MinterCheck(hexEncoded));
         final DecodeResult rlp = RLPBoxed.decode(bd.getData(), 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-        if (decoded.length != 9) {
-            throw new InvalidEncodedTransactionException("Encoded transaction has invalid data length: expected 9, given %d", decoded.length);
+        if (decoded.length != 10) {
+            throw new InvalidEncodedTransactionException("Encoded transaction has invalid data length: expected 10, given %d", decoded.length);
         }
 
         CheckTransaction transaction = new CheckTransaction();
@@ -141,8 +154,12 @@ public class CheckTransaction {
     /**
      * @return
      */
-    public UnsignedBytesData getNonce() {
+    public BytesData getNonce() {
         return mNonce;
+    }
+
+    public BigInteger getNonceNumeric() {
+        return new BigInteger(new String(mNonce.getData()));
     }
 
     /**
@@ -183,9 +200,9 @@ public class CheckTransaction {
     }
 
     public TransactionSign sign(PrivateKey privateKey) {
-        UnsignedBytesData hashBytes = new UnsignedBytesData(encode(true));
-        UnsignedBytesData hash = hashBytes.sha3Data();
-        UnsignedBytesData pk = new UnsignedBytesData(mPassphrase.getBytes()).sha256Mutable();
+        BytesData hashBytes = new BytesData(encode(true));
+        BytesData hash = hashBytes.sha3Data();
+        BytesData pk = new BytesData(mPassphrase.getBytes()).sha256Mutable();
 
         NativeSecp256k1.RecoverableSignature lockSig;
 
@@ -198,14 +215,14 @@ public class CheckTransaction {
 
         lockSig.v[0] = lockSig.v[0] == 27 ? 0x0 : (byte) 0x01;
 
-        mLock = new UnsignedBytesData(lockSig.r, lockSig.s, lockSig.v);
+        mLock = new BytesData(lockSig.r, lockSig.s, lockSig.v);
 
-        UnsignedBytesData withLock = new UnsignedBytesData(encode(false)).sha3Mutable();
+        BytesData withLock = new BytesData(encode(false)).sha3Mutable();
 
         NativeSecp256k1.RecoverableSignature rsv;
         long ctx2 = NativeSecp256k1.contextCreate();
         try {
-            rsv = NativeSecp256k1.signRecoverableSerialized(ctx2, withLock.getBytes(), privateKey.getData());
+            rsv = NativeSecp256k1.signRecoverableSerialized(ctx2, withLock.getBytes(), privateKey.getBytes());
         } finally {
             NativeSecp256k1.contextCleanup(ctx2);
         }
@@ -218,8 +235,12 @@ public class CheckTransaction {
         return new TransactionSign(signedCheck);
     }
 
-    public UnsignedBytesData getLock() {
+    public BytesData getLock() {
         return mLock;
+    }
+
+    public String getGasCoin() {
+        return mGasCoin.replace("\0", "");
     }
 
     char[] fromRawRlp(int idx, Object[] raw) {
@@ -229,19 +250,22 @@ public class CheckTransaction {
         return (char[]) raw[idx];
     }
 
+    @SuppressWarnings("UnusedAssignment")
     private void decodeRLP(Object[] raw) {
-        mNonce = new UnsignedBytesData((char[]) raw[0]);
-        mChainId = BlockchainID.valueOf(fixBigintSignedByte(fromRawRlp(1, raw)));
-        mDueBlock = fixBigintSignedByte(raw[2]);
-        mCoin = charsToStringSafe(fromRawRlp(3, raw), 10);
-        mValue = fixBigintSignedByte(raw[4]);
-        mLock = new UnsignedBytesData((char[]) raw[5]);
+        int idx = 0;
+        mNonce = new BytesData((char[]) raw[idx++]);
+        mChainId = BlockchainID.valueOf(fixBigintSignedByte(fromRawRlp(idx++, raw)));
+        mDueBlock = fixBigintSignedByte(raw[idx++]);
+        mCoin = charsToStringSafe(fromRawRlp(idx++, raw), 10);
+        mValue = fixBigintSignedByte(raw[idx++]);
+        mGasCoin = charsToStringSafe(fromRawRlp(idx++, raw), 10);
+        mLock = new BytesData((char[]) raw[idx++]);
         mSignature = new SignatureSingleData();
 
         char[][] vrs = new char[3][];
-        vrs[0] = (char[]) raw[6];
-        vrs[1] = (char[]) raw[7];
-        vrs[2] = (char[]) raw[8];
+        vrs[0] = (char[]) raw[idx++];
+        vrs[1] = (char[]) raw[idx++];
+        vrs[2] = (char[]) raw[idx++];
         mSignature.decodeRaw(vrs);
     }
 
@@ -252,7 +276,8 @@ public class CheckTransaction {
                     BigInteger.valueOf(mChainId.getId()),
                     mDueBlock,
                     mCoin,
-                    mValue
+                    mValue,
+                    mGasCoin,
             });
         }
 
@@ -264,6 +289,7 @@ public class CheckTransaction {
                     mDueBlock,
                     mCoin,
                     mValue,
+                    mGasCoin,
                     lock,
                     mSignature.getV().getData(),
                     mSignature.getR().getData(),
@@ -277,6 +303,7 @@ public class CheckTransaction {
                 mDueBlock,
                 mCoin,
                 mValue,
+                mGasCoin,
                 lock
         });
     }
@@ -289,24 +316,26 @@ public class CheckTransaction {
          * @param passphrase password to verify check proof
          */
         public Builder(BigInteger nonce, String passphrase) {
-            this(new UnsignedBytesData(nonce.toString(10).getBytes()), passphrase);
+            this(new BytesData(nonce.toString(10).getBytes()), passphrase);
         }
 
         public Builder(CharSequence nonce, String passphrase) {
-            this(new UnsignedBytesData(nonce.toString().getBytes()), passphrase);
+            this(new BytesData(nonce.toString().getBytes()), passphrase);
         }
 
-        public Builder(UnsignedBytesData nonce, String passphrase) {
+        public Builder(BytesData nonce, String passphrase) {
             mCheck = new CheckTransaction(nonce, passphrase);
             mCheck.mChainId = BuildConfig.BLOCKCHAIN_ID;
         }
 
         public Builder setChainId(BlockchainID id) {
+            checkNotNull(id, "chain id is null");
             mCheck.mChainId = id;
             return this;
         }
 
-        public Builder setCoin(String coin) {
+        public Builder setCoin(@Nonnull String coin) {
+            //noinspection ConstantConditions
             checkArgument(coin != null && coin.length() >= 3 && coin.length() <= 10, String.format("Invalid coin passed: %s", coin));
             mCheck.mCoin = strrpad(10, coin);
             return this;
@@ -323,6 +352,11 @@ public class CheckTransaction {
 
         public Builder setDueBlock(BigInteger dueBlockNum) {
             mCheck.mDueBlock = dueBlockNum;
+            return this;
+        }
+
+        public Builder setGasCoin(String gasCoin) {
+            mCheck.mGasCoin = StringHelper.strrpad(10, gasCoin);
             return this;
         }
 

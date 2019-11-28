@@ -36,7 +36,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import network.minter.core.crypto.MinterAddress;
-import network.minter.core.internal.api.converters.MinterAddressDeserializer;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
@@ -77,7 +76,7 @@ public class TxCreateMultisigAddress extends Operation {
         super(in);
         mThreshold = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         in.readList(mWeights, BigInteger.class.getClassLoader());
-        in.readList(mAddresses, MinterAddressDeserializer.class.getClassLoader());
+        in.readList(mAddresses, MinterAddress.class.getClassLoader());
     }
 
     @Override

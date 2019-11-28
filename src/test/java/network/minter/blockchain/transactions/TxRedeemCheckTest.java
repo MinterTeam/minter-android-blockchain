@@ -38,9 +38,9 @@ import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.models.operational.TxRedeemCheck;
 import network.minter.core.MinterSDK;
+import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static org.junit.Assert.assertEquals;
@@ -57,10 +57,10 @@ public class TxRedeemCheckTest {
 
     @Test
     public void testEncode() throws OperationInvalidDataException {
-        PrivateKey privateKey = new PrivateKey("64e27afaab363f21eec05291084367f6f1297a7b280d69d672febecda94a09ea");
-        String validTx = "f901470102018a4d4e540000000000000009b8ecf8eab8a5f8a38334383002830f423f8a4d4e5400000000000000888ac7230489e80000b841d184caa333fe636288fc68d99dea2c8af5f7db4569a0bb91e03214e7e238f89d2b21f4d2b730ef590fd8de72bd43eb5c6265664df5aa3610ef6c71538d9295ee001ba08bd966fc5a093024a243e62cdc8131969152d21ee9220bc0d95044f54e3dd485a033bc4e03da3ea8a2cd2bd149d16c022ee604298575380db8548b4fd6672a9195b841da021d4f84728e0d3d312a18ec84c21768e0caa12a53cb0a1452771f72b0d1a91770ae139fd6c23bcf8cec50f5f2e733eabb8482cf29ee540e56c6639aac469600808001b845f8431ca054ab4e282049e698be637e02378c08aa6af86a55d1749065db207ce61c77d49aa00355674c7fd492c9763ad8808e3da560f9b3ec1459fd1bb365f2403ac77ac783";
-        String validCheck = "Mcf8a38334383002830f423f8a4d4e5400000000000000888ac7230489e80000b841d184caa333fe636288fc68d99dea2c8af5f7db4569a0bb91e03214e7e238f89d2b21f4d2b730ef590fd8de72bd43eb5c6265664df5aa3610ef6c71538d9295ee001ba08bd966fc5a093024a243e62cdc8131969152d21ee9220bc0d95044f54e3dd485a033bc4e03da3ea8a2cd2bd149d16c022ee604298575380db8548b4fd6672a9195";
-        String validProof = "da021d4f84728e0d3d312a18ec84c21768e0caa12a53cb0a1452771f72b0d1a91770ae139fd6c23bcf8cec50f5f2e733eabb8482cf29ee540e56c6639aac469600";
+        PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
+        String validTx = "f901540102018a4d4e540000000000000009b8f9f8f7b8b2f8b08331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b20000008a4d4e5400000000000000b841b59c9a11ee79a5dbe6e40383a5db5a90960b452e5fddc63cc8f3d092ebf7e39303340d8f42bda3b55a681b9ece3229f9cf718d717ef0c2cb818c52a9b93f27d9001ca0afe5f4c59f1a1f64bd2d7bb97f0fc0cbb9cf1b40d12dc59f948dc419bbad51f8a05033b98e743a9d2af329e890933ea585785573d3a40f52aaa76858083d68654eb841133824027bddf75120c93cf183f5ff18beea9c350203eb7af02bcbbbca5e282201efe7e4eac2494de85b762296dd4b7ea7879b238a6dd8b012838ee6fc04d51501808001b845f8431ca0d00ee903c7859ec891a983ff70b4167843140a62a5d346df29baf344c9feedd6a0323f997418d719e3a4d5b1da8854e60cb9f70674d12763214c374f9bd53d47ec";
+        String validCheck = "Mcf8b08331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b20000008a4d4e5400000000000000b841b59c9a11ee79a5dbe6e40383a5db5a90960b452e5fddc63cc8f3d092ebf7e39303340d8f42bda3b55a681b9ece3229f9cf718d717ef0c2cb818c52a9b93f27d9001ca0afe5f4c59f1a1f64bd2d7bb97f0fc0cbb9cf1b40d12dc59f948dc419bbad51f8a05033b98e743a9d2af329e890933ea585785573d3a40f52aaa76858083d68654e";
+        String validProof = "133824027bddf75120c93cf183f5ff18beea9c350203eb7af02bcbbbca5e282201efe7e4eac2494de85b762296dd4b7ea7879b238a6dd8b012838ee6fc04d51501";
 
         Transaction tx = new Transaction.Builder(new BigInteger("1"))
                 .setBlockchainId(BlockchainID.TestNet)
@@ -77,12 +77,12 @@ public class TxRedeemCheckTest {
 
     @Test
     public void testDecode() {
-        String validCheck = "Mcf8a38334383002830f423f8a4d4e5400000000000000888ac7230489e80000b841d184caa333fe636288fc68d99dea2c8af5f7db4569a0bb91e03214e7e238f89d2b21f4d2b730ef590fd8de72bd43eb5c6265664df5aa3610ef6c71538d9295ee001ba08bd966fc5a093024a243e62cdc8131969152d21ee9220bc0d95044f54e3dd485a033bc4e03da3ea8a2cd2bd149d16c022ee604298575380db8548b4fd6672a9195";
-        String validProof = "da021d4f84728e0d3d312a18ec84c21768e0caa12a53cb0a1452771f72b0d1a91770ae139fd6c23bcf8cec50f5f2e733eabb8482cf29ee540e56c6639aac469600";
-        String pass = "pass";
-        MinterAddress address = new MinterAddress("Mxa7bc33954f1ce855ed1a8c768fdd32ed927def47");
+        String validCheck = "Mcf8b08331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b20000008a4d4e5400000000000000b841b59c9a11ee79a5dbe6e40383a5db5a90960b452e5fddc63cc8f3d092ebf7e39303340d8f42bda3b55a681b9ece3229f9cf718d717ef0c2cb818c52a9b93f27d9001ca0afe5f4c59f1a1f64bd2d7bb97f0fc0cbb9cf1b40d12dc59f948dc419bbad51f8a05033b98e743a9d2af329e890933ea585785573d3a40f52aaa76858083d68654e";
+        String validProof = "133824027bddf75120c93cf183f5ff18beea9c350203eb7af02bcbbbca5e282201efe7e4eac2494de85b762296dd4b7ea7879b238a6dd8b012838ee6fc04d51501";
+        String pass = "hello";
+        MinterAddress address = new MinterAddress("Mx5f0b55330e289490efa54c92e2120d6ebb6514ca");
 
-        Transaction tx = Transaction.fromEncoded("f901470102018a4d4e540000000000000009b8ecf8eab8a5f8a38334383002830f423f8a4d4e5400000000000000888ac7230489e80000b841d184caa333fe636288fc68d99dea2c8af5f7db4569a0bb91e03214e7e238f89d2b21f4d2b730ef590fd8de72bd43eb5c6265664df5aa3610ef6c71538d9295ee001ba08bd966fc5a093024a243e62cdc8131969152d21ee9220bc0d95044f54e3dd485a033bc4e03da3ea8a2cd2bd149d16c022ee604298575380db8548b4fd6672a9195b841da021d4f84728e0d3d312a18ec84c21768e0caa12a53cb0a1452771f72b0d1a91770ae139fd6c23bcf8cec50f5f2e733eabb8482cf29ee540e56c6639aac469600808001b845f8431ca054ab4e282049e698be637e02378c08aa6af86a55d1749065db207ce61c77d49aa00355674c7fd492c9763ad8808e3da560f9b3ec1459fd1bb365f2403ac77ac783");
+        Transaction tx = Transaction.fromEncoded("f901540102018a4d4e540000000000000009b8f9f8f7b8b2f8b08331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b20000008a4d4e5400000000000000b841b59c9a11ee79a5dbe6e40383a5db5a90960b452e5fddc63cc8f3d092ebf7e39303340d8f42bda3b55a681b9ece3229f9cf718d717ef0c2cb818c52a9b93f27d9001ca0afe5f4c59f1a1f64bd2d7bb97f0fc0cbb9cf1b40d12dc59f948dc419bbad51f8a05033b98e743a9d2af329e890933ea585785573d3a40f52aaa76858083d68654eb841133824027bddf75120c93cf183f5ff18beea9c350203eb7af02bcbbbca5e282201efe7e4eac2494de85b762296dd4b7ea7879b238a6dd8b012838ee6fc04d51501808001b845f8431ca0d00ee903c7859ec891a983ff70b4167843140a62a5d346df29baf344c9feedd6a0323f997418d719e3a4d5b1da8854e60cb9f70674d12763214c374f9bd53d47ec");
 
         assertEquals(new BigInteger("1"), tx.getNonce());
         assertEquals(BlockchainID.TestNet, tx.getBlockchainId());
@@ -96,9 +96,9 @@ public class TxRedeemCheckTest {
 
         CheckTransaction check = data.getDecodedCheck();
         assertEquals("MNT", check.getCoin());
-        assertEquals(new BigDecimal("10"), check.getValue());
-        assertEquals(new BigInteger("999999"), check.getDueBlock());
+        assertEquals(new BigDecimal("128"), check.getValue());
+        assertEquals(new BigInteger("999999999"), check.getDueBlock());
 
-        assertEquals(CheckTransaction.makeProof(address, pass), new UnsignedBytesData(validProof));
+        assertEquals(CheckTransaction.makeProof(address, pass), new BytesData(validProof));
     }
 }

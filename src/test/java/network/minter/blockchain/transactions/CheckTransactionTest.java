@@ -28,17 +28,19 @@ package network.minter.blockchain.transactions;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.CheckTransaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
+import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterCheck;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.internal.exceptions.NativeLoadException;
+import network.minter.core.util.FastByteComparisons;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -62,12 +64,10 @@ public class CheckTransactionTest {
         PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
         MinterAddress address = new MinterAddress("Mx5f0b55330e289490efa54c92e2120d6ebb6514ca");
 
-        final String validCheckData = "Mcf8a58331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b2000000b8412374f8a8a53c3efe9d8617ad2c0ea8532c71babba55c72e23fff581c96987a233a0ff89affaccbac423b04e1176c4b4fbfbc642c2ef76d2d1f0aafd2250de771011ba05afa84a3971fb430fd3594a0d573a3fa9618299e970912d4754e02c7bf61b343a00e771ed1425dade278f81dd59aed48fccc976294ecbc34b76bce115fa93cea68";
-        CheckTransaction validCheck = CheckTransaction.fromEncoded(validCheckData);
-
         CheckTransaction check = new CheckTransaction.Builder(new BigInteger("128"), "hello")
                 .setChainId(BlockchainID.TestNet)
                 .setCoin("MNT")
+                .setGasCoin("MNT")
                 .setDueBlock(new BigInteger("999999999"))
                 .setValue("128")
                 .build();
@@ -75,8 +75,13 @@ public class CheckTransactionTest {
 
         MinterCheck checkData = new MinterCheck(sign.getTxSign());
 
+        final String validCheckData = "Mcf8b08331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b20000008a4d4e5400000000000000b841b59c9a11ee79a5dbe6e40383a5db5a90960b452e5fddc63cc8f3d092ebf7e39303340d8f42bda3b55a681b9ece3229f9cf718d717ef0c2cb818c52a9b93f27d9001ca0afe5f4c59f1a1f64bd2d7bb97f0fc0cbb9cf1b40d12dc59f948dc419bbad51f8a05033b98e743a9d2af329e890933ea585785573d3a40f52aaa76858083d68654e";
+        CheckTransaction validCheck = CheckTransaction.fromEncoded(validCheckData);
+
         CheckTransaction decoded = CheckTransaction.fromEncoded(checkData.toString());
         assertEquals(validCheck.getNonce(), decoded.getNonce());
+        assertEquals("MNT", decoded.getGasCoin());
+        assertEquals(validCheck.getGasCoin(), decoded.getGasCoin());
         assertEquals(validCheck.getChainId(), decoded.getChainId());
         assertEquals(validCheck.getCoin(), decoded.getCoin());
         assertEquals(validCheck.getDueBlock(), decoded.getDueBlock());
@@ -95,25 +100,36 @@ public class CheckTransactionTest {
 
     @Test
     public void testSignCheck() {
-        PrivateKey privateKey = new PrivateKey("64e27afaab363f21eec05291084367f6f1297a7b280d69d672febecda94a09ea");
-        MinterAddress address = new MinterAddress("Mxa7bc33954f1ce855ed1a8c768fdd32ed927def47");
-        String pass = "pass";
-        String validCheck = "Mcf8a38334383002830f423f8a4d4e5400000000000000888ac7230489e80000b841d184caa333fe636288fc68d99dea2c8af5f7db4569a0bb91e03214e7e238f89d2b21f4d2b730ef590fd8de72bd43eb5c6265664df5aa3610ef6c71538d9295ee001ba08bd966fc5a093024a243e62cdc8131969152d21ee9220bc0d95044f54e3dd485a033bc4e03da3ea8a2cd2bd149d16c022ee604298575380db8548b4fd6672a9195";
-        String validProof = "da021d4f84728e0d3d312a18ec84c21768e0caa12a53cb0a1452771f72b0d1a91770ae139fd6c23bcf8cec50f5f2e733eabb8482cf29ee540e56c6639aac469600";
+        PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
+        MinterAddress address = new MinterAddress("Mx5f0b55330e289490efa54c92e2120d6ebb6514ca");
+        String pass = "hello";
+        String validCheck = "Mcf8b08331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b20000008a4d4e5400000000000000b841b59c9a11ee79a5dbe6e40383a5db5a90960b452e5fddc63cc8f3d092ebf7e39303340d8f42bda3b55a681b9ece3229f9cf718d717ef0c2cb818c52a9b93f27d9001ca0afe5f4c59f1a1f64bd2d7bb97f0fc0cbb9cf1b40d12dc59f948dc419bbad51f8a05033b98e743a9d2af329e890933ea585785573d3a40f52aaa76858083d68654e";
 
-        CheckTransaction check = new CheckTransaction.Builder(new BigInteger("480"), pass)
+        CheckTransaction check = new CheckTransaction.Builder(new BigInteger("128"), pass)
+                .setChainId(BlockchainID.TestNet)
+                .setGasCoin("MNT")
                 .setCoin("MNT")
-		        .setChainId(BlockchainID.TestNet)
-                .setDueBlock(new BigInteger("999999"))
-                .setValue("10")
+                .setDueBlock(new BigInteger("999999999"))
+                .setValue("128")
                 .build();
 
         TransactionSign sign = check.sign(privateKey);
 
+        CheckTransaction decoded = CheckTransaction.fromEncoded(sign.getTxSign());
+        assertEquals(new BigInteger("128"), decoded.getNonceNumeric());
+        assertTrue(FastByteComparisons.equal("128".getBytes(), decoded.getNonce().getBytes()));
+        assertEquals(BlockchainID.TestNet, decoded.getChainId());
+        assertEquals("MNT", decoded.getCoin());
+        assertEquals("MNT", decoded.getGasCoin());
+        assertEquals(new BigInteger("999999999"), decoded.getDueBlock());
+        assertEquals(new BigDecimal("128"), decoded.getValue());
+
+        CheckTransaction validDec = CheckTransaction.fromEncoded(validCheck);
+
         assertEquals(validCheck, sign.getTxSign());
 
-	    UnsignedBytesData proof = CheckTransaction.makeProof(address, pass);
-        assertEquals(validProof, proof.toHexString());
+        BytesData proof = CheckTransaction.makeProof(address, pass);
+        System.out.println(proof.toHexString());
 
     }
 }

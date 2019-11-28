@@ -45,7 +45,6 @@ import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
@@ -86,8 +85,8 @@ public class Transaction implements Parcelable {
     Operation mOperationData;
 
     // max - 1024 bytes (1 kilobyte)
-    UnsignedBytesData mPayload = new UnsignedBytesData(new char[0]);
-    UnsignedBytesData mServiceData = new UnsignedBytesData(new char[0]);
+    BytesData mPayload = new BytesData(new char[0]);
+    BytesData mServiceData = new BytesData(new char[0]);
     SignatureType mSignatureType = Single;
     SignatureData mSignatureData;
 
@@ -136,8 +135,8 @@ public class Transaction implements Parcelable {
         mGasCoin = in.readString();
         mType = (OperationType) in.readValue(OperationType.class.getClassLoader());
         mOperationData = (Operation) in.readValue(Operation.class.getClassLoader());
-        mPayload = (UnsignedBytesData) in.readValue(BytesData.class.getClassLoader());
-        mServiceData = (UnsignedBytesData) in.readValue(BytesData.class.getClassLoader());
+        mPayload = (BytesData) in.readValue(BytesData.class.getClassLoader());
+        mServiceData = (BytesData) in.readValue(BytesData.class.getClassLoader());
         mSignatureType = (SignatureType) in.readValue(SignatureType.class.getClassLoader());
         mSignatureData = (SignatureData) in.readValue(mSignatureType.mTypeClass.getClassLoader());
     }
@@ -150,7 +149,7 @@ public class Transaction implements Parcelable {
     public static Transaction fromEncoded(@Nonnull String hexEncoded) {
         checkNotNull(hexEncoded, "hexEncoded data can't be null");
         checkArgument(hexEncoded.length() > 0, "Encoded transaction is empty");
-        final UnsignedBytesData bd = new UnsignedBytesData(hexEncoded);
+        final BytesData bd = new BytesData(hexEncoded);
         final DecodeResult rlp = RLPBoxed.decode(bd.getData(), 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
@@ -246,15 +245,15 @@ public class Transaction implements Parcelable {
         mSignatureType = Multi;
         checkArgument(privateKeys.size() > 0, "Private keys can't be empty");
 
-        final UnsignedBytesData rawTxData = new UnsignedBytesData(encode(true));
-        final UnsignedBytesData hash = rawTxData.sha3Data();
+        final BytesData rawTxData = new BytesData(encode(true));
+        final BytesData hash = rawTxData.sha3Data();
 
         final List<SignatureSingleData> signaturesData = new ArrayList<>(privateKeys.size());
 
         long ctx = NativeSecp256k1.contextCreate();
         try {
             for (final PrivateKey pk : privateKeys) {
-                final NativeSecp256k1.RecoverableSignature signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), pk.getData());
+                final NativeSecp256k1.RecoverableSignature signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), pk.getBytes());
                 final SignatureSingleData signatureData = new SignatureSingleData();
                 signatureData.setSign(signature);
                 signaturesData.add(signatureData);
@@ -267,7 +266,24 @@ public class Transaction implements Parcelable {
         mSignatureData = new SignatureMultiData();
         ((SignatureMultiData) mSignatureData).setSigns(signatureAddress, signaturesData);
 
-        return new TransactionSign(new UnsignedBytesData(encode(false)).toHexString());
+        return new TransactionSign(new BytesData(encode(false)).toHexString());
+    }
+
+    public BytesData getUnsignedTxHash() {
+        mSignatureType = Single;
+        char[] encoded = encode(true);
+        final BytesData rawTxData = new BytesData(encoded);
+        return rawTxData.sha3Data();
+    }
+
+    public TransactionSign signExternal(SignatureSingleData signature) {
+        mSignatureData = signature;
+        return new TransactionSign(new BytesData(encode(false)).toHexString());
+    }
+
+    public TransactionSign signExternal(char[] r, char[] s, char[] v) {
+        mSignatureData = new SignatureSingleData(r, s, v);
+        return new TransactionSign(new BytesData(encode(false)).toHexString());
     }
 
     /**
@@ -279,14 +295,14 @@ public class Transaction implements Parcelable {
     public TransactionSign signSingle(@Nonnull final PrivateKey privateKey) {
         mSignatureType = Single;
         char[] encoded = encode(true);
-        final UnsignedBytesData rawTxData = new UnsignedBytesData(encoded);
-        final UnsignedBytesData hash = rawTxData.sha3Data();
+        final BytesData rawTxData = new BytesData(encoded);
+        final BytesData hash = rawTxData.sha3Data();
 
         NativeSecp256k1.RecoverableSignature signature;
 
         long ctx = NativeSecp256k1.contextCreate();
         try {
-            signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getData());
+            signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getBytes());
         } finally {
             // DON'T forget cleanup to avoid leaks
             NativeSecp256k1.contextCleanup(ctx);
@@ -299,7 +315,7 @@ public class Transaction implements Parcelable {
         mSignatureData = new SignatureSingleData();
         ((SignatureSingleData) mSignatureData).setSign(signature);
 
-        return new TransactionSign(new UnsignedBytesData(encode(false)).toHexString());
+        return new TransactionSign(new BytesData(encode(false)).toHexString());
     }
 
     /**
@@ -335,7 +351,7 @@ public class Transaction implements Parcelable {
         return mGasCoin.replace("\0", "");
     }
 
-    public UnsignedBytesData getPayload() {
+    public BytesData getPayload() {
         return mPayload;
     }
 
@@ -383,8 +399,8 @@ public class Transaction implements Parcelable {
          * ha, where is the 5th index?
          * see here: {@link #fromEncoded(String)}
          */
-        mPayload = new UnsignedBytesData(fromRawRlp(6, raw));
-        mServiceData = new UnsignedBytesData(fromRawRlp(7, raw));
+        mPayload = new BytesData(fromRawRlp(6, raw));
+        mServiceData = new BytesData(fromRawRlp(7, raw));
         mSignatureType = SignatureType.findByValue(new BigInteger(charsToBytes(fromRawRlp(8, raw))));
         /**
          * And there's no 9 index, it's signature data
@@ -392,10 +408,10 @@ public class Transaction implements Parcelable {
          */
     }
 
-    char[] encode(boolean forSignature) {
+    char[] encode(boolean excludeSignature) {
         final char[] data = mOperationData.encodeRLP();
 
-        if (forSignature) {
+        if (excludeSignature) {
             return RLPBoxed.encode(new Object[]{
                     mNonce, BigInteger.valueOf(mChainId.getId()), mGasPrice, mGasCoin, mOperationData.getType().getValue(),
                     data,
@@ -435,7 +451,7 @@ public class Transaction implements Parcelable {
             checkArgument(externalTransaction.mOperationData != null, "Transaction data must be set");
             mTx.mType = externalTransaction.getType();
             mTx.mOperationData = externalTransaction.mOperationData;
-            mTx.mPayload = firstNonNull(externalTransaction.getPayload(), new UnsignedBytesData(new char[0]));
+            mTx.mPayload = firstNonNull(externalTransaction.getPayload(), new BytesData(new char[0]));
             if (externalTransaction.getGasCoin() == null || externalTransaction.getGasCoin().equals("")) {
                 mTx.mGasCoin = strrpad(10, MinterSDK.DEFAULT_COIN);
             } else {
@@ -519,18 +535,7 @@ public class Transaction implements Parcelable {
          */
         public Builder setPayload(BytesData data) {
             checkArgument(data.size() <= 1024, "Payload maximum size: 1024 bytes");
-            mTx.mPayload = new UnsignedBytesData(data.getData(), true);
-            return this;
-        }
-
-        /**
-         * Set arbitrary user-defined bytes
-         * @param data max size: 1024 bytes
-         * @return {@link Builder}
-         */
-        public Builder setPayload(UnsignedBytesData data) {
-            checkArgument(data.size() <= 1024, "Payload maximum size: 1024 bytes");
-            mTx.mPayload = new UnsignedBytesData(data, true);
+            mTx.mPayload = new BytesData(data.getData(), true);
             return this;
         }
 
@@ -542,7 +547,7 @@ public class Transaction implements Parcelable {
         public Builder setPayload(@Nonnull String hexString) {
             checkNotNull(hexString, "Hex data string can't be null");
             checkArgument(hexString.length() <= 2048, "Payload maximum size: 1024 bytes (2048 in hex string)");
-            mTx.mPayload = new UnsignedBytesData(hexString);
+            mTx.mPayload = new BytesData(hexString);
             return this;
         }
 

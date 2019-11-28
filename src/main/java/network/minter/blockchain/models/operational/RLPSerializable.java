@@ -28,8 +28,6 @@ package network.minter.blockchain.models.operational;
 
 import javax.annotation.Nonnull;
 
-import network.minter.core.util.RLP;
-
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich [edward.vstock@gmail.com]

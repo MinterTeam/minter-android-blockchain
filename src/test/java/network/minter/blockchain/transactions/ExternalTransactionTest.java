@@ -49,11 +49,13 @@ import network.minter.blockchain.models.operational.TxSetCandidateOffline;
 import network.minter.blockchain.models.operational.TxSetCandidateOnline;
 import network.minter.blockchain.models.operational.TxUnbound;
 import network.minter.core.MinterSDK;
+import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.internal.exceptions.NativeLoadException;
+import network.minter.core.internal.helpers.StringHelper;
+import network.minter.core.util.RLPBoxed;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -85,7 +87,7 @@ public class ExternalTransactionTest {
                 .setPayload("aaaabbbb".getBytes())
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -115,7 +117,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -145,7 +147,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -175,7 +177,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -215,7 +217,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -251,7 +253,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -287,7 +289,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -323,7 +325,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -356,7 +358,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -387,7 +389,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -416,7 +418,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -445,7 +447,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -472,7 +474,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -498,7 +500,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -537,7 +539,7 @@ public class ExternalTransactionTest {
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData data = tx.encode();
+        BytesData data = tx.encode();
         String encoded = data.toHexString();
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encoded);
@@ -561,6 +563,7 @@ public class ExternalTransactionTest {
         CheckTransaction check = new CheckTransaction.Builder("wazzap", "pass")
                 .setDueBlock(new BigInteger("999999999"))
                 .setChainId(BlockchainID.TestNet)
+                .setGasCoin("MNT")
                 .setCoin("MNT")
                 .setValue("10")
                 .build();
@@ -571,13 +574,16 @@ public class ExternalTransactionTest {
                 .setRawCheck(rawCheck);
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
+                .setGasCoin("MNT")
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData encodedTxData = tx.encode();
+        BytesData encodedTxData = tx.encode();
         String encodedTx = encodedTxData.toHexString();
         System.out.println("Redeem check (no proof)");
         System.out.println(encodedTx);
+        System.out.println("-- proof pass:");
+        System.out.println(StringHelper.charsToHexString(RLPBoxed.encodeString("pass")));
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encodedTx);
         assertEquals(new BigInteger("0"), decoded.getNonce());
@@ -585,7 +591,7 @@ public class ExternalTransactionTest {
         assertEquals(new BigInteger("1"), decoded.getGasPrice());
 
         TxRedeemCheck data = decoded.getData();
-        assertEquals(new UnsignedBytesData(new char[0]), data.getProof());
+        assertEquals(new BytesData(new char[0]), data.getProof());
         assertEquals(rawCheck, data.getRawCheck().toString());
 
         CheckTransaction decCheck = data.getDecodedCheck();
@@ -596,31 +602,33 @@ public class ExternalTransactionTest {
 
         assertEquals(decCheck.getLock(), check.getLock());
         assertEquals(decCheck.getSignature(), check.getSignature());
-
     }
 
     @Test
     public void testRedeemCheckWithProofEncodeDecode() {
         PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
-        CheckTransaction check = new CheckTransaction.Builder("wazzap", "pass")
+        CheckTransaction check = new CheckTransaction.Builder("128", "hello")
                 .setDueBlock(new BigInteger("999999999"))
                 .setChainId(BlockchainID.TestNet)
+                .setGasCoin("MNT")
                 .setCoin("MNT")
-                .setValue("10")
+                .setValue("128")
                 .build();
 
         String rawCheck = check.sign(privateKey).getTxSign();
-        String proof = CheckTransaction.makeProof(privateKey.getPublicKey().toMinter(), "pass").toHexString();
+        String proof = CheckTransaction.makeProof(privateKey.getPublicKey().toMinter(), "hello").toHexString();
 
         TxRedeemCheck txData = new TxRedeemCheck()
                 .setRawCheck(rawCheck)
                 .setProof(proof);
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
+                .setGasCoin("MNT")
+                .setGasPrice(BigInteger.ONE)
                 .setData(txData)
                 .build();
 
-        UnsignedBytesData encodedTxData = tx.encode();
+        BytesData encodedTxData = tx.encode();
         String encodedTx = encodedTxData.toHexString();
 
         System.out.println("Redeem check (with proof)");
@@ -632,14 +640,14 @@ public class ExternalTransactionTest {
         assertEquals(new BigInteger("1"), decoded.getGasPrice());
 
         TxRedeemCheck data = decoded.getData();
-        assertEquals(new UnsignedBytesData(proof), data.getProof());
+        assertEquals(new BytesData(proof), data.getProof());
         assertEquals(rawCheck, data.getRawCheck().toString());
 
         CheckTransaction decCheck = data.getDecodedCheck();
-        assertEquals("wazzap", decCheck.getNonce().toStringASCII());
+        assertEquals("128", decCheck.getNonce().toStringASCII());
         assertEquals(new BigInteger("999999999"), decCheck.getDueBlock());
         assertEquals("MNT", decCheck.getCoin());
-        assertEquals(new BigDecimal("10"), decCheck.getValue());
+        assertEquals(new BigDecimal("128"), decCheck.getValue());
 
         assertEquals(decCheck.getLock(), check.getLock());
         assertEquals(decCheck.getSignature(), check.getSignature());

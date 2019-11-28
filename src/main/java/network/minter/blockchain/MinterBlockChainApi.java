@@ -44,11 +44,11 @@ import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterHash;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.internal.api.ApiService;
-import network.minter.core.internal.api.converters.BigIntegerDeserializer;
-import network.minter.core.internal.api.converters.BytesDataDeserializer;
-import network.minter.core.internal.api.converters.MinterAddressDeserializer;
-import network.minter.core.internal.api.converters.MinterHashDeserializer;
-import network.minter.core.internal.api.converters.MinterPublicKeyDeserializer;
+import network.minter.core.internal.api.converters.BigIntegerJsonConverter;
+import network.minter.core.internal.api.converters.BytesDataJsonConverter;
+import network.minter.core.internal.api.converters.MinterAddressJsonConverter;
+import network.minter.core.internal.api.converters.MinterHashJsonConverter;
+import network.minter.core.internal.api.converters.MinterPublicKeyJsonConverter;
 import network.minter.core.internal.log.Mint;
 import network.minter.core.internal.log.TimberLogger;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -140,11 +140,11 @@ public class MinterBlockChainApi {
 
     public GsonBuilder getGsonBuilder() {
         GsonBuilder out = new GsonBuilder();
-        out.registerTypeAdapter(MinterAddress.class, new MinterAddressDeserializer());
-        out.registerTypeAdapter(MinterHash.class, new MinterHashDeserializer());
-        out.registerTypeAdapter(BigInteger.class, new BigIntegerDeserializer());
-        out.registerTypeAdapter(BytesData.class, new BytesDataDeserializer());
-        out.registerTypeAdapter(MinterPublicKey.class, new MinterPublicKeyDeserializer());
+        out.registerTypeAdapter(MinterAddress.class, new MinterAddressJsonConverter());
+        out.registerTypeAdapter(MinterHash.class, new MinterHashJsonConverter());
+        out.registerTypeAdapter(BigInteger.class, new BigIntegerJsonConverter());
+        out.registerTypeAdapter(BytesData.class, new BytesDataJsonConverter());
+        out.registerTypeAdapter(MinterPublicKey.class, new MinterPublicKeyJsonConverter());
 
         return out;
     }

@@ -34,8 +34,8 @@ import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterCheck;
-import network.minter.core.crypto.UnsignedBytesData;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
@@ -61,7 +61,7 @@ public final class TxRedeemCheck extends Operation {
     };
     private final static int PROOF_LENGTH = 65;
     private MinterCheck mRawCheck;
-    private UnsignedBytesData mProof = new UnsignedBytesData(new char[0]);
+    private BytesData mProof = new BytesData(new char[0]);
 
     public TxRedeemCheck() {
     }
@@ -72,8 +72,8 @@ public final class TxRedeemCheck extends Operation {
 
     protected TxRedeemCheck(Parcel in) {
         super(in);
-        mRawCheck = (MinterCheck) in.readValue(UnsignedBytesData.class.getClassLoader());
-        mProof = (UnsignedBytesData) in.readValue(UnsignedBytesData.class.getClassLoader());
+        mRawCheck = (MinterCheck) in.readValue(BytesData.class.getClassLoader());
+        mProof = (BytesData) in.readValue(BytesData.class.getClassLoader());
     }
 
     @Override
@@ -92,7 +92,7 @@ public final class TxRedeemCheck extends Operation {
         return this;
     }
 
-    public TxRedeemCheck setRawCheck(UnsignedBytesData data) {
+    public TxRedeemCheck setRawCheck(BytesData data) {
         mRawCheck = new MinterCheck(data.getBytes());
         return this;
     }
@@ -102,18 +102,18 @@ public final class TxRedeemCheck extends Operation {
         return this;
     }
 
-    public UnsignedBytesData getProof() {
+    public BytesData getProof() {
         return mProof;
     }
 
     public TxRedeemCheck setProof(final byte[] data) {
         checkArgument(data.length ==
                 PROOF_LENGTH, format(Locale.getDefault(), "Proof must coins exact %d bytes", PROOF_LENGTH));
-        mProof = new UnsignedBytesData(data);
+        mProof = new BytesData(data);
         return this;
     }
 
-    public TxRedeemCheck setProof(UnsignedBytesData data) {
+    public TxRedeemCheck setProof(BytesData data) {
         checkArgument(data.size() ==
                 PROOF_LENGTH, format(Locale.getDefault(), "Proof must coins exact %d bytes", PROOF_LENGTH));
         mProof = data.clone();
@@ -124,7 +124,7 @@ public final class TxRedeemCheck extends Operation {
         checkArgument(hexString.length() == PROOF_LENGTH *
                 2, format(Locale.getDefault(), "Proof must coins exact %d bytes (%d hex string len)", PROOF_LENGTH,
                 PROOF_LENGTH * 2));
-        mProof = new UnsignedBytesData(hexString);
+        mProof = new BytesData(hexString);
         return this;
     }
 
@@ -160,7 +160,7 @@ public final class TxRedeemCheck extends Operation {
         final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mRawCheck = new MinterCheck(fromRawRlp(0, decoded));
-        mProof = new UnsignedBytesData(fromRawRlp(1, decoded));
+        mProof = new BytesData(fromRawRlp(1, decoded));
     }
 
 
