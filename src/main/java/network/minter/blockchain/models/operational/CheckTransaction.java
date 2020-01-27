@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -192,7 +192,7 @@ public class CheckTransaction {
      * @return
      */
     public BigDecimal getValue() {
-        return new BigDecimal(mValue).divide(Transaction.VALUE_MUL_DEC);
+        return Transaction.humanizeValue(mValue);
     }
 
     public SignatureSingleData getSignature() {
@@ -342,7 +342,7 @@ public class CheckTransaction {
         }
 
         public Builder setValue(BigDecimal value) {
-            mCheck.mValue = value.multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+            mCheck.mValue = Transaction.normalizeValue(value);
             return this;
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -40,6 +40,7 @@ import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
+import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
 import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
@@ -119,7 +120,7 @@ public final class TxDelegate extends Operation {
     }
 
     public BigDecimal getStake() {
-        return new BigDecimal(mStake).divide(Transaction.VALUE_MUL_DEC);
+        return Transaction.humanizeValue(mStake);
     }
 
     public TxDelegate setStake(BigInteger amountNormalized) {
@@ -132,7 +133,7 @@ public final class TxDelegate extends Operation {
     }
 
     public TxDelegate setStake(BigDecimal amount) {
-        mStake = amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+        mStake = normalizeValue(amount);
         return this;
     }
 

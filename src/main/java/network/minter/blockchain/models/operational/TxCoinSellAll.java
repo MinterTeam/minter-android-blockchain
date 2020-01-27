@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -39,6 +39,8 @@ import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
+import static network.minter.blockchain.models.operational.Transaction.humanizeValue;
+import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
 import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
@@ -108,7 +110,7 @@ public final class TxCoinSellAll extends Operation {
 	}
 
 	public BigDecimal getMinValueToBuy() {
-		return new BigDecimal(mMinValueToBuy).divide(Transaction.VALUE_MUL_DEC);
+        return humanizeValue(mMinValueToBuy);
 	}
 
     public TxCoinSellAll setMinValueToBuy(BigInteger amount) {
@@ -117,7 +119,7 @@ public final class TxCoinSellAll extends Operation {
     }
 
     public TxCoinSellAll setMinValueToBuy(BigDecimal amount) {
-        return setMinValueToBuy(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+        return setMinValueToBuy(normalizeValue(amount));
     }
 
     public TxCoinSellAll setMinValueToBuy(@Nonnull final CharSequence decimalValue) {

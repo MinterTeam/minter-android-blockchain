@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.11.1
+ - Fixed human values calculation
+
 ## 0.11.0
  - Fixes, updated core sdk
  - Added method to get unsigned transaction hash `Transaction#getUnsignedTxHash`

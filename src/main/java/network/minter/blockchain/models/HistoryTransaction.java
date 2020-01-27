@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -133,7 +133,7 @@ public class HistoryTransaction {
         }
 
         public BigDecimal getAmount() {
-            return new BigDecimal(amount).divide(Transaction.VALUE_MUL_DEC);
+            return Transaction.humanizeValue(amount);
         }
     }
 
@@ -164,11 +164,11 @@ public class HistoryTransaction {
         }
 
         public BigDecimal getInitialAmount() {
-            return new BigDecimal(initialAmount).divide(Transaction.VALUE_MUL_DEC);
+            return Transaction.humanizeValue(initialAmount);
         }
 
         public BigDecimal getInitialReserve() {
-            return new BigDecimal(initialReserve).divide(Transaction.VALUE_MUL_DEC);
+            return Transaction.humanizeValue(initialReserve);
         }
 
         public BigDecimal getConstantReserveRatio() {
@@ -213,14 +213,14 @@ public class HistoryTransaction {
             if (valueToBuy == null) {
                 valueToBuy = BigInteger.ZERO;
             }
-            return new BigDecimal(valueToBuy).divide(Transaction.VALUE_MUL_DEC);
+            return Transaction.humanizeValue(valueToBuy);
         }
 
         public BigDecimal getValueToSell() {
             if (valueToSell == null) {
                 valueToSell = BigInteger.ZERO;
             }
-            return new BigDecimal(valueToSell).divide(Transaction.VALUE_MUL_DEC);
+            return Transaction.humanizeValue(valueToSell);
         }
     }
 
@@ -259,7 +259,7 @@ public class HistoryTransaction {
             if (stake == null) {
                 stake = BigInteger.ZERO;
             }
-            return new BigDecimal(stake).divide(Transaction.VALUE_MUL_DEC);
+            return Transaction.humanizeValue(stake);
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -77,6 +77,20 @@ public class Transaction implements Parcelable {
             return new Transaction[size];
         }
     };
+
+    public static BigDecimal humanizeValue(BigInteger in) {
+        return new BigDecimal(in).divide(VALUE_MUL_DEC);
+    }
+
+    public static BigInteger normalizeValue(BigDecimal in) {
+        return in.multiply(VALUE_MUL_DEC).toBigInteger();
+    }
+
+    public static BigInteger normalizeValue(CharSequence in) {
+        if (in == null) return BigInteger.ZERO;
+        return new BigDecimal(in.toString()).multiply(VALUE_MUL_DEC).toBigInteger();
+    }
+
     BigInteger mNonce;
     BlockchainID mChainId;
     BigInteger mGasPrice = new BigInteger("1");

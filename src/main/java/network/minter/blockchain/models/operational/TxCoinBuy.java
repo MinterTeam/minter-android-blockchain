@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -112,7 +112,7 @@ public final class TxCoinBuy extends Operation {
     }
 
     public BigDecimal getMaxValueToSell() {
-        return new BigDecimal(mMaxValueToSell).divide(Transaction.VALUE_MUL_DEC);
+        return Transaction.humanizeValue(mMaxValueToSell);
     }
 
     /**
@@ -132,8 +132,8 @@ public final class TxCoinBuy extends Operation {
         return this;
     }
 
-    public TxCoinBuy setValueToBuy(BigDecimal amount) {
-        return setValueToBuy(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+    public TxCoinBuy setMaxValueToSell(BigDecimal amount) {
+        return setMaxValueToSell(Transaction.normalizeValue(amount));
     }
 
     /**
@@ -141,7 +141,7 @@ public final class TxCoinBuy extends Operation {
      * @return BigDecimal value
      */
     public BigDecimal getValueToBuy() {
-        return Transaction.VALUE_MUL_DEC.divide(new BigDecimal(mValueToBuy));
+        return Transaction.humanizeValue(mValueToBuy);
     }
 
     public TxCoinBuy setMaxValueToSell(BigInteger amount) {
@@ -149,8 +149,8 @@ public final class TxCoinBuy extends Operation {
         return this;
     }
 
-    public TxCoinBuy setMaxValueToSell(BigDecimal amount) {
-        return setMaxValueToSell(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+    public TxCoinBuy setValueToBuy(BigDecimal amount) {
+        return setValueToBuy(Transaction.normalizeValue(amount));
     }
 
     public TxCoinBuy setValueToBuy(@Nonnull final CharSequence decimalValue) {

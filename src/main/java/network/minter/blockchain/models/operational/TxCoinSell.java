@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -38,6 +38,7 @@ import javax.annotation.Nullable;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
+import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
 import static network.minter.core.internal.helpers.StringHelper.charsToString;
 import static network.minter.core.internal.helpers.StringHelper.strrpad;
@@ -112,15 +113,15 @@ public final class TxCoinSell extends Operation {
     }
 
     public BigDecimal getMinValueToBuy() {
-        return new BigDecimal(mMinValueToBuy).divide(Transaction.VALUE_MUL_DEC);
+        return Transaction.humanizeValue(mMinValueToBuy);
     }
 
     public BigInteger getValueToSellBigInteger() {
         return mValueToSell;
     }
 
-    public BigDecimal getValueToSell() {
-        return new BigDecimal(mValueToSell).divide(Transaction.VALUE_MUL_DEC);
+    public TxCoinSell setMinValueToBuy(BigDecimal amount) {
+        return setMinValueToBuy(normalizeValue(amount));
     }
 
     public TxCoinSell setValueToSell(BigInteger amount) {
@@ -132,8 +133,8 @@ public final class TxCoinSell extends Operation {
         return setMinValueToBuy(new BigDecimal(decimalValue.toString()));
     }
 
-    public TxCoinSell setValueToSell(BigDecimal amount) {
-        return setValueToSell(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+    public BigDecimal getValueToSell() {
+        return Transaction.humanizeValue(mValueToSell);
     }
 
     public TxCoinSell setValueToSell(@Nonnull final CharSequence decimalValue) {
@@ -145,8 +146,8 @@ public final class TxCoinSell extends Operation {
         return this;
     }
 
-    public TxCoinSell setMinValueToBuy(BigDecimal amount) {
-        return setMinValueToBuy(amount.multiply(Transaction.VALUE_MUL_DEC).toBigInteger());
+    public TxCoinSell setValueToSell(BigDecimal amount) {
+        return setValueToSell(normalizeValue(amount));
     }
 
     @Override

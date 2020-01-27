@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -39,7 +39,8 @@ import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
-import static network.minter.blockchain.models.operational.Transaction.VALUE_MUL_DEC;
+import static network.minter.blockchain.models.operational.Transaction.humanizeValue;
+import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
 import static network.minter.core.internal.helpers.StringHelper.charsToString;
@@ -149,7 +150,7 @@ public final class TxCreateCoin extends Operation {
      * @return big decimal normalized value
      */
     public BigDecimal getInitialAmount() {
-        return new BigDecimal(mInitialAmount).divide(Transaction.VALUE_MUL_DEC);
+        return humanizeValue(mInitialAmount);
     }
 
     public TxCreateCoin setInitialAmount(String amountDecimal) {
@@ -157,7 +158,7 @@ public final class TxCreateCoin extends Operation {
     }
 
     public TxCreateCoin setInitialAmount(BigDecimal amount) {
-        return setInitialAmount(amount.multiply(VALUE_MUL_DEC).toBigInteger());
+        return setInitialAmount(normalizeValue(amount));
     }
 
     public TxCreateCoin setInitialAmount(BigInteger amount) {
@@ -171,11 +172,11 @@ public final class TxCreateCoin extends Operation {
      * @return big decimal normalized value
      */
     public BigDecimal getInitialReserve() {
-        return new BigDecimal(mInitialReserve).divide(VALUE_MUL_DEC);
+        return humanizeValue(mInitialReserve);
     }
 
     public TxCreateCoin setInitialReserve(BigDecimal amount) {
-        return setInitialReserve(amount.multiply(VALUE_MUL_DEC).toBigInteger());
+        return setInitialReserve(normalizeValue(amount));
     }
 
     public TxCreateCoin setInitialReserve(BigInteger amount) {

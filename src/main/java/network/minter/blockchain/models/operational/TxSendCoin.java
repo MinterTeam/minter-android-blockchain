@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -42,6 +42,7 @@ import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
+import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.helpers.StringHelper.charsToString;
@@ -86,7 +87,7 @@ public final class TxSendCoin extends Operation {
      * @return
      */
     public BigDecimal getValue() {
-        return new BigDecimal(mValue).divide(Transaction.VALUE_MUL_DEC);
+        return Transaction.humanizeValue(mValue);
     }
 
     /**
@@ -106,12 +107,12 @@ public final class TxSendCoin extends Operation {
      * @see Transaction#VALUE_MUL
      */
     public TxSendCoin setValue(BigDecimal value) {
-        mValue = value.multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+        mValue = normalizeValue(value);
         return this;
     }
 
-	private TxSendCoin setValue(BigInteger value) {
-		mValue = value.multiply(Transaction.VALUE_MUL);
+    private TxSendCoin setValue(BigInteger valueNormalized) {
+        mValue = valueNormalized;
 		return this;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -46,7 +46,7 @@ public class TransactionCommissionValue {
      * @return commission
      */
     public BigDecimal getValue() {
-        return new BigDecimal(value).divide(Transaction.VALUE_MUL_DEC);
+        return Transaction.humanizeValue(value);
     }
 
     /**

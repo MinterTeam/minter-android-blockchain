@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -36,11 +36,11 @@ import network.minter.blockchain.models.BCResult;
 import network.minter.blockchain.models.Coin;
 import network.minter.blockchain.models.ExchangeBuyValue;
 import network.minter.blockchain.models.ExchangeSellValue;
-import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.data.DataRepository;
 import retrofit2.Call;
 
+import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
 
 /**
@@ -71,7 +71,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @return Exchange calculation
      */
     public Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(@Nonnull String coinToSell, BigDecimal valueToSell, @Nonnull String coinToBuy) {
-        return getCoinExchangeCurrencyToSell(coinToSell, valueToSell.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
+        return getCoinExchangeCurrencyToSell(coinToSell, normalizeValue(valueToSell), coinToBuy);
     }
 
     /**
@@ -96,7 +96,7 @@ public class BlockChainCoinRepository extends DataRepository<BlockChainCoinEndpo
      * @return Exchange calculation
      */
     public Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(@Nonnull String coinToSell, BigDecimal valueToBuy, @Nonnull String coinToBuy) {
-        return getCoinExchangeCurrencyToBuy(coinToSell, valueToBuy.multiply(Transaction.VALUE_MUL_DEC).toBigInteger(), coinToBuy);
+        return getCoinExchangeCurrencyToBuy(coinToSell, normalizeValue(valueToBuy), coinToBuy);
     }
 
     /**

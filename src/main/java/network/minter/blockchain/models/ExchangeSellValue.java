@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -48,11 +48,11 @@ public class ExchangeSellValue {
     public BigInteger commission;
 
     public BigDecimal getAmount() {
-        return new BigDecimal(willGet).divide(Transaction.VALUE_MUL_DEC);
+        return Transaction.humanizeValue(willGet);
     }
 
     public BigDecimal getCommission() {
-        return new BigDecimal(commission).divide(Transaction.VALUE_MUL_DEC);
+        return Transaction.humanizeValue(commission);
     }
 
     public BigDecimal getAmountWithCommission() {
