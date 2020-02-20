@@ -1,9 +1,13 @@
 # Release notes
 
+## 0.11.2
+ - Added CheckTransactionCompat to use it in network v1.0
+
 ## 0.11.1
  - Fixed human values calculation
 
 ## 0.11.0
+ - Added Gas Coin to Check
  - Fixes, updated core sdk
  - Added method to get unsigned transaction hash `Transaction#getUnsignedTxHash`
  - Added method to sign tx with a signature created outside `Transaction#signExternal`
