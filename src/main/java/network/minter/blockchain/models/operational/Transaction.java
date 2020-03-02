@@ -36,6 +36,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -77,33 +78,17 @@ public class Transaction implements Parcelable {
             return new Transaction[size];
         }
     };
-
-    public static BigDecimal humanizeValue(BigInteger in) {
-        return new BigDecimal(in).divide(VALUE_MUL_DEC);
-    }
-
-    public static BigInteger normalizeValue(BigDecimal in) {
-        return in.multiply(VALUE_MUL_DEC).toBigInteger();
-    }
-
-    public static BigInteger normalizeValue(CharSequence in) {
-        if (in == null) return BigInteger.ZERO;
-        return new BigDecimal(in.toString()).multiply(VALUE_MUL_DEC).toBigInteger();
-    }
-
     BigInteger mNonce;
     BlockchainID mChainId;
     BigInteger mGasPrice = new BigInteger("1");
     String mGasCoin = MinterSDK.DEFAULT_COIN;
     OperationType mType = OperationType.SendCoin;
     Operation mOperationData;
-
     // max - 1024 bytes (1 kilobyte)
     BytesData mPayload = new BytesData(new char[0]);
     BytesData mServiceData = new BytesData(new char[0]);
     SignatureType mSignatureType = Single;
     SignatureData mSignatureData;
-
     public enum SignatureType {
         Single((byte) 0x01, SignatureSingleData.class),
         Multi((byte) 0x02, SignatureMultiData.class);
@@ -134,11 +119,9 @@ public class Transaction implements Parcelable {
             return mTypeClass;
         }
     }
-
     protected Transaction(BigInteger nonce) {
         mNonce = nonce;
     }
-
     protected Transaction() {
     }
 
@@ -153,6 +136,19 @@ public class Transaction implements Parcelable {
         mServiceData = (BytesData) in.readValue(BytesData.class.getClassLoader());
         mSignatureType = (SignatureType) in.readValue(SignatureType.class.getClassLoader());
         mSignatureData = (SignatureData) in.readValue(mSignatureType.mTypeClass.getClassLoader());
+    }
+
+    public static BigDecimal humanizeValue(BigInteger in) {
+        return new BigDecimal(in).divide(VALUE_MUL_DEC);
+    }
+
+    public static BigInteger normalizeValue(BigDecimal in) {
+        return in.multiply(VALUE_MUL_DEC).toBigInteger();
+    }
+
+    public static BigInteger normalizeValue(CharSequence in) {
+        if (in == null) return BigInteger.ZERO;
+        return new BigDecimal(in.toString()).multiply(VALUE_MUL_DEC).toBigInteger();
     }
 
     /**
@@ -247,6 +243,10 @@ public class Transaction implements Parcelable {
 
     public OperationType getType() {
         return mType;
+    }
+
+    public TransactionSign signMulti(MinterAddress signatureAddress, PrivateKey... pks) {
+        return signMulti(signatureAddress, Arrays.asList(pks));
     }
 
     /**

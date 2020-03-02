@@ -47,7 +47,6 @@ import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxCreateCoin extends Operation {
@@ -69,6 +68,7 @@ public final class TxCreateCoin extends Operation {
     private BigInteger mInitialReserve;
     // unsigned!!!
     private Integer mConstantReserveRatio;
+    private BigInteger mMaxSupply = BigInteger.ZERO;
 
     public TxCreateCoin() {
     }
@@ -84,6 +84,7 @@ public final class TxCreateCoin extends Operation {
         mInitialAmount = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mInitialReserve = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mConstantReserveRatio = in.readByte() == 0x00 ? null : in.readInt();
+        mMaxSupply = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
 
     public static BigDecimal calculateCreatingCost(String coin) {
@@ -124,6 +125,7 @@ public final class TxCreateCoin extends Operation {
             dest.writeByte((byte) (0x01));
             dest.writeInt(mConstantReserveRatio);
         }
+        dest.writeValue(mMaxSupply);
     }
 
     public String getName() {
@@ -146,7 +148,6 @@ public final class TxCreateCoin extends Operation {
 
     /**
      * Get normalized immutable initial amount as big decimal value
-     *
      * @return big decimal normalized value
      */
     public BigDecimal getInitialAmount() {
@@ -167,8 +168,40 @@ public final class TxCreateCoin extends Operation {
     }
 
     /**
+     * Get coin hardcap
+     * @return human decimal value
+     */
+    public BigDecimal getMaxSupply() {
+        return humanizeValue(mMaxSupply);
+    }
+
+    /**
+     * Coin purchase will not be possible if the limit is exceeded
+     * @param maxSupply
+     * @return self
+     */
+    public TxCreateCoin setMaxSupply(BigInteger maxSupply) {
+        mMaxSupply = maxSupply;
+        return this;
+    }
+
+    /**
+     * Coin purchase will not be possible if the limit is exceeded
+     * @param maxSupply Coin HardCap
+     * @return self
+     */
+    public TxCreateCoin setMaxSupply(BigDecimal maxSupply) {
+        mMaxSupply = normalizeValue(maxSupply);
+        return this;
+    }
+
+    public TxCreateCoin setMaxSupply(String maxSupply) {
+        mMaxSupply = normalizeValue(new BigDecimal(maxSupply));
+        return this;
+    }
+
+    /**
      * Get normalized initial reserve in base coin
-     *
      * @return big decimal normalized value
      */
     public BigDecimal getInitialReserve() {
@@ -190,7 +223,6 @@ public final class TxCreateCoin extends Operation {
 
     /**
      * Get constant reserve ratio (in percents)
-     *
      * @return int value
      */
     public int getConstantReserveRatio() {
@@ -216,6 +248,7 @@ public final class TxCreateCoin extends Operation {
                 .addResult("mSymbol", mSymbol != null && mSymbol.length() > 2 && mSymbol.length() < 11, "Coin mSymbol length must be from 3 to 10 chars")
                 .addResult("mInitialAmount", mInitialAmount != null, "Initial Amount must be set")
                 .addResult("mInitialReserve", mInitialReserve != null, "Initial Reserve must be set")
+                .addResult("mMaxSupply", mMaxSupply != null, "Maximum supply value must be set")
                 .addResult("mConstantReserveRatio", mConstantReserveRatio != null, "Reserve ratio must be set")
                 .addResult("mConstantReserveRatio", mConstantReserveRatio != null && mConstantReserveRatio > 1 && mConstantReserveRatio <= 100, "Reserve ratio must from 1% to 100%");
     }
@@ -223,23 +256,25 @@ public final class TxCreateCoin extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{
+        return RLPBoxed.encode(new Object[]{
                 mName,
                 mSymbol,
                 mInitialAmount,
                 mInitialReserve,
-                mConstantReserveRatio
+                mConstantReserveRatio,
+                mMaxSupply
         });
     }
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-	    mName = charsToString(fromRawRlp(0, decoded));
-	    mSymbol = charsToString(fromRawRlp(1, decoded));
+        mName = charsToString(fromRawRlp(0, decoded));
+        mSymbol = charsToString(fromRawRlp(1, decoded));
         mInitialAmount = fixBigintSignedByte(fromRawRlp(2, decoded));
         mInitialReserve = fixBigintSignedByte(fromRawRlp(3, decoded));
         mConstantReserveRatio = fixBigintSignedByte(fromRawRlp(4, decoded)).intValue();
+        mMaxSupply = fixBigintSignedByte(fromRawRlp(5, decoded));
     }
 }

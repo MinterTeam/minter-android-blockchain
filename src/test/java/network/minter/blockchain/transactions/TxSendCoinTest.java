@@ -33,7 +33,9 @@ import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
+import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.SignatureData;
+import network.minter.blockchain.models.operational.SignatureMultiData;
 import network.minter.blockchain.models.operational.SignatureSingleData;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
@@ -61,89 +63,6 @@ public class TxSendCoinTest {
             e.printStackTrace();
         }
     }
-//
-//    @Test
-//    public void testDecode1() throws OperationInvalidDataException {
-//        String encoded = "f8830302018a4d4e540000000000000001aae98a4d4e5400000000000000948b47278483c9bc2918e261fddf2f0357c91d039e880de0b6b3a7640000808001b844f8421b9fd6be92e70e95fdacbbe22b1d87f31c2f4d9b51560ac0d0c674c84e0f45c838a0200e19ac44a1009f4a6056505bf18f71a579ab056d6b1123f6b94effcbf9c88477";
-//        PrivateKey privateKey = new PrivateKey("1e3958f278b76d294b8ffcd7713fde9df371b1e6851186f12eb019066aecb417");
-//        Transaction tx = Transaction.fromEncoded(encoded);
-//
-//
-//        TransactionSign signInt = tx.signSingle(privateKey);
-//        Transaction tx2 = Transaction.fromEncoded(signInt.getTxSign());
-//
-//
-//        assertEquals(
-//                "Signatures are different",
-//                tx2.<SignatureSingleData>getSignatureData().toString(),
-//                tx.<SignatureSingleData>getSignatureData().toString()
-//        );
-//        System.out.println(tx2.<SignatureSingleData>getSignatureData().toString());
-//        System.out.println(tx.<SignatureSingleData>getSignatureData().toString());
-//
-//        SignatureSingleData sdSrc = tx.getSignatureData();
-//        SignatureSingleData sdTrg = tx2.getSignatureData();
-//
-//        assertTrue(Arrays.equals(sdTrg.getR().getData(), sdSrc.getR().getData()));
-//        assertTrue(Arrays.equals(sdTrg.getS().getData(), sdSrc.getS().getData()));
-//        assertTrue(Arrays.equals(sdTrg.getV().getData(), sdSrc.getV().getData()));
-////        char[] v = mV.getData();
-////        char[] r = BytesHelper.dropLeadingZeroes(mR.getData());
-////        char[] s = BytesHelper.dropLeadingZeroes(mS.getData());
-////
-////        return RLPBoxed.encode(new Object[]{v, r, s})
-//        char[] sdeSrc = RLPBoxed.encode(new Object[]{
-//                sdSrc.getV(),
-//                sdSrc.getR(),
-//                sdSrc.getS()
-//        });
-//
-//        char[] sdeTrg = RLPBoxed.encode(new Object[]{
-//                sdTrg.getV(),
-//                sdTrg.getR(),
-//                sdTrg.getS()
-//        });
-//
-//        assertTrue(Arrays.equals(sdeTrg, sdeSrc));
-//
-//        SignatureSingleData sdExt = new SignatureSingleData(sdSrc.getR().getData(), sdSrc.getS().getData(), sdSrc.getV().getData());
-//        TransactionSign signExt = tx.signExternal(sdExt);
-//
-//        assertEquals(
-//                "Transactions local and external are different",
-//                signInt.getTxSign(),
-//                signExt.getTxSign()
-//        );
-//
-//        Transaction walletTx = new Transaction.Builder(new BigInteger("3"))
-//                .setBlockchainId(BlockchainID.TestNet)
-//                .setGasCoin("MNT")
-//                .setGasPrice(BigInteger.ONE)
-//                .sendCoin()
-//                .setCoin("MNT")
-//                .setTo("Mx8b47278483c9bc2918e261fddf2f0357c91d039e")
-//                .setValue("1")
-//                .build();
-//
-//
-//        TransactionSign walletTxSign = walletTx.signExternal(sdExt);
-//
-//        assertEquals(
-//                "Transactions local and external are different",
-//                walletTxSign.getTxSign(),
-//                signExt.getTxSign()
-//        );
-//
-//        System.out.println("R:" + tx2.<SignatureSingleData>getSignatureData().getR());
-//        System.out.println("S:" + tx2.<SignatureSingleData>getSignatureData().getS());
-//        System.out.println("V:" + tx2.<SignatureSingleData>getSignatureData().getV());
-//
-//        assertEquals(
-//                "Transactions are different",
-//                signInt.getTxSign(),
-//                encoded
-//        );
-//    }
 
     @Test
     public void testDecode128Nonce()
@@ -289,6 +208,56 @@ public class TxSendCoinTest {
         assertEquals(coin, transaction.<TxSendCoin>getData().getCoin());
         assertEquals(gasCoin, transaction.getGasCoin());
         assertEquals("", transaction.getPayload().stringValue());
+
+
+    }
+
+    @Test
+    public void testMultiSigEncode() throws OperationInvalidDataException {
+
+        String validTx = "f901270102018a4d4e540000000000000001aae98a4d4e540000000000000094d82558ea00eb81d35f2654953598f5d51737d31d880de0b6b3a7640000808002b8e8f8e694db4f4b6942cb927e8d7e3a1f602d0f1fb43b5bd2f8cff8431ca0a116e33d2fea86a213577fc9dae16a7e4cadb375499f378b33cddd1d4113b6c1a021ee1e9eb61bbd24233a0967e1c745ab23001cf8816bb217d01ed4595c6cb2cdf8431ca0f7f9c7a6734ab2db210356161f2d012aa9936ee506d88d8d0cba15ad6c84f8a7a04b71b87cbbe7905942de839211daa984325a15bdeca6eea75e5d0f28f9aaeef8f8431ba0d8c640d7605034eefc8870a6a3d1c22e2f589a9319288342632b1c4e6ce35128a055fe3f93f31044033fe7b07963d547ac50bccaac38a057ce61665374c72fb454";
+        MinterAddress sender = new MinterAddress("Mxdb4f4b6942cb927e8d7e3a1f602d0f1fb43b5bd2");
+        PrivateKey pk1 = new PrivateKey("b354c3d1d456d5a1ddd65ca05fd710117701ec69d82dac1858986049a0385af9");
+        PrivateKey pk2 = new PrivateKey("38b7dfb77426247aed6081f769ed8f62aaec2ee2b38336110ac4f7484478dccb");
+        PrivateKey pk3 = new PrivateKey("94c0915734f92dd66acfdc48f82b1d0b208efd544fe763386160ec30c968b4af");
+
+        Transaction tx = new Transaction.Builder(new BigInteger("1"))
+                .setGasCoin("MNT")
+                .setBlockchainId(BlockchainID.TestNet)
+                .setGasPrice(BigInteger.ONE)
+                .sendCoin()
+                .setTo("Mxd82558ea00eb81d35f2654953598f5d51737d31d")
+                .setCoin("MNT")
+                .setValue("1")
+                .build();
+
+        TransactionSign sign = tx.signMulti(sender, pk1, pk2, pk3);
+
+        assertEquals(validTx, sign.getTxSign());
+    }
+
+    @Test
+    public void testMultiSigDecode() {
+        String validTx = "f901270102018a4d4e540000000000000001aae98a4d4e540000000000000094d82558ea00eb81d35f2654953598f5d51737d31d880de0b6b3a7640000808002b8e8f8e694db4f4b6942cb927e8d7e3a1f602d0f1fb43b5bd2f8cff8431ca0a116e33d2fea86a213577fc9dae16a7e4cadb375499f378b33cddd1d4113b6c1a021ee1e9eb61bbd24233a0967e1c745ab23001cf8816bb217d01ed4595c6cb2cdf8431ca0f7f9c7a6734ab2db210356161f2d012aa9936ee506d88d8d0cba15ad6c84f8a7a04b71b87cbbe7905942de839211daa984325a15bdeca6eea75e5d0f28f9aaeef8f8431ba0d8c640d7605034eefc8870a6a3d1c22e2f589a9319288342632b1c4e6ce35128a055fe3f93f31044033fe7b07963d547ac50bccaac38a057ce61665374c72fb454";
+        MinterAddress sender = new MinterAddress("Mxdb4f4b6942cb927e8d7e3a1f602d0f1fb43b5bd2");
+        Transaction tx = Transaction.fromEncoded(validTx);
+
+        assertEquals(BigInteger.ONE, tx.getNonce());
+        assertEquals("MNT", tx.getGasCoin());
+        assertEquals(BigInteger.ONE, tx.getGasPrice());
+        assertEquals(BlockchainID.TestNet, tx.getBlockchainId());
+
+        assertEquals(OperationType.SendCoin, tx.getType());
+        assertEquals(Transaction.SignatureType.Multi, tx.getSignatureType());
+
+        SignatureMultiData sigData = tx.getSignatureData();
+        assertEquals(sender, sigData.getSignatureAddress());
+
+
+        TxSendCoin data = tx.getData();
+        assertEquals(new BigDecimal("1"), data.getValue());
+        assertEquals("MNT", data.getCoin());
+        assertEquals(new MinterAddress("Mxd82558ea00eb81d35f2654953598f5d51737d31d"), data.getTo());
 
 
     }

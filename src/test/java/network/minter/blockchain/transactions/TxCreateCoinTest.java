@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -60,19 +60,20 @@ public class TxCreateCoinTest {
     @Test
     public void testEncode() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-	    final String validTx = "f8850102018a4d4e540000000000000005abea8a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a808001b845f8431ca0a0b58787e19d8ef3cbd887936617af5cf069a25a568f838c3d04daf5ad2f6f8ea07660c13ab5017edb87f5b52be4574c8a33a893bac178adec9c262a1408e4f1fe";
+        final String validTx = "f88f0102018a4d4e540000000000000005b5f48a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a893635c9adc5dea00000808001b845f8431ca0ccfabd9283d27cf7978bca378e0cc7dc69a39ff3bdc56707fa2d552655f9290da0226057221cbaef35696c9315cd29e783d3c66d842d0a3948a922abb42ca0dabe";
         final PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoin("MNT")
-		        .setGasPrice(new BigInteger("1"))
-		        .setBlockchainId(BlockchainID.TestNet)
+                .setGasPrice(new BigInteger("1"))
+                .setBlockchainId(BlockchainID.TestNet)
                 .createCoin()
                 .setName("SUPER TEST")
                 .setSymbol("SPRTEST")
                 .setInitialAmount("100")
                 .setInitialReserve("10")
                 .setConstantReserveRatio(10)
+                .setMaxSupply("1000")
                 .build();
 
         assertNotNull(tx);
@@ -83,7 +84,7 @@ public class TxCreateCoinTest {
     @Test
     public void testDecode() {
         final BigInteger nonce = new BigInteger("1");
-	    final String validTx = "f8850102018a4d4e540000000000000005abea8a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a808001b845f8431ca0a0b58787e19d8ef3cbd887936617af5cf069a25a568f838c3d04daf5ad2f6f8ea07660c13ab5017edb87f5b52be4574c8a33a893bac178adec9c262a1408e4f1fe";
+        final String validTx = "f88f0102018a4d4e540000000000000005b5f48a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a893635c9adc5dea00000808001b845f8431ca0ccfabd9283d27cf7978bca378e0cc7dc69a39ff3bdc56707fa2d552655f9290da0226057221cbaef35696c9315cd29e783d3c66d842d0a3948a922abb42ca0dabe";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);
@@ -98,6 +99,7 @@ public class TxCreateCoinTest {
         assertEquals("SPRTEST", data.getSymbol());
         assertEquals(new BigDecimal("100"), data.getInitialAmount());
         assertEquals(new BigDecimal("10"), data.getInitialReserve());
+        assertEquals(new BigDecimal("1000"), data.getMaxSupply());
         assertEquals(10, data.getConstantReserveRatio());
 
     }
