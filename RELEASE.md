@@ -1,5 +1,10 @@
 # Release notes
 
+## 0.12.0
+ - Updated Create Coin transaction - added max supply for texasnet
+ - Updated tests for Create Multisig address transactions
+ - Added test for multisignature transaction
+
 ## 0.11.2
  - Added CheckTransactionCompat to use it in network v1.0
 

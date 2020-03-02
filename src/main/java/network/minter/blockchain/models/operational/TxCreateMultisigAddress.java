@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,6 +29,7 @@ package network.minter.blockchain.models.operational;
 import android.os.Parcel;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -87,15 +88,6 @@ public class TxCreateMultisigAddress extends Operation {
         dest.writeList(mAddresses);
     }
 
-    /**
-     * @param threshold This is not exact Long value, it's unsigned int, be carefully
-     * @return
-     */
-    public TxCreateMultisigAddress setThreshold(long threshold) {
-        mThreshold = new BigInteger(String.valueOf(threshold));
-        return this;
-    }
-
     public TxCreateMultisigAddress addWeight(long... weight) {
         for (long w : weight) {
             mWeights.add(new BigInteger(String.valueOf(w)));
@@ -105,6 +97,43 @@ public class TxCreateMultisigAddress extends Operation {
 
     public TxCreateMultisigAddress addAddress(MinterAddress address) {
         mAddresses.add(address);
+        return this;
+    }
+
+    public TxCreateMultisigAddress addAddress(MinterAddress address, long weight) {
+        mAddresses.add(address);
+        mWeights.add(new BigInteger(String.valueOf(weight)));
+        return this;
+    }
+
+    public TxCreateMultisigAddress addAddress(CharSequence address, long weight) {
+        mAddresses.add(new MinterAddress(address));
+        mWeights.add(new BigInteger(String.valueOf(weight)));
+        return this;
+    }
+
+    public List<MinterAddress> getAddresses() {
+        return mAddresses;
+    }
+
+    public List<Long> getWeights() {
+        List<Long> out = new ArrayList<>(mWeights.size());
+        for (BigInteger bi : mWeights) {
+            out.add(bi.longValue());
+        }
+        return out;
+    }
+
+    public long getThreshold() {
+        return mThreshold.longValue();
+    }
+
+    /**
+     * @param threshold This is not exact Long value, it's unsigned int, be carefully
+     * @return
+     */
+    public TxCreateMultisigAddress setThreshold(long threshold) {
+        mThreshold = new BigInteger(String.valueOf(threshold));
         return this;
     }
 
@@ -125,26 +154,22 @@ public class TxCreateMultisigAddress extends Operation {
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mThreshold = fixBigintSignedByte(fromRawRlp(0, decoded));
 
         Object[] weights = (Object[]) decoded[1];
         mWeights = new LinkedList<>();
         for (Object weightsEncoded : weights) {
-	        final char[][] weightsBytes = objArrToByteArrArr((Object[]) weightsEncoded);
-	        for (char[] weight : weightsBytes) {
-                mWeights.add(fixBigintSignedByte(weight));
-            }
+            BigInteger weight = fixBigintSignedByte(weightsEncoded);
+            mWeights.add((weight));
         }
 
         Object[] addresses = (Object[]) decoded[2];
         mAddresses = new LinkedList<>();
         for (Object address : addresses) {
-	        char[][] ws = objArrToByteArrArr((Object[]) address);
-	        for (char[] w : ws) {
-                mAddresses.add(new MinterAddress(w));
-            }
+            MinterAddress add = new MinterAddress((char[]) address);
+            mAddresses.add(add);
         }
     }
 
@@ -152,13 +177,13 @@ public class TxCreateMultisigAddress extends Operation {
     @Override
     protected char[] encodeRLP() {
         final BigInteger[] weights = mWeights.toArray(new BigInteger[mWeights.size()]);
-	    final MinterAddress[] addresses = new MinterAddress[mAddresses.size()];
+        final MinterAddress[] addresses = new MinterAddress[mAddresses.size()];
         for (int i = 0; i < mAddresses.size(); i++) {
-	        addresses[i] = mAddresses.get(i);
+            addresses[i] = mAddresses.get(i);
         }
 
-	    return RLPBoxed.encode(new Object[]{
-			    mThreshold.toByteArray(),
+        return RLPBoxed.encode(new Object[]{
+                mThreshold.toByteArray(),
                 weights,
                 addresses
         });
