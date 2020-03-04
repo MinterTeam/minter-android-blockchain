@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.12.1
+ - Added ability to sign multisig transaction with predefined signatures `Transaction#signMultiExternal(MinterAddress, List<SignatureSingleData>)`
+
 ## 0.12.0
  - Updated Create Coin transaction - added max supply for texasnet
  - Updated tests for Create Multisig address transactions

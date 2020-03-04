@@ -249,6 +249,12 @@ public class Transaction implements Parcelable {
         return signMulti(signatureAddress, Arrays.asList(pks));
     }
 
+    public TransactionSign signMultiExternal(MinterAddress signatureAddress, List<SignatureSingleData> signatureData) {
+        mSignatureType = Multi;
+        ((SignatureMultiData) mSignatureData).setSigns(signatureAddress, signatureData);
+        return new TransactionSign(new BytesData(encode(false)).toHexString());
+    }
+
     /**
      * Sign multi signature transaction data with private keys
      * @param privateKeys private key list to sign with

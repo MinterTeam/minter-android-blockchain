@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -34,7 +34,9 @@ import java.math.BigInteger;
 import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.CheckTransaction;
 import network.minter.blockchain.models.operational.ExternalTransaction;
+import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.Transaction;
+import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.models.operational.TxCoinBuy;
 import network.minter.blockchain.models.operational.TxCoinSell;
 import network.minter.blockchain.models.operational.TxCoinSellAll;
@@ -602,6 +604,31 @@ public class ExternalTransactionTest {
 
         assertEquals(decCheck.getLock(), check.getLock());
         assertEquals(decCheck.getSignature(), check.getSignature());
+    }
+
+    @Test
+    public void testCreateMultiSigAddressEncodeDecode() throws OperationInvalidDataException {
+        final BigInteger nonce = new BigInteger("1");
+        final String validTx = "f8a30102018a4d4e54000000000000000cb848f84607c3010305f83f94ee81347211c72524338f9680072af9074433314394ee81347211c72524338f9680072af9074433314594ee81347211c72524338f9680072af90744333144808001b845f8431ca094eb41d39e6782f5539615cc66da7073d4283893f0b3ee2b2f36aee1eaeb7c57a037f90ffdb45eb9b6f4cf301b48e73a6a81df8182e605b656a52057537d264ab4";
+        PrivateKey privateKey = new PrivateKey("bc3503cae8c8561df5eadc4a9eda21d32c252a6c94cfae55b5310bf6085c8582");
+
+        Transaction tx = new Transaction.Builder(nonce)
+                .setNonce(nonce)
+                .setGasCoin("MNT")
+                .setBlockchainId(BlockchainID.TestNet)
+                .createMultisigAddress()
+                .addAddress("Mxee81347211c72524338f9680072af90744333143", 1)
+                .addAddress("Mxee81347211c72524338f9680072af90744333145", 3)
+                .addAddress("Mxee81347211c72524338f9680072af90744333144", 5)
+                .setThreshold(7)
+                .build();
+
+        TransactionSign sign = tx.signSingle(privateKey);
+        assertEquals(validTx, sign.getTxSign());
+
+        ExternalTransaction ext = new ExternalTransaction(tx);
+        System.out.println("Create MultiSig Address");
+        System.out.println(ext.encode().toHexString());
     }
 
     @Test

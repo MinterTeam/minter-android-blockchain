@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -62,6 +62,13 @@ public final class SignatureSingleData extends SignatureData {
     private BytesData mS;
 
     public SignatureSingleData() {
+    }
+
+    public SignatureSingleData(BytesData signatureRSV) {
+        checkArgument(signatureRSV.size() == 65, "Signature length must be 65 bytes");
+        mR = new BytesData(signatureRSV.takeRange(0, 32));
+        mS = new BytesData(signatureRSV.takeRange(32, 64));
+        mV = new BytesData(signatureRSV.takeRange(64, 65));
     }
 
     public SignatureSingleData(char[] r, char[] s, char[] v) {
