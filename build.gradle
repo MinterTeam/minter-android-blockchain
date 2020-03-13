@@ -211,4 +211,4 @@ dependencies {
 // Coverage
 apply from: 'scripts/jacoco.gradle'
 // Publishing
-apply from: 'scripts/minter_publish.gradle'
+apply from: 'scripts/maven_publish.gradle'
