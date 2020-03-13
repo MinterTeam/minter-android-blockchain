@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -122,6 +122,15 @@ public class ExternalTransaction implements Parcelable {
         }
 
         return transaction;
+    }
+
+    public Transaction toTransaction() throws OperationInvalidDataException {
+        return new Transaction.Builder(mNonce)
+                .setGasCoin(mGasCoin)
+                .setGasPrice(mGasPrice)
+                .setPayload(mPayload)
+                .setData(mOperationData)
+                .build();
     }
 
     /**

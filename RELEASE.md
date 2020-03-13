@@ -1,5 +1,9 @@
 # Release notes
 
+## 0.12.2
+ - Added Deeplink builder with Url-Safe base64 encoder
+ - Updated tests
+
 ## 0.12.1
  - Added ability to sign multisig transaction with predefined signatures `Transaction#signMultiExternal(MinterAddress, List<SignatureSingleData>)`
 

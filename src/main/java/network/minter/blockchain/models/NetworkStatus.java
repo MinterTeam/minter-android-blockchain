@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -55,9 +55,9 @@ public class NetworkStatus {
     @SerializedName("latest_block_time")
     @Expose
     public String latestBlockTime;
-    @SerializedName("state_history")
+    @SerializedName("keep_last_states")
     @Expose
-    public String stateHistory;
+    public int keepLastStates;
     @SerializedName("tm_status")
     @Expose
     public TmStatus tmStatus;

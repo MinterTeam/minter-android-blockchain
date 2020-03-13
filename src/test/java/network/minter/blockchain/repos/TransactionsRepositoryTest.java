@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -51,7 +51,7 @@ public class TransactionsRepositoryTest {
 
     @Test
     public void testGetTransactions() throws IOException {
-        MinterAddress address = new MinterAddress("Mx2ffe59556ffc6564f8e6132f445bc2e102fd713c");
+        MinterAddress address = new MinterAddress("Mx8d008dffe2f9144a39a2094ebdedadad335e814f");
         MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
 
         BlockChainTransactionRepository repo = MinterBlockChainApi.getInstance().transactions();
@@ -70,7 +70,7 @@ public class TransactionsRepositoryTest {
 
         BlockChainTransactionRepository repo = MinterBlockChainApi.getInstance().transactions();
 
-        Response<BCResult<HistoryTransaction>> response = repo.getTransaction("Mt1e4ef6ee466ff0fc7c75f4caa07f43bfb33d2f5e6bdf5923a7a697135f6a5202").execute();
+        Response<BCResult<HistoryTransaction>> response = repo.getTransaction("Mt7eaadbe89f63b33dac477c76dde4d47630052211df121a8c361abb197345c152").execute();
 
         assertTrue(response.isSuccessful());
         assertTrue(response.body().isOk());

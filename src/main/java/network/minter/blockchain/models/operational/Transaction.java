@@ -614,6 +614,11 @@ public class Transaction implements Parcelable {
             }
         }
 
+        public <Op extends Operation> Op setData(Op txData) {
+            mTx.mOperationData = txData;
+            return (Op) mTx.mOperationData;
+        }
+
         /**
          * Create "Buy coin" transaction builder
          * @return {@link TxCoinBuy}

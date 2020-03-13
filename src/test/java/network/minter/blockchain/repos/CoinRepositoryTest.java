@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -47,7 +47,7 @@ public class CoinRepositoryTest {
 
     @Test
     public void testGetCoinInfo() throws IOException {
-        String coin = "USD";
+        String coin = "TESTCOIN";
 
         MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
 
