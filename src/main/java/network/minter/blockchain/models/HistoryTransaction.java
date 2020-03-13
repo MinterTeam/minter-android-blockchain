@@ -51,18 +51,18 @@ public class HistoryTransaction {
     public BytesData hash;
     @SerializedName("raw_tx")
     public BytesData rawTx;
+    public Long height;
+    public Long index;
     public MinterAddress from;
     public BigInteger nonce;
-    public Type type;
+    public int gas;
     @SerializedName("gas_price")
     public int gasPrice;
-    public int gas;
     @SerializedName("gas_coin")
     public String gasCoin;
-    public String payload;
-    @SerializedName("service_data")
-    public String serviceData;
+    public Type type;
     public TxBaseResult data;
+    public String payload;
     public Map<String, String> tags;
 
     public enum Type {

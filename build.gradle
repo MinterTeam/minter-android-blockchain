@@ -31,7 +31,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:3.6.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
@@ -58,7 +58,7 @@ apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '0.12.1'
+version = '0.12.2'
 
 ext {
     minterMinSdk = 16
@@ -172,7 +172,7 @@ android {
         }
         netTest {
             dimension "env"
-            buildConfigField "String", "BASE_NODE_URL", '"http://138.197.222.87:8841"'
+            buildConfigField "String", "BASE_NODE_URL", '"https://minter-node-1.testnet.minter.network:8841"'
             buildConfigField "network.minter.blockchain.models.operational.BlockchainID", "BLOCKCHAIN_ID", "network.minter.blockchain.models.operational.BlockchainID.TestNet"
         }
     }

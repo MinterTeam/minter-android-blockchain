@@ -50,14 +50,14 @@ import network.minter.blockchain.models.operational.TxSendCoin;
 import network.minter.blockchain.models.operational.TxSetCandidateOffline;
 import network.minter.blockchain.models.operational.TxSetCandidateOnline;
 import network.minter.blockchain.models.operational.TxUnbound;
+import network.minter.blockchain.utils.Base64UrlSafe;
+import network.minter.blockchain.utils.DeepLinkBuilder;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
-import network.minter.core.internal.helpers.StringHelper;
-import network.minter.core.util.RLPBoxed;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -72,6 +72,7 @@ public class ExternalTransactionTest {
     static {
         try {
             MinterSDK.initialize();
+            DeepLinkBuilder.BIP_WALLET_URL = DeepLinkBuilder.BIP_WALLET_TESTNET;
         } catch (NativeLoadException e) {
             e.printStackTrace();
         }
@@ -104,7 +105,7 @@ public class ExternalTransactionTest {
         assertEquals(new MinterAddress("Mx8d008dffe2f9144a39a2094ebdedadad335e814f"), op.getTo());
 
         System.out.println("Send");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -135,7 +136,7 @@ public class ExternalTransactionTest {
         assertEquals(new BigDecimal("0.0001"), op.getMinValueToBuy());
 
         System.out.println("Sell");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -164,19 +165,21 @@ public class ExternalTransactionTest {
         assertEquals(new BigDecimal("0.0001"), op.getMinValueToBuy());
 
         System.out.println("SellAll");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
     public void testBuyEncodeDecode() {
         TxCoinBuy txData = new TxCoinBuy()
                 .setCoinToBuy("BANANATEST")
-                .setCoinToSell(MinterSDK.DEFAULT_COIN)
+                .setCoinToSell("MNT")
                 .setValueToBuy("1")
                 .setMaxValueToSell("100");
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
                 .setData(txData)
+                .setGasCoin("MNT")
+                .setGasPrice(BigInteger.ONE)
                 .build();
 
         BytesData data = tx.encode();
@@ -189,7 +192,7 @@ public class ExternalTransactionTest {
         TxCoinBuy op = decoded.getData(TxCoinBuy.class);
         assertNotNull(op);
 
-        assertEquals(MinterSDK.DEFAULT_COIN, op.getCoinToSell());
+        assertEquals("MNT", op.getCoinToSell());
         assertEquals("BANANATEST", op.getCoinToBuy());
         assertEquals(new BigDecimal("100"), op.getMaxValueToSell());
         assertEquals(new BigDecimal("1"), op.getValueToBuy());
@@ -203,7 +206,7 @@ public class ExternalTransactionTest {
 
 
         System.out.println("Buy");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -325,6 +328,8 @@ public class ExternalTransactionTest {
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
                 .setData(txData)
+                .setGasCoin("MNT")
+                .setGasPrice(BigInteger.ONE)
                 .build();
 
         BytesData data = tx.encode();
@@ -344,7 +349,7 @@ public class ExternalTransactionTest {
         assertEquals(new BigDecimal("1000"), op.getInitialReserve());
 
         System.out.println("CreateCoin");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -377,7 +382,7 @@ public class ExternalTransactionTest {
         assertEquals(new BigDecimal("5"), op.getStake());
 
         System.out.println("DeclareCandidacy");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -406,7 +411,7 @@ public class ExternalTransactionTest {
         assertEquals(new BigDecimal("10"), op.getStake());
 
         System.out.println("Delegate");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -435,7 +440,7 @@ public class ExternalTransactionTest {
         assertEquals(new BigDecimal("10"), op.getValue());
 
         System.out.println("Unbond");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -462,7 +467,7 @@ public class ExternalTransactionTest {
         assertEquals(pk, op.getPublicKey());
 
         System.out.println("SetCandidateOnline");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -489,7 +494,7 @@ public class ExternalTransactionTest {
         assertEquals(pk, op.getPublicKey());
 
         System.out.println("SetCandidateOffline");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -524,7 +529,7 @@ public class ExternalTransactionTest {
         assertEquals(new BigDecimal("0.2"), t2.getValue());
 
         System.out.println("Multisend");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -556,7 +561,7 @@ public class ExternalTransactionTest {
         assertEquals(address, op.getRewardAddress());
 
         System.out.println("EditCandidate");
-        System.out.println(data.toHexString());
+        System.out.println(new DeepLinkBuilder(decoded).build());
     }
 
     @Test
@@ -583,9 +588,8 @@ public class ExternalTransactionTest {
         BytesData encodedTxData = tx.encode();
         String encodedTx = encodedTxData.toHexString();
         System.out.println("Redeem check (no proof)");
-        System.out.println(encodedTx);
-        System.out.println("-- proof pass:");
-        System.out.println(StringHelper.charsToHexString(RLPBoxed.encodeString("pass")));
+        System.out.println(new DeepLinkBuilder(tx).setCheckPassword("pass").build());
+        System.out.println((Base64UrlSafe.encodeString("pass")));
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encodedTx);
         assertEquals(new BigInteger("0"), decoded.getNonce());
@@ -628,7 +632,7 @@ public class ExternalTransactionTest {
 
         ExternalTransaction ext = new ExternalTransaction(tx);
         System.out.println("Create MultiSig Address");
-        System.out.println(ext.encode().toHexString());
+        System.out.println(new DeepLinkBuilder(ext).build());
     }
 
     @Test
@@ -659,7 +663,8 @@ public class ExternalTransactionTest {
         String encodedTx = encodedTxData.toHexString();
 
         System.out.println("Redeem check (with proof)");
-        System.out.println(encodedTx);
+        System.out.println(new DeepLinkBuilder(tx).setCheckPassword("hello").build());
+        System.out.println((Base64UrlSafe.encodeString("hello")));
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encodedTx);
         assertEquals(new BigInteger("0"), decoded.getNonce());

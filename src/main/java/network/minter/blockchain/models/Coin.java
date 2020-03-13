@@ -34,7 +34,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.Transaction;
-import network.minter.core.crypto.MinterAddress;
 
 /**
  * minter-android-blockchain. 2018
@@ -49,7 +48,8 @@ public class Coin {
     public int crr;
     @SerializedName("reserve_balance")
     public BigInteger reserveBalance;
-    public MinterAddress creator;
+    @SerializedName("max_supply")
+    public BigInteger maxSupply;
 
     public String getSymbol() {
         return symbol.toUpperCase();

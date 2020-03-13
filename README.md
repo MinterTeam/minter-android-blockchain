@@ -24,7 +24,7 @@ project build.gradle
 ```groovy
 
 ext {
-    minterBlockchainSDK = "0.12.1"
+    minterBlockchainSDK = "0.12.2"
 }
 
 dependencies {
@@ -97,7 +97,7 @@ final PrivateKey privateKey = PrivateKey.fromMnemonic("your phrase must contains
 
 Create transaction builder and build transaction:
 ```java
-Transaction tx = new Transaction.Builder(new BigInteger("1"))
+Transaction tx = new Transaction.Builder(nonce)
     // optional: available for all transactions, but not useful for some transactions
     .setGasCoin("MNT")
     // here you should select what transaction you are trying to create, builder will select exact type
@@ -105,7 +105,7 @@ Transaction tx = new Transaction.Builder(new BigInteger("1"))
     // required: coin to send
     .setCoin(coin)
     // required: value to send
-    .setValue(10D)
+    .setValue("10")
     // required: recipient address
     .setTo(toAddress)
     // finally, build object

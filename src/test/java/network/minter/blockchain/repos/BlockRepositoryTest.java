@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -61,7 +61,7 @@ public class BlockRepositoryTest {
 
     @Test
     public void testGetMinGas() throws IOException {
-        MinterBlockChainApi api = MinterBlockChainApi.createInstance("http://159.89.107.246:8841", true, null);
+        MinterBlockChainApi api = MinterBlockChainApi.createInstance("https://minter-node-1.testnet.minter.network:8841", true, null);
 
         BlockChainBlockRepository repository = api.block();
         Response<BCResult<BigInteger>> response = repository.getMinGasPrice().execute();
@@ -74,7 +74,7 @@ public class BlockRepositoryTest {
 
     @Test
     public void testGetMaxGas() throws IOException {
-        MinterBlockChainApi api = MinterBlockChainApi.createInstance("http://159.89.107.246:8841", true, null);
+        MinterBlockChainApi api = MinterBlockChainApi.createInstance("https://minter-node-1.testnet.minter.network:8841", true, null);
 
         BlockChainBlockRepository repository = api.block();
         Response<BCResult<BigInteger>> response = repository.getMaxGasPrice().execute();
@@ -87,10 +87,10 @@ public class BlockRepositoryTest {
 
     @Test
     public void testGetMaxGasByHeight() throws IOException {
-        MinterBlockChainApi api = MinterBlockChainApi.createInstance("http://159.89.107.246:8841", true, null);
+        MinterBlockChainApi api = MinterBlockChainApi.createInstance("https://minter-node-1.testnet.minter.network:8841", true, null);
 
         BlockChainBlockRepository repository = api.block();
-        Response<BCResult<BigInteger>> response = repository.getMaxGasPrice(10).execute();
+        Response<BCResult<BigInteger>> response = repository.getMaxGasPrice().execute();
 
         assertTrue(response.isSuccessful());
         assertTrue(response.body().isOk());
