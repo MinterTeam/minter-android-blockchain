@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -36,7 +36,7 @@ public enum BlockchainID {
     MainNet((byte) 0x01),
     TestNet((byte) 0x02);
 
-    private BigInteger mId;
+    private final BigInteger mId;
 
     BlockchainID(byte id) {
         mId = new BigInteger(String.valueOf(id));

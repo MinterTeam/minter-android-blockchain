@@ -31,7 +31,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.1'
+        classpath 'com.android.tools.build:gradle:4.0.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
@@ -53,19 +53,18 @@ allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
-apply plugin: 'jacoco'
 apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '0.12.2'
+version = '0.13.0'
 
 ext {
     minterMinSdk = 16
     minterMaxSdk = 29
     minterBuildTools = "29.0.2"
     minterLibSupport = "28.0.0"
-    minterCoreVers = "0.7.0"
+    minterCoreVers = "0.7.1"
 
 
     buildArtifactName = project.name
@@ -153,10 +152,12 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            testCoverageEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
             minifyEnabled true
+            testCoverageEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -172,7 +173,7 @@ android {
         }
         netTest {
             dimension "env"
-            buildConfigField "String", "BASE_NODE_URL", '"https://minter-node-1.testnet.minter.network:8841"'
+            buildConfigField "String", "BASE_NODE_URL", '"https://minter-node-1.testnet.minter.network"'
             buildConfigField "network.minter.blockchain.models.operational.BlockchainID", "BLOCKCHAIN_ID", "network.minter.blockchain.models.operational.BlockchainID.TestNet"
         }
     }
@@ -187,10 +188,10 @@ dependencies {
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 
     // network
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.6.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.5.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
 
     implementation 'org.parceler:parceler-api:1.1.12'
     annotationProcessor 'org.parceler:parceler:1.1.12'
@@ -200,15 +201,13 @@ dependencies {
     implementation 'com.google.guava:guava:26.0-android'
 
     // testing
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.annotation:annotation:1.1.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test:rules:1.2.0'
-    androidTestImplementation 'com.squareup.retrofit2:converter-gson:2.6.0'
+    androidTestImplementation 'com.squareup.retrofit2:converter-gson:2.8.1'
     androidTestImplementation 'com.google.code.gson:gson:2.8.6'
 }
 
-// Coverage
-apply from: 'scripts/jacoco.gradle'
 // Publishing
 apply from: 'scripts/maven_publish.gradle'

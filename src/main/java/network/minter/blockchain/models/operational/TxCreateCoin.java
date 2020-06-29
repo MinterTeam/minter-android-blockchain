@@ -68,7 +68,7 @@ public final class TxCreateCoin extends Operation {
     private BigInteger mInitialReserve;
     // unsigned!!!
     private Integer mConstantReserveRatio;
-    private BigInteger mMaxSupply = BigInteger.ZERO;
+    private BigInteger mMaxSupply = new BigDecimal("1000000000000000").multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
 
     public TxCreateCoin() {
     }

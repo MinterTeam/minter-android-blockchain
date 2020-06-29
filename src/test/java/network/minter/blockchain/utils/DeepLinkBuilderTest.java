@@ -72,10 +72,10 @@ public class DeepLinkBuilderTest {
 
     @Test
     public void testCheck() {
-        CheckTransaction tx = new CheckTransaction.Builder("aaa", "hello")
+        CheckTransaction tx = new CheckTransaction.Builder("aabс", "hello")
                 .setChainId(BlockchainID.TestNet)
                 .setGasCoin("MNT")
-                .setDueBlock(new BigInteger("999999"))
+                .setDueBlock(new BigInteger("9999999"))
                 .setCoin("MNT")
                 .setValue("10")
                 .build();
@@ -88,7 +88,7 @@ public class DeepLinkBuilderTest {
         String res = deepLinkBuilder.build();
         System.out.println(res);
 
-        assertEquals("https://testnet.bip.to/tx/-MYJuLX4s7iw-K6DYWFhAoMPQj-KTU5UAAAAAAAAAIiKxyMEiegAAIpNTlQAAAAAAAAAuEHRhP4uhTQXbZE6k9otuwX4ctsgaQY8BK26mO520otx4DnF9F9NTgcFElUrg89BwX1uCYvJQSjLnaSorbZK6XTbARyg-By5fKQTn--rJYTStb15OvkSidxlL2IMEUpWMhE0p9mgRYp9zKZAurAFP2ppUadYfhAsPR-_aT-jeDD9TDtDawuAgIABik1OVAAAAAAAAAA?p=aGVsbG8",
+        assertEquals("https://testnet.bip.to/tx/-MYJuLX4s7iw-K6DYWFiAoOYln-KTU5UAAAAAAAAAIiKxyMEiegAAIpNTlQAAAAAAAAAuEGdCy4_jCu66Xtn7M-SeEOWCG-KXKP_BOwklqwwRsHb-QjvhCG68qHDkoe7SCufrBYZP6BpmUf-S5Gj_Pgso0jrABygoHRmWBFBol057RDsuCPDWHT7xFaQwmtW-gDZEWj-NWCgCuwSoh9ZmhugIWyRgtsIiVQdKJRwaBfff3Ap3llaMZGAgIABik1OVAAAAAAAAAA?p=aGVsbG8",
                 res);
     }
 }

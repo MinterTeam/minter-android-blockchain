@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import network.minter.blockchain.BuildConfig;
 import network.minter.core.MinterSDK;
@@ -89,6 +90,7 @@ public class Transaction implements Parcelable {
     BytesData mServiceData = new BytesData(new char[0]);
     SignatureType mSignatureType = Single;
     SignatureData mSignatureData;
+
     public enum SignatureType {
         Single((byte) 0x01, SignatureSingleData.class),
         Multi((byte) 0x02, SignatureMultiData.class);
@@ -119,9 +121,11 @@ public class Transaction implements Parcelable {
             return mTypeClass;
         }
     }
+
     protected Transaction(BigInteger nonce) {
         mNonce = nonce;
     }
+
     protected Transaction() {
     }
 
@@ -249,8 +253,15 @@ public class Transaction implements Parcelable {
         return signMulti(signatureAddress, Arrays.asList(pks));
     }
 
+    /**
+     * Does no signs transactions, only sets signatures to the transaction.
+     * @param signatureAddress multisig address
+     * @param signatureData multisig signatures
+     * @return valid transaction ready to send
+     */
     public TransactionSign signMultiExternal(MinterAddress signatureAddress, List<SignatureSingleData> signatureData) {
         mSignatureType = Multi;
+        mSignatureData = new SignatureMultiData();
         ((SignatureMultiData) mSignatureData).setSigns(signatureAddress, signatureData);
         return new TransactionSign(new BytesData(encode(false)).toHexString());
     }
@@ -289,6 +300,10 @@ public class Transaction implements Parcelable {
         return new TransactionSign(new BytesData(encode(false)).toHexString());
     }
 
+    /**
+     * After you set all tx data, you can get transaction hash ready to sign with secp256k1
+     * @return 32 byte hash
+     */
     public BytesData getUnsignedTxHash() {
         mSignatureType = Single;
         char[] encoded = encode(true);
@@ -296,11 +311,23 @@ public class Transaction implements Parcelable {
         return rawTxData.sha3Data();
     }
 
+    /**
+     * Set valid signature to transaction and prepare it to send
+     * @param signature signature constructed with {@link SignatureSingleData}
+     * @return valid transaction ready to send
+     */
     public TransactionSign signExternal(SignatureSingleData signature) {
         mSignatureData = signature;
         return new TransactionSign(new BytesData(encode(false)).toHexString());
     }
 
+    /**
+     * Set valid signature to transaction and prepare it to send
+     * @param r R-component
+     * @param s S-component
+     * @param v V-component
+     * @return valid transaction ready to send
+     */
     public TransactionSign signExternal(char[] r, char[] s, char[] v) {
         mSignatureData = new SignatureSingleData(r, s, v);
         return new TransactionSign(new BytesData(encode(false)).toHexString());
@@ -312,6 +339,7 @@ public class Transaction implements Parcelable {
      * @return {@link TransactionSign} Raw transaction sign
      * @since 0.3.0
      */
+    @Nullable
     public TransactionSign signSingle(@Nonnull final PrivateKey privateKey) {
         mSignatureType = Single;
         char[] encoded = encode(true);
@@ -339,6 +367,64 @@ public class Transaction implements Parcelable {
     }
 
     /**
+     * Sign transaction for multisig. Call this method as much, as you have private keys
+     * @param privateKey your private key
+     * @return valid signature or null if data is invalid
+     */
+    @Nullable
+    public SignatureSingleData signOnlyMulti(PrivateKey privateKey) {
+        mSignatureType = Multi;
+        char[] encoded = encode(true);
+        final BytesData rawTxData = new BytesData(encoded);
+        final BytesData hash = rawTxData.sha3Data();
+
+        NativeSecp256k1.RecoverableSignature signature;
+
+        long ctx = NativeSecp256k1.contextCreate();
+        try {
+            signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getBytes());
+        } finally {
+            // DON'T forget cleanup to avoid leaks
+            NativeSecp256k1.contextCleanup(ctx);
+        }
+
+        if (signature == null) {
+            return null;
+        }
+
+        return new SignatureSingleData(signature);
+    }
+
+    /**
+     * Just sign transaction with private key and get raw signature
+     * @param privateKey your private key
+     * @return valid signature or null if data is invalid
+     */
+    @Nullable
+    public SignatureSingleData signOnlySingle(PrivateKey privateKey) {
+        mSignatureType = Single;
+        char[] encoded = encode(true);
+        final BytesData rawTxData = new BytesData(encoded);
+        final BytesData hash = rawTxData.sha3Data();
+
+        NativeSecp256k1.RecoverableSignature signature;
+
+        long ctx = NativeSecp256k1.contextCreate();
+        try {
+            signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getBytes());
+        } finally {
+            // DON'T forget cleanup to avoid leaks
+            NativeSecp256k1.contextCleanup(ctx);
+        }
+
+        if (signature == null) {
+            return null;
+        }
+
+        return new SignatureSingleData(signature);
+    }
+
+    /**
      * Get transaction data
      * @param cls class to cast data object
      * @param <OpType> operation type
@@ -348,6 +434,11 @@ public class Transaction implements Parcelable {
         return cls.cast(mOperationData);
     }
 
+    /**
+     * Get transaction data with auto-cast
+     * @param <OpType> operation type
+     * @return object extends {@link Operation}
+     */
     @SuppressWarnings("unchecked")
     public <OpType extends Operation> OpType getData() {
         return (OpType) mOperationData;
@@ -367,14 +458,26 @@ public class Transaction implements Parcelable {
         return mChainId;
     }
 
+    /**
+     * Returns gas coin without zero-bytes
+     * @return
+     */
     public String getGasCoin() {
         return mGasCoin.replace("\0", "");
     }
 
+    /**
+     * Get payload as bytes
+     * @return
+     */
     public BytesData getPayload() {
         return mPayload;
     }
 
+    /**
+     * Get payload as a String
+     * @return
+     */
     public String getPayloadString() {
         return new String(getPayload().getData());
     }
@@ -465,6 +568,11 @@ public class Transaction implements Parcelable {
         private final Transaction mTx;
         private ExternalTransaction mExtTx = null;
 
+        /**
+         * Create build from valid {@link ExternalTransaction} given from deeplink
+         * @param nonce address transaction count + 1
+         * @param externalTransaction deeplink transaction data
+         */
         public Builder(BigInteger nonce, ExternalTransaction externalTransaction) {
             this(nonce);
             checkArgument(externalTransaction.getType() != null, "Transaction type must be set");
@@ -489,7 +597,7 @@ public class Transaction implements Parcelable {
 
         /**
          * Init builder with transaction nonce. If you don't have it yet, set it later using {@link #setNonce(BigInteger)}
-         * @param nonce transaction nonce
+         * @param nonce address transaction count + 1
          */
         public Builder(BigInteger nonce) {
             checkArgument(nonce != null, "Nonce must be set");
@@ -497,6 +605,10 @@ public class Transaction implements Parcelable {
             mTx.mChainId = BuildConfig.BLOCKCHAIN_ID;
         }
 
+        /**
+         * Build {@link Transaction} via {@link ExternalTransaction} passed to special constructor. This means, all data from ExternalTransaction will be copied to normal transaction
+         * @return valid {@link Transaction} with data from {@link ExternalTransaction}
+         */
         public Transaction buildFromExternal() {
             if (mExtTx == null) {
                 throw new IllegalStateException("Unable to build network tx without external transaction. Or build by yourself normal transaction.");
@@ -524,7 +636,8 @@ public class Transaction implements Parcelable {
          * @param coin string coin name. Min length: 3, maximum: 10
          * @return {@link Builder}
          */
-        public Builder setGasCoin(String coin) {
+        public Builder setGasCoin(@Nonnull String coin) {
+            checkArgument(coin != null, "Gas coin can't be null");
             mTx.mGasCoin = strrpad(10, coin);
             return this;
         }
@@ -534,7 +647,8 @@ public class Transaction implements Parcelable {
          * @param gasPrice commission multiplier
          * @return {@link Builder}
          */
-        public Builder setGasPrice(BigInteger gasPrice) {
+        public Builder setGasPrice(@Nonnull BigInteger gasPrice) {
+            checkArgument(gasPrice != null, "Gas can't be null");
             mTx.mGasPrice = gasPrice;
             return this;
         }
@@ -545,6 +659,10 @@ public class Transaction implements Parcelable {
          * @return {@link Builder}
          */
         public Builder setPayload(byte[] data) {
+            if (data == null) {
+                mTx.mPayload = new BytesData(new char[0]);
+                return this;
+            }
             return setPayload(new BytesData(data, true));
         }
 
@@ -554,6 +672,10 @@ public class Transaction implements Parcelable {
          * @return {@link Builder}
          */
         public Builder setPayload(BytesData data) {
+            if (data == null) {
+                mTx.mPayload = new BytesData(new char[0]);
+                return this;
+            }
             checkArgument(data.size() <= 1024, "Payload maximum size: 1024 bytes");
             mTx.mPayload = new BytesData(data.getData(), true);
             return this;
@@ -564,8 +686,11 @@ public class Transaction implements Parcelable {
          * @param hexString max decoded size: 1024 bytes, means max string length should be 2048
          * @return {@link Builder}
          */
-        public Builder setPayload(@Nonnull String hexString) {
-            checkNotNull(hexString, "Hex data string can't be null");
+        public Builder setPayload(String hexString) {
+            if (hexString == null) {
+                mTx.mPayload = new BytesData(new char[0]);
+                return this;
+            }
             checkArgument(hexString.length() <= 2048, "Payload maximum size: 1024 bytes (2048 in hex string)");
             mTx.mPayload = new BytesData(hexString);
             return this;
@@ -596,8 +721,8 @@ public class Transaction implements Parcelable {
         /**
          * Create custom transaction builder, if (for example) you were forked minter blockchain and were created own transaction.
          * OR you can create dynamically any of existing transaction using just Class<?> object
-         * @param operationClass
-         * @param <Op>
+         * @param operationClass Class extends Operation
+         * @param <Op> operation type
          * @return
          */
         public <Op extends Operation> Op create(Class<Op> operationClass) {
@@ -614,6 +739,7 @@ public class Transaction implements Parcelable {
             }
         }
 
+        @SuppressWarnings("unchecked")
         public <Op extends Operation> Op setData(Op txData) {
             mTx.mOperationData = txData;
             return (Op) mTx.mOperationData;

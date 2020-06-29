@@ -1,5 +1,11 @@
 # Release notes
 
+## 0.13.0
+ - Changes for signing transaction logic
+ - Fixed some api result models
+ - Updated tests
+ - Max supply now defaults to 10^15
+
 ## 0.12.2
  - Added Deeplink builder with Url-Safe base64 encoder
  - Updated tests
@@ -25,7 +31,7 @@
  - Added method to sign tx with a signature created outside `Transaction#signExternal`
 
 ## 0.10.0
- - Added check decoding from **Mc[data]**
+ - Added check decoding from **Mc...**
  - More check tests
  - Fixed check signing
 

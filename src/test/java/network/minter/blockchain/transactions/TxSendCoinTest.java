@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
@@ -232,6 +233,38 @@ public class TxSendCoinTest {
                 .build();
 
         TransactionSign sign = tx.signMulti(sender, pk1, pk2, pk3);
+
+        assertEquals(validTx, sign.getTxSign());
+    }
+
+    @Test
+    public void testMultiSigHashesOnlyEncode() throws OperationInvalidDataException {
+
+        String validTx = "f901270102018a4d4e540000000000000001aae98a4d4e540000000000000094d82558ea00eb81d35f2654953598f5d51737d31d880de0b6b3a7640000808002b8e8f8e694db4f4b6942cb927e8d7e3a1f602d0f1fb43b5bd2f8cff8431ca0a116e33d2fea86a213577fc9dae16a7e4cadb375499f378b33cddd1d4113b6c1a021ee1e9eb61bbd24233a0967e1c745ab23001cf8816bb217d01ed4595c6cb2cdf8431ca0f7f9c7a6734ab2db210356161f2d012aa9936ee506d88d8d0cba15ad6c84f8a7a04b71b87cbbe7905942de839211daa984325a15bdeca6eea75e5d0f28f9aaeef8f8431ba0d8c640d7605034eefc8870a6a3d1c22e2f589a9319288342632b1c4e6ce35128a055fe3f93f31044033fe7b07963d547ac50bccaac38a057ce61665374c72fb454";
+        MinterAddress multisigAddress = new MinterAddress("Mxdb4f4b6942cb927e8d7e3a1f602d0f1fb43b5bd2");
+        PrivateKey pk1 = new PrivateKey("b354c3d1d456d5a1ddd65ca05fd710117701ec69d82dac1858986049a0385af9");
+        PrivateKey pk2 = new PrivateKey("38b7dfb77426247aed6081f769ed8f62aaec2ee2b38336110ac4f7484478dccb");
+        PrivateKey pk3 = new PrivateKey("94c0915734f92dd66acfdc48f82b1d0b208efd544fe763386160ec30c968b4af");
+
+        Transaction tx = new Transaction.Builder(new BigInteger("1"))
+                .setGasCoin("MNT")
+                .setBlockchainId(BlockchainID.TestNet)
+                .setGasPrice(BigInteger.ONE)
+                .sendCoin()
+                .setTo("Mxd82558ea00eb81d35f2654953598f5d51737d31d")
+                .setCoin("MNT")
+                .setValue("1")
+                .build();
+
+        SignatureSingleData s1 = tx.signOnlyMulti(pk1);
+        SignatureSingleData s2 = tx.signOnlyMulti(pk2);
+        SignatureSingleData s3 = tx.signOnlyMulti(pk3);
+
+        TransactionSign sign = tx.signMultiExternal(multisigAddress, new ArrayList<SignatureSingleData>() {{
+            add(s1);
+            add(s2);
+            add(s3);
+        }});
 
         assertEquals(validTx, sign.getTxSign());
     }

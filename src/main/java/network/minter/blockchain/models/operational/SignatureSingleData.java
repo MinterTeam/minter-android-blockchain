@@ -71,6 +71,10 @@ public final class SignatureSingleData extends SignatureData {
         mV = new BytesData(signatureRSV.takeRange(64, 65));
     }
 
+    public SignatureSingleData(NativeSecp256k1.RecoverableSignature signature) {
+        setSign(signature);
+    }
+
     public SignatureSingleData(char[] r, char[] s, char[] v) {
         checkArgument(r.length == 32, "R length must be 32");
         checkArgument(s.length == 32, "S length must be 32");

@@ -39,7 +39,6 @@ import java.util.Map;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.core.crypto.MinterCheck;
 import network.minter.core.crypto.MinterPublicKey;
 
 /**
@@ -75,7 +74,7 @@ public class HistoryTransaction {
         @SerializedName("4")
         BuyCoin(TxConvertCoinResult.class),
         @SerializedName("5")
-        CreateCoin(TxCreateResult.class),
+        CreateCoin(TxCreateCoinResult.class),
         @SerializedName("6")
         DeclareCandidacy(TxDeclareCandidacyResult.class),
         @SerializedName("7")
@@ -141,7 +140,7 @@ public class HistoryTransaction {
      * Data model for creating coin transaction
      */
     @Parcel
-    public static class TxCreateResult extends TxBaseResult {
+    public static class TxCreateCoinResult extends TxBaseResult {
         public String name;
         public String symbol;
         @SerializedName("initial_amount")
@@ -149,7 +148,9 @@ public class HistoryTransaction {
         @SerializedName("initial_reserve")
         public BigInteger initialReserve;
         @SerializedName("constant_reserve_ratio")
-        public BigDecimal constantReserveRatio;
+        public BigDecimal crr;
+        @SerializedName("max_supply")
+        public BigInteger maxSupply;
 
         public String getName() {
             return name;
@@ -171,8 +172,8 @@ public class HistoryTransaction {
             return Transaction.humanizeValue(initialReserve);
         }
 
-        public BigDecimal getConstantReserveRatio() {
-            return constantReserveRatio;
+        public BigDecimal getCrr() {
+            return crr;
         }
     }
 
@@ -322,18 +323,29 @@ public class HistoryTransaction {
     @Parcel
     public static class TxRedeemCheckResult extends TxBaseResult {
         @SerializedName("raw_check")
-        public MinterCheck rawCheck;
-        public BytesData proof;
+        public String rawCheck;
+        public String proof;
 
-        public BytesData getProof() {
+        /**
+         * Base64 encoded proof data
+         * @return
+         */
+        public String getProof() {
             return proof;
         }
 
-        public MinterCheck getRawCheck() {
+        /**
+         * Base64 encoded check data
+         * @return
+         */
+        public String getRawCheck() {
             return rawCheck;
         }
     }
 
+    /**
+     * To get created multisig address, use {@link HistoryTransaction.tags['tx.created_multisig']}
+     */
     @Parcel
     public static class TxCreateMultisigResult extends TxBaseResult {
         public BigInteger threshold;
@@ -349,13 +361,6 @@ public class HistoryTransaction {
 
     @Parcel
     public static class TxEditCandidateResult extends TxBaseResult {
-        @SerializedName("list")
-        public List<CandidateEditResult> items;
-    }
-
-    //@TODO standard! write to Lashin to fix this
-    @Parcel
-    public static class CandidateEditResult {
         @SerializedName("reward_address")
         public MinterAddress rewardAddress;
         @SerializedName("owner_address")
