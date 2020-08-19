@@ -219,6 +219,20 @@ public class ExternalTransaction implements Parcelable {
         mPayload = null;
     }
 
+    public void resetPayload(BytesData payload) {
+        checkArgument(payload.size() <= 1024, "Payload maximum size: 1024 bytes");
+        mPayload = payload;
+    }
+
+    public <Op extends Operation> void resetData(Op operationData) {
+        mType = operationData.getType();
+        mOperationData = operationData;
+        FieldsValidationResult dataValidation = mOperationData.validate();
+        if (dataValidation != null) {
+            checkArgument(dataValidation.isValid(), dataValidation.getInvalidFieldsMessages());
+        }
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -250,7 +264,7 @@ public class ExternalTransaction implements Parcelable {
     }
 
     public static class Builder {
-        private ExternalTransaction mTx;
+        private final ExternalTransaction mTx;
 
         public Builder() {
             mTx = new ExternalTransaction();
@@ -320,6 +334,11 @@ public class ExternalTransaction implements Parcelable {
         public <Op extends Operation> Builder setData(Op operationData) {
             mTx.mType = operationData.getType();
             mTx.mOperationData = operationData;
+            FieldsValidationResult dataValidation = mTx.mOperationData.validate();
+            if (dataValidation != null) {
+                checkArgument(dataValidation.isValid(), dataValidation.getInvalidFieldsMessages());
+            }
+
             return this;
         }
 

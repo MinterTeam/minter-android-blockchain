@@ -1,5 +1,8 @@
 # Release notes
 
+## 0.13.1
+ - Ability to reset transaction data and payload in external transaction builder
+
 ## 0.13.0
  - Changes for signing transaction logic
  - Fixed some api result models
