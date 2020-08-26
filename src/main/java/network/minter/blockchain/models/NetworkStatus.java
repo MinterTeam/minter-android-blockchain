@@ -26,10 +26,11 @@
 
 package network.minter.blockchain.models;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
+
+import java.math.BigInteger;
 
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterPublicKey;
@@ -39,144 +40,28 @@ import network.minter.core.crypto.MinterPublicKey;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @Parcel
-public class NetworkStatus {
+public class NetworkStatus extends NodeResult {
+
     @SerializedName("version")
-    @Expose
     public String version;
     @SerializedName("latest_block_hash")
-    @Expose
     public BytesData latestBlockHash;
     @SerializedName("latest_app_hash")
-    @Expose
     public BytesData latestAppHash;
     @SerializedName("latest_block_height")
-    @Expose
     public long latestBlockHeight;
     @SerializedName("latest_block_time")
-    @Expose
     public String latestBlockTime;
     @SerializedName("keep_last_states")
-    @Expose
-    public int keepLastStates;
-    @SerializedName("tm_status")
-    @Expose
-    public TmStatus tmStatus;
+    public long keepLastStates;
+    @SerializedName("total_slashed")
+    public BigInteger totalSlashed;
+    @SerializedName("catching_up")
+    public boolean catchingUp;
+    @SerializedName("public_key")
+    public MinterPublicKey publicKey;
+    @SerializedName("node_id")
+    public String nodeId;
 
-    @Parcel
-    public static class NodeInfo {
-        @SerializedName("protocol_version")
-        @Expose
-        public ProtocolVersion protocolVersion;
-        @SerializedName("id")
-        @Expose
-        public BytesData id;
-        @SerializedName("listen_addr")
-        @Expose
-        public String listenAddr;
-        @SerializedName("network")
-        @Expose
-        public String network;
-        @SerializedName("version")
-        @Expose
-        public String version;
-        @SerializedName("channels")
-        @Expose
-        public String channels;
-        @SerializedName("moniker")
-        @Expose
-        public String moniker;
-        @SerializedName("other")
-        @Expose
-        public Other other;
-    }
-
-    @Parcel
-    public static class Other {
-        @SerializedName("tx_index")
-        @Expose
-        public String txIndex;
-        @SerializedName("rpc_address")
-        @Expose
-        public String rpcAddress;
-    }
-
-    @Parcel
-    public static class ProtocolVersion {
-        @SerializedName("p2p")
-        @Expose
-        public long p2p;
-        @SerializedName("block")
-        @Expose
-        public long block;
-        @SerializedName("app")
-        @Expose
-        public long app;
-    }
-
-    @Parcel
-    public static class PubKey {
-        @SerializedName("type")
-        @Expose
-        public String type;
-        @SerializedName("value")
-        @Expose
-        public String value;
-    }
-
-    @Parcel
-    public static class SyncInfo {
-        @SerializedName("latest_block_hash")
-        @Expose
-        public BytesData latestBlockHash;
-        @SerializedName("latest_app_hash")
-        @Expose
-        public BytesData latestAppHash;
-        @SerializedName("latest_block_height")
-        @Expose
-        public long latestBlockHeight;
-        @SerializedName("latest_block_time")
-        @Expose
-        public String latestBlockTime;
-        @SerializedName("catching_up")
-        @Expose
-        public boolean catchingUp;
-    }
-
-    @Parcel
-    public static class TmStatus {
-        @SerializedName("node_info")
-        @Expose
-        public NodeInfo nodeInfo;
-        @SerializedName("sync_info")
-        @Expose
-        public SyncInfo syncInfo;
-        @SerializedName("validator_info")
-        @Expose
-        public ValidatorStatus validatorStatus;
-    }
-
-    @Parcel
-    public static class Validator {
-        @SerializedName("pub_key")
-        @Expose
-        public MinterPublicKey pubKey;
-        @SerializedName("voting_power")
-        @Expose
-        public String votingPower;
-    }
-
-    @Parcel
-    public static class ValidatorStatus {
-        @SerializedName("address")
-        @Expose
-        public BytesData address;
-        @SerializedName("pub_key")
-        @Expose
-        public PubKey pubKey;
-        @SerializedName("voting_power")
-        @Expose
-        public String votingPower;
-
-    }
 
 }

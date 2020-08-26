@@ -55,28 +55,28 @@ public class DeepLinkBuilderTest {
     public void testSend() throws OperationInvalidDataException {
         Transaction tx = new Transaction.Builder(BigInteger.ZERO)
                 .setGasPrice(BigInteger.ONE)
-                .setGasCoin("MNT")
+                .setGasCoinId(MinterSDK.DEFAULT_COIN_ID)
                 .setBlockchainId(BlockchainID.TestNet)
                 .sendCoin()
                 .setTo("Mx8d008dffe2f9144a39a2094ebdedadad335e814f")
                 .setValue("1")
-                .setCoin("MNT")
+                .setCoinId(MinterSDK.DEFAULT_COIN_ID)
                 .build();
 
         DeepLinkBuilder deepLinkBuilder = new DeepLinkBuilder(tx);
         String res = deepLinkBuilder.build();
         System.out.println(res);
 
-        assertEquals("https://testnet.bip.to/tx/-DoBqumKTU5UAAAAAAAAAJSNAI3_4vkUSjmiCU697a2tM16BT4gN4Lazp2QAAICAAYpNTlQAAAAAAAAA", res);
+        assertEquals("https://testnet.bip.to/tx/5gGg34CUjQCN_-L5FEo5oglOve2trTNegU-IDeC2s6dkAACAgAGA", res);
     }
 
     @Test
     public void testCheck() {
         CheckTransaction tx = new CheckTransaction.Builder("aabс", "hello")
                 .setChainId(BlockchainID.TestNet)
-                .setGasCoin("MNT")
+                .setGasCoin(MinterSDK.DEFAULT_COIN_ID)
                 .setDueBlock(new BigInteger("9999999"))
-                .setCoin("MNT")
+                .setCoinId(MinterSDK.DEFAULT_COIN_ID)
                 .setValue("10")
                 .build();
 
@@ -88,7 +88,7 @@ public class DeepLinkBuilderTest {
         String res = deepLinkBuilder.build();
         System.out.println(res);
 
-        assertEquals("https://testnet.bip.to/tx/-MYJuLX4s7iw-K6DYWFiAoOYln-KTU5UAAAAAAAAAIiKxyMEiegAAIpNTlQAAAAAAAAAuEGdCy4_jCu66Xtn7M-SeEOWCG-KXKP_BOwklqwwRsHb-QjvhCG68qHDkoe7SCufrBYZP6BpmUf-S5Gj_Pgso0jrABygoHRmWBFBol057RDsuCPDWHT7xFaQwmtW-gDZEWj-NWCgCuwSoh9ZmhugIWyRgtsIiVQdKJRwaBfff3Ap3llaMZGAgIABik1OVAAAAAAAAAA?p=aGVsbG8",
+        assertEquals("https://testnet.bip.to/tx/-KoJuKP4obie-JyFYWFi0YECg5iWf4CIiscjBInoAACAuEE82JrvRb_-FSKj4K6U-ERLH28ZUbixnTaWAYZRGI73Hj6O_GVltyg30kF0hRwd5nceb0zT0PXudntGVjNkRRySARug6QQkG4EOwNJyz9EReLIqNLhasbnFG9rq0B6rjJ4T8J2gfwXRASIatPCaUndq2iEmqbbI5iitGfBRUKeEgjxCsb6AgIABgA?p=aGVsbG8",
                 res);
     }
 }

@@ -59,21 +59,21 @@ public class TxCreateCoinTest {
 
     @Test
     public void testEncode() throws OperationInvalidDataException {
-        final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88f0102018a4d4e540000000000000005b5f48a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a893635c9adc5dea00000808001b845f8431ca0ccfabd9283d27cf7978bca378e0cc7dc69a39ff3bdc56707fa2d552655f9290da0226057221cbaef35696c9315cd29e783d3c66d842d0a3948a922abb42ca0dabe";
-        final PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
+        final BigInteger nonce = new BigInteger("9");
+        final String validTx = "f88b0901018005b83af8388a535550455220544553548a535550455254455354318a021e19e0c9bab24000008a021e19e0c9bab2400000638a021e27c1806e59a40000808001b845f8431ba03c4678e9549256b9413827dc617de9b054b3c02ea72eb5b99d038ad49c600dcca02c54da56153d766ed1c9bc1917d82b6c56029e9f889e4d0d1e945eafeca9991b";
+        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
-                .setGasCoin("MNT")
+                .setGasCoinId(MinterSDK.DEFAULT_COIN_ID)
                 .setGasPrice(new BigInteger("1"))
-                .setBlockchainId(BlockchainID.TestNet)
+                .setBlockchainId(BlockchainID.MainNet)
                 .createCoin()
                 .setName("SUPER TEST")
-                .setSymbol("SPRTEST")
-                .setInitialAmount("100")
-                .setInitialReserve("10")
-                .setConstantReserveRatio(10)
-                .setMaxSupply("1000")
+                .setSymbol("SUPERTEST1")
+                .setInitialAmount("10000")
+                .setInitialReserve("10000")
+                .setConstantReserveRatio(99)
+                .setMaxSupply("10001")
                 .build();
 
         assertNotNull(tx);
@@ -83,24 +83,25 @@ public class TxCreateCoinTest {
 
     @Test
     public void testDecode() {
-        final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f88f0102018a4d4e540000000000000005b5f48a535550455220544553548a5350525445535400000089056bc75e2d63100000888ac7230489e800000a893635c9adc5dea00000808001b845f8431ca0ccfabd9283d27cf7978bca378e0cc7dc69a39ff3bdc56707fa2d552655f9290da0226057221cbaef35696c9315cd29e783d3c66d842d0a3948a922abb42ca0dabe";
+        final BigInteger nonce = new BigInteger("9");
+        final String validTx = "f88b0901018005b83af8388a535550455220544553548a535550455254455354318a021e19e0c9bab24000008a021e19e0c9bab2400000638a021e27c1806e59a40000808001b845f8431ba03c4678e9549256b9413827dc617de9b054b3c02ea72eb5b99d038ad49c600dcca02c54da56153d766ed1c9bc1917d82b6c56029e9f889e4d0d1e945eafeca9991b";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);
 
+        assertEquals(BlockchainID.MainNet, tx.getBlockchainId());
         assertEquals(nonce, tx.getNonce());
-        assertEquals("MNT", tx.getGasCoin());
+        assertEquals(MinterSDK.DEFAULT_COIN_ID, tx.getGasCoinId());
         assertEquals(OperationType.CreateCoin, tx.getType());
         TxCreateCoin data = tx.getData();
 
         assertNotNull(data);
         assertEquals("SUPER TEST", data.getName());
-        assertEquals("SPRTEST", data.getSymbol());
-        assertEquals(new BigDecimal("100"), data.getInitialAmount());
-        assertEquals(new BigDecimal("10"), data.getInitialReserve());
-        assertEquals(new BigDecimal("1000"), data.getMaxSupply());
-        assertEquals(10, data.getConstantReserveRatio());
+        assertEquals("SUPERTEST1", data.getSymbol());
+        assertEquals(new BigDecimal("10000"), data.getInitialAmount());
+        assertEquals(new BigDecimal("10000"), data.getInitialReserve());
+        assertEquals(new BigDecimal("10001"), data.getMaxSupply());
+        assertEquals(99, data.getConstantReserveRatio());
 
     }
 }

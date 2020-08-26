@@ -29,66 +29,124 @@ package network.minter.blockchain.repos;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
-import network.minter.blockchain.MinterBlockChainApi;
-import network.minter.blockchain.models.BCResult;
+import network.minter.blockchain.MinterBlockChainSDK;
 import network.minter.blockchain.models.HistoryTransaction;
+import network.minter.blockchain.models.HistoryTransactionList;
+import network.minter.blockchain.models.TransactionCommissionValue;
 import network.minter.blockchain.models.UnconfirmedTransactions;
-import network.minter.blockchain.repo.BlockChainTransactionRepository;
+import network.minter.blockchain.models.operational.BlockchainID;
+import network.minter.blockchain.models.operational.OperationInvalidDataException;
+import network.minter.blockchain.models.operational.Transaction;
+import network.minter.blockchain.models.operational.TransactionSign;
+import network.minter.blockchain.repo.NodeTransactionRepository;
+import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
-import retrofit2.Response;
+import network.minter.core.crypto.PrivateKey;
+import network.minter.core.internal.exceptions.NativeLoadException;
+import network.minter.core.internal.log.StdLogger;
 
+import static junit.framework.Assert.assertEquals;
+import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
  * minter-android-blockchain. 2019
- *
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class TransactionsRepositoryTest {
 
+    static {
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Test
     public void testGetTransactions() throws IOException {
-        MinterAddress address = new MinterAddress("Mx8d008dffe2f9144a39a2094ebdedadad335e814f");
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+        MinterAddress address = new MinterAddress("Mx6ab3a04c2f4d6022163f36a73840980cc8fc6a8b");
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843", true, new StdLogger());
 
-        BlockChainTransactionRepository repo = MinterBlockChainApi.getInstance().transactions();
+        NodeTransactionRepository repo = MinterBlockChainSDK.getInstance().transactions();
 
-        Response<BCResult<List<HistoryTransaction>>> response = repo.getTransactions(new BlockChainTransactionRepository.TQuery().setFrom(address)).execute();
+        HistoryTransactionList response = repo.getTransactions(
+                new NodeTransactionRepository.TQuery().setFrom(address)
+        ).blockingFirst();
 
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
+        assertTrue(response.isOk());
+        assertNotNull(response.items);
 
-        assertNotNull(response.body().result);
+        HistoryTransaction tx = response.items.get(0);
+        assertNotNull(tx.hash);
+        assertNotNull(tx.rawTx);
+        assertNotNull(tx.height);
+        assertNotNull(tx.index);
+        assertNotNull(tx.from);
+        assertNotNull(tx.nonce);
+        assertNotNull(tx.gas);
+        assertNotNull(tx.gasPrice);
+        assertNotNull(tx.gasCoinId);
+        assertNotNull(tx.type);
+        assertNotNull(tx.data);
+        assertNotNull(tx.payload);
+        assertNotNull(tx.tags);
+    }
+
+    @Test
+    public void testEstimateTxCommission() throws OperationInvalidDataException {
+        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
+        MinterAddress toAddress = new MinterAddress("Mx67691076548b20234461ff6fd2bc9c64393eb8fc");
+        final String validTx = "f86f01010180019fde809467691076548b20234461ff6fd2bc9c64393eb8fc872bdbb64bc09000808001b845f8431ca08be3f0c3aecc80ec97332e8aa39f20cd9e735092c0de37eb726d8d3d0a255a66a02040a1001d1a9116317eb24aa7ee4730ed980bd08a1fc0adb4e7598425178d3a";
+
+        Transaction tx = new Transaction.Builder(new BigInteger("1"))
+                .setBlockchainId(BlockchainID.MainNet)
+                .setGasCoinId(DEFAULT_COIN_ID)
+                .sendCoin()
+                .setCoinId(DEFAULT_COIN_ID)
+                .setValue("0.012345")
+                .setTo(toAddress)
+                .build();
+
+        TransactionSign sign = tx.signSingle(privateKey);
+
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843", true, new StdLogger());
+        NodeTransactionRepository repo = MinterBlockChainSDK.getInstance().transactions();
+        TransactionCommissionValue feeResult = repo.getTransactionCommission(sign).blockingFirst();
+        assertNotNull(feeResult);
+        assertTrue(feeResult.isOk());
+        assertEquals(new BigDecimal("0.01"), feeResult.getValueDecimal());
+        assertEquals(new BigInteger("10000000000000000"), feeResult.getValue());
     }
 
     @Test
     public void testGetTransaction() throws IOException {
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843", true, new StdLogger());
 
-        BlockChainTransactionRepository repo = MinterBlockChainApi.getInstance().transactions();
+        NodeTransactionRepository repo = MinterBlockChainSDK.getInstance().transactions();
 
-        Response<BCResult<HistoryTransaction>> response = repo.getTransaction("Mt7eaadbe89f63b33dac477c76dde4d47630052211df121a8c361abb197345c152").execute();
+        HistoryTransaction response = repo.getTransaction("Mt81B3B9A79437FBCF66F9E6679DBCF0825E6C1B10450C7F3769031C033389AC30").blockingFirst();
 
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
-
-        assertNotNull(response.body().result);
+        assertTrue(response.isOk());
+        assertNotNull(response.hash);
     }
 
     @Test
     public void testGetUnconfirmed() throws IOException {
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843", true, new StdLogger());
+//
+        NodeTransactionRepository repository = MinterBlockChainSDK.getInstance().transactions();
 
-        BlockChainTransactionRepository repository = MinterBlockChainApi.getInstance().transactions();
+        UnconfirmedTransactions response = repository.getUnconfirmedList().blockingFirst();
 
-        Response<BCResult<UnconfirmedTransactions>> response = repository.getUnconfirmedList().execute();
-
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
-
-        assertNotNull(response.body().result);
+        assertTrue(response.isOk());
+        assertNotNull(response.count);
+        assertNotNull(response.total);
+        assertNotNull(response.totalBytes);
+        assertNotNull(response.items);
     }
 }

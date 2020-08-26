@@ -36,14 +36,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import network.minter.core.crypto.MinterPublicKey;
-import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
+import static network.minter.blockchain.models.operational.Transaction.humanizeValue;
 import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
@@ -63,7 +62,7 @@ public final class TxUnbound extends Operation {
         }
     };
     private MinterPublicKey mPubKey;
-    private String mCoin;
+    private BigInteger mCoinId;
     private BigInteger mValue;
 
     public TxUnbound() {
@@ -76,7 +75,7 @@ public final class TxUnbound extends Operation {
     protected TxUnbound(Parcel in) {
         super(in);
         mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-        mCoin = in.readString();
+        mCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mValue = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
 
@@ -84,7 +83,7 @@ public final class TxUnbound extends Operation {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeValue(mPubKey);
-        dest.writeString(mCoin);
+        dest.writeValue(mCoinId);
         dest.writeValue(mValue);
     }
 
@@ -107,21 +106,25 @@ public final class TxUnbound extends Operation {
         return this;
     }
 
-    public String getCoin() {
-        return mCoin.replace("\0", "");
+    public BigInteger getCoinId() {
+        return mCoinId;
     }
 
-    public TxUnbound setCoin(String coinName) {
-        mCoin = StringHelper.strrpad(10, coinName.toUpperCase());
+    public TxUnbound setCoinId(BigInteger coinId) {
+        mCoinId = coinId;
         return this;
     }
 
-    public BigInteger getValueBigInteger() {
+    public TxUnbound setCoinId(long coinId) {
+        return setCoinId(BigInteger.valueOf(coinId));
+    }
+
+    public BigInteger getValue() {
         return mValue;
     }
 
-    public BigDecimal getValue() {
-        return Transaction.humanizeValue(mValue);
+    public BigDecimal getValueDecimal() {
+        return humanizeValue(mValue);
     }
 
     public TxUnbound setValue(BigDecimal stakeDecimal) {
@@ -148,8 +151,7 @@ public final class TxUnbound extends Operation {
     @Override
     protected FieldsValidationResult validate() {
         return new FieldsValidationResult()
-                .addResult("mCoin", mCoin != null && mCoin.length() > 2 &&
-                        mCoin.length() < 11, "Coin symbol length must be from 3 to 10 chars")
+                .addResult("mCoin", mCoinId != null, "Coin must be set")
                 .addResult("mPubKey", mPubKey != null, "Node Public key must be set")
                 .addResult("mValue", mValue != null, "Value must be set");
     }
@@ -157,7 +159,7 @@ public final class TxUnbound extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-        return RLPBoxed.encode(new Object[]{mPubKey, mCoin, mValue});
+        return RLPBoxed.encode(new Object[]{mPubKey, mCoinId, mValue});
     }
 
     @Override
@@ -165,7 +167,7 @@ public final class TxUnbound extends Operation {
         final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mPubKey = new MinterPublicKey(fromRawRlp(0, decoded));
-        mCoin = charsToString(fromRawRlp(1, decoded), 10);
+        mCoinId = fixBigintSignedByte(fromRawRlp(1, decoded));
         mValue = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 

@@ -35,14 +35,12 @@ import java.math.BigInteger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
 import static network.minter.blockchain.models.operational.Transaction.humanizeValue;
 import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
@@ -61,8 +59,8 @@ public final class TxCoinSellAll extends Operation {
             return new TxCoinSellAll[size];
         }
     };
-    private String mCoinToSell;
-    private String mCoinToBuy;
+    private BigInteger mCoinIdToSell;
+    private BigInteger mCoinIdToBuy;
     private BigInteger mMinValueToBuy;
 
     public TxCoinSellAll() {
@@ -74,44 +72,52 @@ public final class TxCoinSellAll extends Operation {
 
     protected TxCoinSellAll(Parcel in) {
         super(in);
-        mCoinToSell = in.readString();
-        mCoinToBuy = in.readString();
+        mCoinIdToSell = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+        mCoinIdToBuy = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mMinValueToBuy = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeString(mCoinToSell);
-        dest.writeString(mCoinToBuy);
+        dest.writeValue(mCoinIdToSell);
+        dest.writeValue(mCoinIdToBuy);
         dest.writeValue(mMinValueToBuy);
     }
 
-    public String getCoinToSell() {
-        return mCoinToSell.replace("\0", "");
+    public BigInteger getCoinIdToSell() {
+        return mCoinIdToSell;
     }
 
-    public TxCoinSellAll setCoinToSell(String coin) {
-        mCoinToSell = StringHelper.strrpad(10, coin.toUpperCase());
+    public TxCoinSellAll setCoinIdToSell(BigInteger coinId) {
+        mCoinIdToSell = coinId;
         return this;
     }
 
-    public String getCoinToBuy() {
-        return mCoinToBuy.replace("\0", "");
+    public TxCoinSellAll setCoinIdToSell(long coinId) {
+        return setCoinIdToSell(BigInteger.valueOf(coinId));
     }
 
-    public TxCoinSellAll setCoinToBuy(String coin) {
-        mCoinToBuy = StringHelper.strrpad(10, coin.toUpperCase());
+    public BigInteger getCoinIdToBuy() {
+        return mCoinIdToBuy;
+    }
+
+    public TxCoinSellAll setCoinIdToBuy(BigInteger coinId) {
+        mCoinIdToBuy = coinId;
         return this;
     }
 
-	public BigInteger getMinValueToBuyBigInteger() {
-		return mMinValueToBuy;
-	}
+    public TxCoinSellAll setCoinIdToBuy(long coinId) {
+        return setCoinIdToBuy(BigInteger.valueOf(coinId));
+    }
 
-	public BigDecimal getMinValueToBuy() {
+    public BigInteger getMinValueToBuyBigInteger() {
+        return mMinValueToBuy;
+    }
+
+    public BigDecimal getMinValueToBuy() {
         return humanizeValue(mMinValueToBuy);
-	}
+    }
 
     public TxCoinSellAll setMinValueToBuy(BigInteger amount) {
         mMinValueToBuy = amount;
@@ -135,28 +141,28 @@ public final class TxCoinSellAll extends Operation {
     @Override
     protected FieldsValidationResult validate() {
         return new FieldsValidationResult()
-                .addResult("mCoinToBuy", mCoinToBuy != null && mCoinToBuy.length() > 2 && mCoinToBuy.length() < 11, "Coin length must be from 3 to 10 chars")
-                .addResult("mCoinToSell", mCoinToSell != null && mCoinToSell.length() > 2 && mCoinToSell.length() < 11, "Coin length must be from 3 to 10 chars")
+                .addResult("mCoinToBuy", mCoinIdToBuy != null, "Coin to buy must be set")
+                .addResult("mCoinToSell", mCoinIdToSell != null, "Coin to sell must be set")
                 .addResult("mMinValueToBuy", mMinValueToBuy != null, "Minimum value to buy must be set");
     }
 
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{
-                mCoinToSell,
-                mCoinToBuy,
+        return RLPBoxed.encode(new Object[]{
+                mCoinIdToSell,
+                mCoinIdToBuy,
                 mMinValueToBuy
         });
     }
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-	    mCoinToSell = charsToString(fromRawRlp(0, decoded));
-	    mCoinToBuy = charsToString(fromRawRlp(1, decoded));
+        mCoinIdToSell = fixBigintSignedByte(fromRawRlp(0, decoded));
+        mCoinIdToBuy = fixBigintSignedByte(fromRawRlp(1, decoded));
         mMinValueToBuy = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 }

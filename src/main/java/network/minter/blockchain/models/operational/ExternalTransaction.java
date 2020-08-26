@@ -36,7 +36,6 @@ import javax.annotation.Nonnull;
 
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
-import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
@@ -45,8 +44,6 @@ import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.common.Preconditions.firstNonNull;
 import static network.minter.core.internal.helpers.BytesHelper.charsToBytes;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.charsToString;
-import static network.minter.core.internal.helpers.StringHelper.strrpad;
 
 /**
  * minter-android-blockchain. 2019
@@ -72,12 +69,12 @@ public class ExternalTransaction implements Parcelable {
     BytesData mPayload = new BytesData(new char[0]);
     BigInteger mNonce;
     BigInteger mGasPrice;
-    String mGasCoin = MinterSDK.DEFAULT_COIN;
+    BigInteger mGasCoinId = MinterSDK.DEFAULT_COIN_ID;
 
     public ExternalTransaction(Transaction transaction) {
         mNonce = transaction.mNonce;
         mGasPrice = transaction.mGasPrice;
-        mGasCoin = transaction.mGasCoin;
+        mGasCoinId = transaction.mGasCoinId;
         mType = transaction.mType;
         mOperationData = transaction.mOperationData;
         mPayload = transaction.mPayload;
@@ -89,7 +86,7 @@ public class ExternalTransaction implements Parcelable {
         mPayload = (BytesData) in.readValue(BytesData.class.getClassLoader());
         mNonce = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mGasPrice = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mGasCoin = in.readString();
+        mGasCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
 
     protected ExternalTransaction() {
@@ -126,7 +123,7 @@ public class ExternalTransaction implements Parcelable {
 
     public Transaction toTransaction() throws OperationInvalidDataException {
         return new Transaction.Builder(mNonce)
-                .setGasCoin(mGasCoin)
+                .setGasCoinId(mGasCoinId)
                 .setGasPrice(mGasPrice)
                 .setPayload(mPayload)
                 .setData(mOperationData)
@@ -144,7 +141,7 @@ public class ExternalTransaction implements Parcelable {
                 mPayload.getData(),
                 firstNonNull(mNonce, BigInteger.ZERO),
                 firstNonNull(mGasPrice, new BigInteger("1")),
-                firstNonNull(StringHelper.strrpad(10, mGasCoin), ""),
+                firstNonNull(mGasCoinId, MinterSDK.DEFAULT_COIN_ID),
         });
         return new BytesData(res);
     }
@@ -158,8 +155,8 @@ public class ExternalTransaction implements Parcelable {
         return mType;
     }
 
-    public String getGasCoin() {
-        return mGasCoin.replace("\0", "");
+    public BigInteger getGasCoinId() {
+        return mGasCoinId;
     }
 
     public BigInteger getNonce() {
@@ -172,7 +169,6 @@ public class ExternalTransaction implements Parcelable {
 
     /**
      * Get transaction data
-     * @param cls class to cast data object
      * @param <OpType> operation type
      * @return object extends {@link Operation}
      */
@@ -213,7 +209,7 @@ public class ExternalTransaction implements Parcelable {
     public void cleanup() {
         mNonce = null;
         mGasPrice = null;
-        mGasCoin = null;
+        mGasCoinId = null;
         mType = null;
         mOperationData = null;
         mPayload = null;
@@ -245,7 +241,7 @@ public class ExternalTransaction implements Parcelable {
         dest.writeValue(mPayload);
         dest.writeValue(mNonce);
         dest.writeValue(mGasPrice);
-        dest.writeString(mGasCoin);
+        dest.writeValue(mGasCoinId);
     }
 
     char[] fromRawRlp(int idx, Object[] raw) {
@@ -260,7 +256,7 @@ public class ExternalTransaction implements Parcelable {
         mPayload = new BytesData(fromRawRlp(2, raw));
         mNonce = fixBigintSignedByte(raw[3]);
         mGasPrice = fixBigintSignedByte((raw[4]));
-        mGasCoin = charsToString(fromRawRlp(5, raw));
+        mGasCoinId = fixBigintSignedByte((raw[5]));
     }
 
     public static class Builder {
@@ -271,22 +267,24 @@ public class ExternalTransaction implements Parcelable {
         }
 
         public Builder setNonce(BigInteger nonce) {
+            checkNotNull(nonce, "Nonce must be set");
             mTx.mNonce = nonce;
             return this;
         }
 
         public Builder setGasPrice(BigInteger gasPrice) {
-            mTx.mGasPrice = gasPrice;
+            mTx.mGasPrice = firstNonNull(gasPrice, BigInteger.ONE);
             return this;
         }
 
         /**
          * Set fee coin. By default if not set, using {@link MinterSDK#DEFAULT_COIN}
-         * @param coin string coin name. Min length: 3, maximum: 10
+         * @param coinId string coin name. Min length: 3, maximum: 10
          * @return {@link Transaction.Builder}
          */
-        public Builder setGasCoin(String coin) {
-            mTx.mGasCoin = strrpad(10, coin);
+        public Builder setGasCoinId(BigInteger coinId) {
+            checkNotNull(coinId, "CoinId must be set");
+            mTx.mGasCoinId = coinId;
             return this;
         }
 
@@ -296,6 +294,10 @@ public class ExternalTransaction implements Parcelable {
          * @return {@link Transaction.Builder}
          */
         public Builder setPayload(byte[] data) {
+            if (data == null) {
+                mTx.mPayload = null;
+                return this;
+            }
             return setPayload(new BytesData(data, true));
         }
 
@@ -305,6 +307,10 @@ public class ExternalTransaction implements Parcelable {
          * @return {@link Transaction.Builder}
          */
         public Builder setPayload(BytesData data) {
+            if (data == null) {
+                mTx.mPayload = null;
+                return this;
+            }
             checkArgument(data.size() <= 1024, "Payload maximum size: 1024 bytes");
             mTx.mPayload = new BytesData(data.getData(), true);
             return this;
@@ -315,8 +321,11 @@ public class ExternalTransaction implements Parcelable {
          * @param hexString max decoded size: 1024 bytes, means max string length should be 2048
          * @return {@link Transaction.Builder}
          */
-        public Builder setPayload(@Nonnull String hexString) {
-            checkNotNull(hexString, "Hex data string can't be null");
+        public Builder setPayload(String hexString) {
+            if (hexString == null) {
+                mTx.mPayload = null;
+                return this;
+            }
             checkArgument(hexString.length() <= 2048, "Payload maximum size: 1024 bytes (2048 in hex string)");
             mTx.mPayload = new BytesData(hexString);
             return this;
@@ -328,15 +337,30 @@ public class ExternalTransaction implements Parcelable {
          * @return {@link Transaction.Builder}
          */
         public Builder setPayload(ByteBuffer byteBuffer) {
+            if (byteBuffer == null) {
+                mTx.mPayload = null;
+                return this;
+            }
             return setPayload(byteBuffer.array());
         }
 
         public <Op extends Operation> Builder setData(Op operationData) {
+            checkNotNull(operationData, "Transaction data can't be null");
+
             mTx.mType = operationData.getType();
             mTx.mOperationData = operationData;
-            FieldsValidationResult dataValidation = mTx.mOperationData.validate();
-            if (dataValidation != null) {
-                checkArgument(dataValidation.isValid(), dataValidation.getInvalidFieldsMessages());
+
+            boolean skipValidation = false;
+            if (mTx.mType == OperationType.RedeemCheck) {
+                // proof must be set to send transaction, but deeplink allowed to not have a proof
+                skipValidation = true;
+            }
+
+            if (!skipValidation) {
+                FieldsValidationResult dataValidation = mTx.mOperationData.validate();
+                if (dataValidation != null) {
+                    checkArgument(dataValidation.isValid(), dataValidation.getInvalidFieldsMessages());
+                }
             }
 
             return this;

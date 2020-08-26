@@ -29,77 +29,86 @@ package network.minter.blockchain.repos;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
+import java.math.BigInteger;
 
-import network.minter.blockchain.MinterBlockChainApi;
-import network.minter.blockchain.models.BCResult;
+import network.minter.blockchain.MinterBlockChainSDK;
+import network.minter.blockchain.models.MaxGasValue;
+import network.minter.blockchain.models.MinGasValue;
 import network.minter.blockchain.models.NetworkStatus;
-import network.minter.blockchain.repo.BlockChainStatusRepository;
-import retrofit2.Response;
+import network.minter.blockchain.repo.NodeStatusRepository;
+import network.minter.core.internal.log.StdLogger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * minter-android-blockchain. 2019
+ * minter-android-blockchain. 2020
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class StatusRepositoryTest {
 
     @Test
     public void testGetStatus() throws IOException {
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
 
-        BlockChainStatusRepository repo = MinterBlockChainApi.getInstance().status();
+        NodeStatusRepository repo = MinterBlockChainSDK.getInstance().status();
 
-        Response<BCResult<NetworkStatus>> response = repo.getNetworkStatus().execute();
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
+        NetworkStatus response = repo.getNetworkStatus().singleElement().blockingGet();
 
-        assertNotNull(response.body().result);
-
-        NetworkStatus status = response.body().result;
+        NetworkStatus status = response;
         assertNotNull(status.version);
         assertNotNull(status.latestBlockHash);
         assertNotNull(status.latestAppHash);
         assertTrue(status.latestBlockHeight > 0);
         assertNotNull(status.latestBlockTime);
-        assertEquals(120, status.keepLastStates);
-        assertNotNull(status.tmStatus);
-        assertNotNull(status.tmStatus.validatorStatus);
-        assertNotNull(status.tmStatus.validatorStatus.address);
-        assertNotNull(status.tmStatus.validatorStatus.pubKey);
-        assertNotNull(status.tmStatus.nodeInfo);
-        assertNotNull(status.tmStatus.nodeInfo.channels);
-        assertNotNull(status.tmStatus.nodeInfo.listenAddr);
-        assertNotNull(status.tmStatus.nodeInfo.moniker);
-        assertNotNull(status.tmStatus.nodeInfo.network);
-        assertNotNull(status.tmStatus.nodeInfo.id);
-        assertNotNull(status.tmStatus.nodeInfo.protocolVersion);
-        assertNotNull(status.tmStatus.syncInfo);
-        assertNotNull(status.tmStatus.syncInfo.latestBlockTime);
-        assertNotNull(status.tmStatus.syncInfo.latestAppHash);
-        assertNotNull(status.tmStatus.syncInfo.latestBlockHash);
-        assertNotNull(status.tmStatus.syncInfo.latestBlockTime);
+        assertEquals(120000000, status.keepLastStates);
     }
 
     @Test
-    public void testGetValidators() throws IOException {
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+    public void testGetMinGas() {
+        MinterBlockChainSDK api = MinterBlockChainSDK.createInstance("http://68.183.211.176:8843", true, null);
 
-        BlockChainStatusRepository repo = MinterBlockChainApi.getInstance().status();
+        NodeStatusRepository repository = api.status();
+        MinGasValue response = repository.getMinGasPrice().blockingFirst();
 
-        Response<BCResult<List<NetworkStatus.Validator>>> response = repo.getValidators().execute();
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
+        assertNotNull(response.value);
+        assertEquals(new BigInteger("1"), response.value);
+    }
 
-        assertNotNull(response.body().result);
+    @Test
+    public void testGetMaxGas() {
+        MinterBlockChainSDK api = MinterBlockChainSDK.createInstance("http://68.183.211.176:8843", true, null);
 
-        List<NetworkStatus.Validator> result = response.body().result;
-        assertTrue(result.size() > 0);
-        NetworkStatus.Validator validator = result.get(0);
-        assertNotNull(validator.votingPower);
-        assertNotNull(validator.pubKey);
+        NodeStatusRepository repository = api.status();
+        MaxGasValue response = repository.getMaxGasPrice().blockingFirst();
+
+        assertNotNull(response.value);
+        assertEquals(new BigInteger("100000"), response.value);
+    }
+
+    @Test
+    public void testGetMaxGasByHeight() {
+        MinterBlockChainSDK api = MinterBlockChainSDK.createInstance("http://68.183.211.176:8843", true, null);
+
+        NodeStatusRepository repository = api.status();
+        MaxGasValue response = repository.getMaxGasPrice(new BigInteger("1")).blockingFirst();
+
+        assertNotNull(response.value);
+        assertEquals(new BigInteger("100000"), response.value);
+    }
+
+    @Test
+    public void testGetMaxGasByHeightErrorTooBigHeight() {
+        MinterBlockChainSDK api = MinterBlockChainSDK.createInstance("http://68.183.211.176:8843", true, new StdLogger());
+
+        NodeStatusRepository repository = api.status();
+        MaxGasValue response = repository.getMaxGasPrice(new BigInteger("10000000")).blockingFirst();
+
+        assertNull(response.value);
+        assertFalse(response.isOk());
+        assertEquals(new Integer(13), response.code);
     }
 }

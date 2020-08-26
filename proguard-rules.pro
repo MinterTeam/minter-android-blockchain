@@ -3,7 +3,7 @@
 -keep public class network.minter.blockchain.** { *; }
 -keep public enum network.minter.blockchain.** { *; }
 -keepclassmembers enum * { *; }
--keep public class network.minter.blockchain.MinterBlockChainApi { *; }
+-keep public class network.minter.blockchain.MinterBlockChainSDK { *; }
 
 
 # Parceler library

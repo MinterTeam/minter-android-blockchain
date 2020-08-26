@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -58,34 +58,26 @@ public class TxEditCandidateTest {
         }
     }
 
-    @Test
-    public void testPK() {
-        String mnem = "original expand list pencil blade ivory express achieve inside stool apple truck";
-        PrivateKey pk = PrivateKey.fromMnemonic(mnem);
-
-
-        System.out.println(pk.toHexString());
-        System.out.println(pk.getPublicKey(false).toHexString());
-        System.out.println(pk.getPublicKey(true).toHexString());
-        System.out.println(pk.getPublicKey().toMinter().toHexString());
-    }
-
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
         //original expand list pencil blade ivory express achieve inside stool apple truck
-        PrivateKey privateKey = PrivateKey.fromMnemonic("original expand list pencil blade ivory express achieve inside stool apple truck");
-        MinterAddress address = privateKey.getPublicKey().toMinter();
-        String validTx = "f8a80102018a4d4e54000000000000000eb84df84ba00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a439442516215b2dd72187d3ef6adb19fc3aabbbced239442516215b2dd72187d3ef6adb19fc3aabbbced23808001b845f8431ba005b789fdca2d6a08ae47d62d60cfd442aad3eb7ed110373aba348ec687c15a28a035a7f223ab8d2675419f036445aac07b537882b1f3e10dd9e4d06cdb5ac44a38";
+        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
+        MinterAddress address = new MinterAddress("Mxd82558ea00eb81d35f2654953598f5d51737d31d");
+        MinterPublicKey pubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0");
+        MinterPublicKey nPubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe1");
+        String validTx = "f8d4100101800eb883f881a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe194d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d808001b845f8431ca06a9ce263674f403e2e612ac7055933c662db6c2db199635de985a69b9c0032baa03f4e2cd2bb33f89a10d4fdd4024f1767bfa94e87da47e075b4d5cbcaf519f66b";
 
-        BigInteger nonce = new BigInteger("1");
+        BigInteger nonce = new BigInteger("16");
         Transaction tx = new Transaction.Builder(nonce)
-                .setGasCoin("MNT")
-                .setBlockchainId(BlockchainID.TestNet)
+                .setGasCoinId(MinterSDK.DEFAULT_COIN_ID)
+                .setBlockchainId(BlockchainID.MainNet)
                 .editCandidate()
-                .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
+                .setPublicKey(pubKey)
+                .setNewPublicKey(nPubKey)
                 .setRewardAddress(address)
                 .setOwnerAddress(address)
+                .setControlAddress(address)
                 .build();
 
         TransactionSign sign = tx.signSingle(privateKey);
@@ -94,21 +86,73 @@ public class TxEditCandidateTest {
 
     @Test
     public void testDecodeSingle() {
-        PrivateKey privateKey = PrivateKey.fromMnemonic("original expand list pencil blade ivory express achieve inside stool apple truck");
-        MinterAddress address = privateKey.getPublicKey().toMinter();
-        String validTx = "f8a80102018a4d4e54000000000000000eb84df84ba00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a439442516215b2dd72187d3ef6adb19fc3aabbbced239442516215b2dd72187d3ef6adb19fc3aabbbced23808001b845f8431ba005b789fdca2d6a08ae47d62d60cfd442aad3eb7ed110373aba348ec687c15a28a035a7f223ab8d2675419f036445aac07b537882b1f3e10dd9e4d06cdb5ac44a38";
+        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
+        MinterAddress address = new MinterAddress("Mxd82558ea00eb81d35f2654953598f5d51737d31d");
+        MinterPublicKey pubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0");
+        MinterPublicKey nPubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe1");
+        String validTx = "f8d4100101800eb883f881a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe194d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d808001b845f8431ca06a9ce263674f403e2e612ac7055933c662db6c2db199635de985a69b9c0032baa03f4e2cd2bb33f89a10d4fdd4024f1767bfa94e87da47e075b4d5cbcaf519f66b";
 
-        BigInteger nonce = new BigInteger("1");
+        BigInteger nonce = new BigInteger("16");
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);
         assertEquals(nonce, tx.getNonce());
 
         TxEditCandidate data = tx.getData();
 
-        MinterPublicKey pubKey = new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43");
-        assertEquals(pubKey, data.getPubKey());
+
+        assertEquals(pubKey, data.getPublicKey());
+        assertEquals(nPubKey, data.getNewPublicKey());
         assertEquals(address, data.getOwnerAddress());
         assertEquals(address, data.getRewardAddress());
+        assertEquals(address, data.getControlAddress());
+
+    }
+
+
+    @Test
+    public void testEncodeSingleWONewPubKey() throws OperationInvalidDataException {
+        //original expand list pencil blade ivory express achieve inside stool apple truck
+        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
+        MinterAddress address = new MinterAddress("Mxd82558ea00eb81d35f2654953598f5d51737d31d");
+        MinterPublicKey pubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0");
+        String validTx = "f8b4100101800eb863f861a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe08094d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d808001b845f8431ba07f5ca6bfef9b876677a328b892382d57383621d4a7b057a2516bb21372c2b585a059b3293bf705d973096680b85f60bf10e27f23b515f9ac429d0261ffb1222cb9";
+
+        BigInteger nonce = new BigInteger("16");
+        Transaction tx = new Transaction.Builder(nonce)
+                .setGasCoinId(MinterSDK.DEFAULT_COIN_ID)
+                .setBlockchainId(BlockchainID.MainNet)
+                .editCandidate()
+                .setPublicKey(pubKey)
+                .setRewardAddress(address)
+                .setOwnerAddress(address)
+                .setControlAddress(address)
+                .build();
+
+        TransactionSign sign = tx.signSingle(privateKey);
+        assertEquals(validTx, sign.getTxSign());
+    }
+
+    @Test
+    public void testDecodeSingleWONewPubKey() {
+        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
+        MinterAddress address = new MinterAddress("Mxd82558ea00eb81d35f2654953598f5d51737d31d");
+        MinterPublicKey pubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0");
+        MinterPublicKey nPubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe1");
+        String validTx = "f8b4100101800eb863f861a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe08094d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d808001b845f8431ba07f5ca6bfef9b876677a328b892382d57383621d4a7b057a2516bb21372c2b585a059b3293bf705d973096680b85f60bf10e27f23b515f9ac429d0261ffb1222cb9";
+
+        BigInteger nonce = new BigInteger("16");
+        Transaction tx = Transaction.fromEncoded(validTx);
+        assertNotNull(tx);
+        assertEquals(nonce, tx.getNonce());
+
+        TxEditCandidate data = tx.getData();
+
+
+        assertEquals(pubKey, data.getPublicKey());
+        assertEquals(null, data.getNewPublicKey());
+        assertEquals(address, data.getOwnerAddress());
+        assertEquals(address, data.getRewardAddress());
+        assertEquals(address, data.getControlAddress());
 
     }
 }

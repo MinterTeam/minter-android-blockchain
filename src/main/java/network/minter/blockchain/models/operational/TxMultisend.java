@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,6 +30,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -89,18 +90,36 @@ public class TxMultisend extends Operation {
         return mItems.size() > index && index > -1 ? mItems.get(index) : null;
     }
 
-    public TxMultisend addItem(String coin, MinterAddress recipient, BigDecimal value) {
+    public TxMultisend addItem(BigInteger coinId, MinterAddress recipient, BigDecimal value) {
         mItems.add(new TxSendCoin(getTx())
-                .setCoin(coin)
+                .setCoinId(coinId)
                 .setTo(recipient)
                 .setValue(value));
 
         return this;
     }
 
-    public TxMultisend addItem(String coin, MinterAddress recipient, CharSequence value) {
+    public TxMultisend addItem(long coinId, MinterAddress recipient, BigDecimal value) {
         mItems.add(new TxSendCoin(getTx())
-                .setCoin(coin)
+                .setCoinId(coinId)
+                .setTo(recipient)
+                .setValue(value));
+
+        return this;
+    }
+
+    public TxMultisend addItem(BigInteger coinId, MinterAddress recipient, CharSequence value) {
+        mItems.add(new TxSendCoin(getTx())
+                .setCoinId(coinId)
+                .setTo(recipient)
+                .setValue(value));
+
+        return this;
+    }
+
+    public TxMultisend addItem(long coinId, MinterAddress recipient, CharSequence value) {
+        mItems.add(new TxSendCoin(getTx())
+                .setCoinId(coinId)
                 .setTo(recipient)
                 .setValue(value));
 
@@ -113,9 +132,24 @@ public class TxMultisend extends Operation {
      * @param value Floating point string value. Precision up to 18 digits: 0.10203040506078090
      * @return
      */
-    public TxMultisend addItem(String coin, String recipient, @Nonnull final CharSequence decimalValue) {
+    public TxMultisend addItem(BigInteger coinId, String recipient, @Nonnull final CharSequence decimalValue) {
         mItems.add(new TxSendCoin(getTx())
-                .setCoin(coin)
+                .setCoinId(coinId)
+                .setTo(recipient)
+                .setValue(decimalValue));
+
+        return this;
+    }
+
+    /**
+     * @param coin coin name to send
+     * @param recipient String address
+     * @param value Floating point string value. Precision up to 18 digits: 0.10203040506078090
+     * @return
+     */
+    public TxMultisend addItem(long coinId, String recipient, @Nonnull final CharSequence decimalValue) {
+        mItems.add(new TxSendCoin(getTx())
+                .setCoinId(coinId)
                 .setTo(recipient)
                 .setValue(decimalValue));
 
@@ -159,7 +193,7 @@ public class TxMultisend extends Operation {
         mItems = new LinkedList<>();
         for (int i = 0; i < items.length; i++) {
             final TxSendCoin data = new TxSendCoin(getTx());
-            // object array of object array contains 3 byte array (V R S)
+            // object array of object array contains 3 byte array (Coin/To/Value)
             data.decodeRaw(objArrToByteArrArr((Object[]) items[i]));
             mItems.add(i, data);
         }
@@ -170,7 +204,7 @@ public class TxMultisend extends Operation {
     protected char[] encodeRLP() {
         final Object[][] items = new Object[mItems.size()][3];
         for (int i = 0; i < mItems.size(); i++) {
-            items[i] = new Object[]{mItems.get(i).getCoinRaw(), mItems.get(i).getTo(), mItems.get(i).getValueBigInteger()};
+            items[i] = new Object[]{mItems.get(i).getCoinId(), mItems.get(i).getTo(), mItems.get(i).getValueBigInteger()};
         }
 
 	    return RLPBoxed.encode(new Object[]{items});

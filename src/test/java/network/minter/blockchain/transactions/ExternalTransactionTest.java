@@ -59,6 +59,7 @@ import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
+import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -81,7 +82,7 @@ public class ExternalTransactionTest {
     @Test
     public void testSendEncodeDecode() {
         TxSendCoin txData = new TxSendCoin()
-                .setCoin("MNT")
+                .setCoinId(DEFAULT_COIN_ID)
                 .setTo("Mx8d008dffe2f9144a39a2094ebdedadad335e814f")
                 .setValue("100");
 
@@ -100,7 +101,7 @@ public class ExternalTransactionTest {
         TxSendCoin op = decoded.getData(TxSendCoin.class);
         assertNotNull(op);
 
-        assertEquals("MNT", op.getCoin());
+        assertEquals(DEFAULT_COIN_ID, op.getCoinId());
         assertEquals(new BigDecimal("100"), op.getValue());
         assertEquals(new MinterAddress("Mx8d008dffe2f9144a39a2094ebdedadad335e814f"), op.getTo());
 
@@ -111,8 +112,8 @@ public class ExternalTransactionTest {
     @Test
     public void testSellEncodeDecode() {
         TxCoinSell txData = new TxCoinSell()
-                .setCoinToBuy("BANANATEST")
-                .setCoinToSell("MNT")
+                .setCoinIdToBuy(1)
+                .setCoinIdToSell(DEFAULT_COIN_ID)
                 .setValueToSell("100")
                 .setMinValueToBuy("0.0001");
 
@@ -130,8 +131,8 @@ public class ExternalTransactionTest {
         TxCoinSell op = decoded.getData(TxCoinSell.class);
         assertNotNull(op);
 
-        assertEquals("MNT", op.getCoinToSell());
-        assertEquals("BANANATEST", op.getCoinToBuy());
+        assertEquals(DEFAULT_COIN_ID, op.getCoinIdToSell());
+        assertEquals(new BigInteger("1"), op.getCoinIdToBuy());
         assertEquals(new BigDecimal("100"), op.getValueToSell());
         assertEquals(new BigDecimal("0.0001"), op.getMinValueToBuy());
 
@@ -142,8 +143,8 @@ public class ExternalTransactionTest {
     @Test
     public void testSellAllEncodeDecode() {
         TxCoinSellAll txData = new TxCoinSellAll()
-                .setCoinToBuy("BANANATEST")
-                .setCoinToSell("MNT")
+                .setCoinIdToBuy(new BigInteger("1"))
+                .setCoinIdToSell(DEFAULT_COIN_ID)
                 .setMinValueToBuy("0.0001");
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
@@ -160,8 +161,8 @@ public class ExternalTransactionTest {
         TxCoinSellAll op = decoded.getData(TxCoinSellAll.class);
         assertNotNull(op);
 
-        assertEquals("MNT", op.getCoinToSell());
-        assertEquals("BANANATEST", op.getCoinToBuy());
+        assertEquals(DEFAULT_COIN_ID, op.getCoinIdToSell());
+        assertEquals(new BigInteger("1"), op.getCoinIdToBuy());
         assertEquals(new BigDecimal("0.0001"), op.getMinValueToBuy());
 
         System.out.println("SellAll");
@@ -171,14 +172,14 @@ public class ExternalTransactionTest {
     @Test
     public void testBuyEncodeDecode() {
         TxCoinBuy txData = new TxCoinBuy()
-                .setCoinToBuy("BANANATEST")
-                .setCoinToSell("MNT")
+                .setCoinIdToBuy(1)
+                .setCoinIdToSell(DEFAULT_COIN_ID)
                 .setValueToBuy("1")
                 .setMaxValueToSell("100");
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
                 .setData(txData)
-                .setGasCoin("MNT")
+                .setGasCoinId(DEFAULT_COIN_ID)
                 .setGasPrice(BigInteger.ONE)
                 .build();
 
@@ -192,8 +193,8 @@ public class ExternalTransactionTest {
         TxCoinBuy op = decoded.getData(TxCoinBuy.class);
         assertNotNull(op);
 
-        assertEquals("MNT", op.getCoinToSell());
-        assertEquals("BANANATEST", op.getCoinToBuy());
+        assertEquals(DEFAULT_COIN_ID, op.getCoinIdToSell());
+        assertEquals(new BigInteger("1"), op.getCoinIdToBuy());
         assertEquals(new BigDecimal("100"), op.getMaxValueToSell());
         assertEquals(new BigDecimal("1"), op.getValueToBuy());
 
@@ -212,8 +213,8 @@ public class ExternalTransactionTest {
     @Test
     public void testBuyEncodeDecodeWithNonce128() {
         TxCoinBuy txData = new TxCoinBuy()
-                .setCoinToBuy("BANANATEST")
-                .setCoinToSell("MNT")
+                .setCoinIdToBuy(new BigInteger("1"))
+                .setCoinIdToSell(DEFAULT_COIN_ID)
                 .setValueToBuy("1")
                 .setMaxValueToSell("100");
 
@@ -232,8 +233,8 @@ public class ExternalTransactionTest {
         TxCoinBuy op = decoded.getData(TxCoinBuy.class);
         assertNotNull(op);
 
-        assertEquals("MNT", op.getCoinToSell());
-        assertEquals("BANANATEST", op.getCoinToBuy());
+        assertEquals(DEFAULT_COIN_ID, op.getCoinIdToSell());
+        assertEquals(new BigInteger("1"), op.getCoinIdToBuy());
         assertEquals(new BigDecimal("100"), op.getMaxValueToSell());
         assertEquals(new BigDecimal("1"), op.getValueToBuy());
 
@@ -248,8 +249,8 @@ public class ExternalTransactionTest {
     @Test
     public void testBuyEncodeDecodeWithNonce255() {
         TxCoinBuy txData = new TxCoinBuy()
-                .setCoinToBuy("BANANATEST")
-                .setCoinToSell("MNT")
+                .setCoinIdToBuy(new BigInteger("1"))
+                .setCoinIdToSell(DEFAULT_COIN_ID)
                 .setValueToBuy("1")
                 .setMaxValueToSell("100");
 
@@ -268,8 +269,8 @@ public class ExternalTransactionTest {
         TxCoinBuy op = decoded.getData(TxCoinBuy.class);
         assertNotNull(op);
 
-        assertEquals("MNT", op.getCoinToSell());
-        assertEquals("BANANATEST", op.getCoinToBuy());
+        assertEquals(DEFAULT_COIN_ID, op.getCoinIdToSell());
+        assertEquals(new BigInteger("1"), op.getCoinIdToBuy());
         assertEquals(new BigDecimal("100"), op.getMaxValueToSell());
         assertEquals(new BigDecimal("1"), op.getValueToBuy());
 
@@ -284,8 +285,8 @@ public class ExternalTransactionTest {
     @Test
     public void testBuyEncodeDecodeWithNonce256() {
         TxCoinBuy txData = new TxCoinBuy()
-                .setCoinToBuy("BANANATEST")
-                .setCoinToSell("MNT")
+                .setCoinIdToBuy(new BigInteger("1"))
+                .setCoinIdToSell(DEFAULT_COIN_ID)
                 .setValueToBuy("1")
                 .setMaxValueToSell("100");
 
@@ -304,8 +305,8 @@ public class ExternalTransactionTest {
         TxCoinBuy op = decoded.getData(TxCoinBuy.class);
         assertNotNull(op);
 
-        assertEquals("MNT", op.getCoinToSell());
-        assertEquals("BANANATEST", op.getCoinToBuy());
+        assertEquals(DEFAULT_COIN_ID, op.getCoinIdToSell());
+        assertEquals(new BigInteger("1"), op.getCoinIdToBuy());
         assertEquals(new BigDecimal("100"), op.getMaxValueToSell());
         assertEquals(new BigDecimal("1"), op.getValueToBuy());
 
@@ -328,7 +329,7 @@ public class ExternalTransactionTest {
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
                 .setData(txData)
-                .setGasCoin("MNT")
+                .setGasCoinId(DEFAULT_COIN_ID)
                 .setGasPrice(BigInteger.ONE)
                 .build();
 
@@ -339,6 +340,7 @@ public class ExternalTransactionTest {
 
         assertTrue(decoded.getPayload().equals(tx.getPayload()));
         assertEquals(decoded.getType(), tx.getType());
+        assertEquals(DEFAULT_COIN_ID, tx.getGasCoinId());
         TxCreateCoin op = decoded.getData(TxCreateCoin.class);
         assertNotNull(op);
 
@@ -358,7 +360,7 @@ public class ExternalTransactionTest {
                 .setAddress(new MinterAddress("Mx9f7fd953c2c69044b901426831ed03ee0bd0597a"))
                 .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
                 .setCommission(10)
-                .setCoin("MNT")
+                .setCoinId(DEFAULT_COIN_ID)
                 .setStake("5");
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
@@ -378,7 +380,7 @@ public class ExternalTransactionTest {
         assertEquals(new MinterAddress("Mx9f7fd953c2c69044b901426831ed03ee0bd0597a"), op.getAddress());
         assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), op.getPublicKey());
         assertEquals(10, op.getCommission());
-        assertEquals("MNT", op.getCoin());
+        assertEquals(new BigInteger("0"), op.getCoinId());
         assertEquals(new BigDecimal("5"), op.getStake());
 
         System.out.println("DeclareCandidacy");
@@ -389,7 +391,7 @@ public class ExternalTransactionTest {
     public void testDelegateEncodeDecode() {
         TxDelegate txData = new TxDelegate()
                 .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
-                .setCoin("MNT")
+                .setCoinId(DEFAULT_COIN_ID)
                 .setStake("10");
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
@@ -406,9 +408,9 @@ public class ExternalTransactionTest {
         TxDelegate op = decoded.getData(TxDelegate.class);
         assertNotNull(op);
 
-        assertEquals("MNT", op.getCoin());
+        assertEquals(DEFAULT_COIN_ID, op.getCoinId());
         assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), op.getPublicKey());
-        assertEquals(new BigDecimal("10"), op.getStake());
+        assertEquals(new BigDecimal("10"), op.getStakeDecimal());
 
         System.out.println("Delegate");
         System.out.println(new DeepLinkBuilder(decoded).build());
@@ -418,7 +420,7 @@ public class ExternalTransactionTest {
     public void testUnbondEncodeDecode() {
         TxUnbound txData = new TxUnbound()
                 .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
-                .setCoin("MNT")
+                .setCoinId(DEFAULT_COIN_ID)
                 .setValue("10");
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
@@ -435,9 +437,9 @@ public class ExternalTransactionTest {
         TxUnbound op = decoded.getData(TxUnbound.class);
         assertNotNull(op);
 
-        assertEquals("MNT", op.getCoin());
+        assertEquals(DEFAULT_COIN_ID, op.getCoinId());
         assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), op.getPublicKey());
-        assertEquals(new BigDecimal("10"), op.getValue());
+        assertEquals(new BigDecimal("10"), op.getValueDecimal());
 
         System.out.println("Unbond");
         System.out.println(new DeepLinkBuilder(decoded).build());
@@ -500,8 +502,8 @@ public class ExternalTransactionTest {
     @Test
     public void testMultisendEncodeDecode() {
         TxMultisend txData = new TxMultisend()
-                .addItem("MNT", "Mxfe60014a6e9ac91618f5d1cab3fd58cded61ee99", "0.1")
-                .addItem("MNT", "Mxddab6281766ad86497741ff91b6b48fe85012e3c", "0.2");
+                .addItem(DEFAULT_COIN_ID, "Mxfe60014a6e9ac91618f5d1cab3fd58cded61ee99", "0.1")
+                .addItem(0, "Mxddab6281766ad86497741ff91b6b48fe85012e3c", "0.2");
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
                 .setData(txData)
@@ -519,12 +521,12 @@ public class ExternalTransactionTest {
 
         assertEquals(2, op.getItems().size());
         TxSendCoin t1 = op.getItem(0);
-        assertEquals("MNT", t1.getCoin());
+        assertEquals(DEFAULT_COIN_ID, t1.getCoinId());
         assertEquals(new MinterAddress("Mxfe60014a6e9ac91618f5d1cab3fd58cded61ee99"), t1.getTo());
         assertEquals(new BigDecimal("0.1"), t1.getValue());
 
         TxSendCoin t2 = op.getItem(1);
-        assertEquals("MNT", t2.getCoin());
+        assertEquals(DEFAULT_COIN_ID, t2.getCoinId());
         assertEquals(new MinterAddress("Mxddab6281766ad86497741ff91b6b48fe85012e3c"), t2.getTo());
         assertEquals(new BigDecimal("0.2"), t2.getValue());
 
@@ -540,7 +542,8 @@ public class ExternalTransactionTest {
         TxEditCandidate txData = new TxEditCandidate()
                 .setPublicKey(pubKey)
                 .setRewardAddress(address)
-                .setOwnerAddress(address);
+                .setOwnerAddress(address)
+                .setControlAddress(address);
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
                 .setData(txData)
@@ -556,7 +559,7 @@ public class ExternalTransactionTest {
         TxEditCandidate op = decoded.getData(TxEditCandidate.class);
         assertNotNull(op);
 
-        assertEquals(pubKey, op.getPubKey());
+        assertEquals(pubKey, op.getPublicKey());
         assertEquals(address, op.getOwnerAddress());
         assertEquals(address, op.getRewardAddress());
 
@@ -567,11 +570,13 @@ public class ExternalTransactionTest {
     @Test
     public void testRedeemCheckNoProofEncodeDecode() {
         PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
-        CheckTransaction check = new CheckTransaction.Builder("wazzap", "pass")
+        String pass = "pass";
+        String nonce = "wazzap";
+        CheckTransaction check = new CheckTransaction.Builder(nonce, pass)
                 .setDueBlock(new BigInteger("999999999"))
                 .setChainId(BlockchainID.TestNet)
-                .setGasCoin("MNT")
-                .setCoin("MNT")
+                .setGasCoin(DEFAULT_COIN_ID)
+                .setCoinId(DEFAULT_COIN_ID)
                 .setValue("10")
                 .build();
 
@@ -581,44 +586,45 @@ public class ExternalTransactionTest {
                 .setRawCheck(rawCheck);
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
-                .setGasCoin("MNT")
+                .setGasCoinId(DEFAULT_COIN_ID)
                 .setData(txData)
                 .build();
 
         BytesData encodedTxData = tx.encode();
         String encodedTx = encodedTxData.toHexString();
         System.out.println("Redeem check (no proof)");
-        System.out.println(new DeepLinkBuilder(tx).setCheckPassword("pass").build());
-        System.out.println((Base64UrlSafe.encodeString("pass")));
+        System.out.println(new DeepLinkBuilder(tx).setCheckPassword(pass).build());
+        System.out.println((Base64UrlSafe.encodeString(pass)));
 
-        ExternalTransaction decoded = ExternalTransaction.fromEncoded(encodedTx);
-        assertEquals(new BigInteger("0"), decoded.getNonce());
-        assertEquals("MNT", decoded.getGasCoin());
-        assertEquals(new BigInteger("1"), decoded.getGasPrice());
+        ExternalTransaction decodedExtTx = ExternalTransaction.fromEncoded(encodedTx);
+        // default nonce = 0
+        assertEquals(new BigInteger("0"), decodedExtTx.getNonce());
+        assertEquals(DEFAULT_COIN_ID, decodedExtTx.getGasCoinId());
+        assertEquals(new BigInteger("1"), decodedExtTx.getGasPrice());
 
-        TxRedeemCheck data = decoded.getData();
+        TxRedeemCheck data = decodedExtTx.getData();
         assertEquals(new BytesData(new char[0]), data.getProof());
         assertEquals(rawCheck, data.getRawCheck().toString());
 
-        CheckTransaction decCheck = data.getDecodedCheck();
-        assertEquals("wazzap", decCheck.getNonce().toStringASCII());
-        assertEquals(new BigInteger("999999999"), decCheck.getDueBlock());
-        assertEquals("MNT", decCheck.getCoin());
-        assertEquals(new BigDecimal("10"), decCheck.getValue());
+        CheckTransaction decodedCheck = data.getDecodedCheck();
+        assertEquals(nonce, decodedCheck.getNonce().toStringASCII());
+        assertEquals(new BigInteger("999999999"), decodedCheck.getDueBlock());
+        assertEquals(DEFAULT_COIN_ID, decodedCheck.getCoinId());
+        assertEquals(new BigDecimal("10"), decodedCheck.getValue());
 
-        assertEquals(decCheck.getLock(), check.getLock());
-        assertEquals(decCheck.getSignature(), check.getSignature());
+        assertEquals(check.getLock(), decodedCheck.getLock());
+        assertEquals(check.getSignature(), decodedCheck.getSignature());
     }
 
     @Test
     public void testCreateMultiSigAddressEncodeDecode() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f8a30102018a4d4e54000000000000000cb848f84607c3010305f83f94ee81347211c72524338f9680072af9074433314394ee81347211c72524338f9680072af9074433314594ee81347211c72524338f9680072af90744333144808001b845f8431ca094eb41d39e6782f5539615cc66da7073d4283893f0b3ee2b2f36aee1eaeb7c57a037f90ffdb45eb9b6f4cf301b48e73a6a81df8182e605b656a52057537d264ab4";
+        final String validTx = "f899010201800cb848f84607c3010305f83f94ee81347211c72524338f9680072af9074433314394ee81347211c72524338f9680072af9074433314594ee81347211c72524338f9680072af90744333144808001b845f8431ca00e69b217111924c4510497ece2d2908eaf3e517821f6eb3867e0d5ecf1ff6f72a0543fdf927df8b49ecc76c95c1f979c56f2e125bc8cea72fea952da286b627b60";
         PrivateKey privateKey = new PrivateKey("bc3503cae8c8561df5eadc4a9eda21d32c252a6c94cfae55b5310bf6085c8582");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setNonce(nonce)
-                .setGasCoin("MNT")
+                .setGasCoinId(DEFAULT_COIN_ID)
                 .setBlockchainId(BlockchainID.TestNet)
                 .createMultisigAddress()
                 .addAddress("Mxee81347211c72524338f9680072af90744333143", 1)
@@ -642,8 +648,8 @@ public class ExternalTransactionTest {
         CheckTransaction check = new CheckTransaction.Builder("128", pass)
                 .setDueBlock(new BigInteger("999999999"))
                 .setChainId(BlockchainID.TestNet)
-                .setGasCoin("MNT")
-                .setCoin("MNT")
+                .setGasCoin(DEFAULT_COIN_ID)
+                .setCoinId(DEFAULT_COIN_ID)
                 .setValue("128")
                 .build();
 
@@ -655,7 +661,7 @@ public class ExternalTransactionTest {
                 .setProof(proof);
 
         ExternalTransaction tx = new ExternalTransaction.Builder()
-                .setGasCoin("MNT")
+                .setGasCoinId(DEFAULT_COIN_ID)
                 .setGasPrice(BigInteger.ONE)
                 .setData(txData)
                 .build();
@@ -669,7 +675,7 @@ public class ExternalTransactionTest {
 
         ExternalTransaction decoded = ExternalTransaction.fromEncoded(encodedTx);
         assertEquals(new BigInteger("0"), decoded.getNonce());
-        assertEquals("MNT", decoded.getGasCoin());
+        assertEquals(DEFAULT_COIN_ID, decoded.getGasCoinId());
         assertEquals(new BigInteger("1"), decoded.getGasPrice());
 
         TxRedeemCheck data = decoded.getData();
@@ -679,7 +685,7 @@ public class ExternalTransactionTest {
         CheckTransaction decCheck = data.getDecodedCheck();
         assertEquals("128", decCheck.getNonce().toStringASCII());
         assertEquals(new BigInteger("999999999"), decCheck.getDueBlock());
-        assertEquals("MNT", decCheck.getCoin());
+        assertEquals(DEFAULT_COIN_ID, decCheck.getCoinId());
         assertEquals(new BigDecimal("128"), decCheck.getValue());
 
         assertEquals(decCheck.getLock(), check.getLock());

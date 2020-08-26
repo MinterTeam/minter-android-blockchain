@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -29,13 +29,18 @@ package network.minter.blockchain.repos;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import network.minter.blockchain.MinterBlockChainApi;
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.Balance;
-import network.minter.blockchain.repo.BlockChainAccountRepository;
-import retrofit2.Response;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import network.minter.blockchain.MinterBlockChainSDK;
+import network.minter.blockchain.models.AddressInfo;
+import network.minter.blockchain.repo.NodeAddressRepository;
+import network.minter.core.MinterSDK;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.internal.exceptions.NativeLoadException;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -45,18 +50,61 @@ import static org.junit.Assert.assertTrue;
  */
 public class BalanceRepositoryTest {
 
+    static {
+        try {
+            MinterSDK.initialize();
+        } catch (NativeLoadException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Test
     public void testGetBalance() throws IOException {
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
 
-        BlockChainAccountRepository repo = MinterBlockChainApi.getInstance().account();
+//        MinterAddress address = PrivateKey.fromMnemonic("toss disease race hour social anger oblige squeeze grant novel gown reveal").getPublicKey().toMinter();
+        MinterAddress address = new MinterAddress("Mx6ab3a04c2f4d6022163f36a73840980cc8fc6a8b");
+        NodeAddressRepository repo = MinterBlockChainSDK.getInstance().account();
 
-        Response<BCResult<Balance>> resp = repo.getBalance("Mx06431236daf96979aa6cdf470a7df26430ad8efb").execute();
+        AtomicBoolean success = new AtomicBoolean(false);
 
-        assertNotNull(resp.body());
-        assertTrue(resp.isSuccessful());
+        repo.getAddressInfo(address)
+                .subscribeOn(Schedulers.trampoline())
+                .blockingSubscribe(result -> {
 
-        assertNotNull(resp.body().result.get("MNT"));
-        assertNotNull(resp.body().result.txCount);
+                    assertTrue(result.isOk());
+                    assertNotNull(result.balance);
+                    assertTrue(result.balance.size() > 0);
+
+                    AddressInfo.CoinBalance bipBalance = result.balance.get(0);
+                    assertNotNull(bipBalance.coin);
+                    assertEquals(MinterSDK.DEFAULT_COIN_ID, bipBalance.coin.id);
+                    success.set(true);
+                }, Throwable::printStackTrace);
+
+
+        assertTrue(success.get());
+    }
+
+    @Test
+    public void testGetBalanceError() throws IOException {
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
+
+        NodeAddressRepository repo = MinterBlockChainSDK.getInstance().account();
+
+        AtomicBoolean success = new AtomicBoolean(false);
+
+        repo.getAddressInfo("MxZab3a04c2f4d6022163f36a73840980cc8fc6a8b")
+                .subscribeOn(Schedulers.trampoline())
+                .blockingSubscribe(result -> {
+
+                    success.set(result.isOk());
+                    assertFalse(result.isOk());
+                    assertFalse(result.balance.size() > 0);
+
+                }, Throwable::printStackTrace);
+
+
+        assertFalse(success.get());
     }
 }

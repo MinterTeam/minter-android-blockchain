@@ -33,33 +33,18 @@ import org.parceler.Parcel;
 import java.util.Collections;
 import java.util.List;
 
-import network.minter.blockchain.models.operational.TransactionSign;
-
-import static network.minter.core.internal.common.Preconditions.firstNonNull;
-
 /**
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @Parcel
-public class UnconfirmedTransactions {
-    @SerializedName("n_txs")
-    public int count;
-    public int total;
+public class UnconfirmedTransactions extends NodeResult {
+    @SerializedName("transaction_count")
+    public Long count;
+    @SerializedName("total_transactions")
+    public Long total;
     @SerializedName("total_bytes")
-    public long totalBytes;
-    @SerializedName("txs")
-    public List<TransactionSign> signatures;
-
-    public int size() {
-        return count;
-    }
-
-    public boolean isEmpty() {
-        return count == 0;
-    }
-    @SuppressWarnings("unchecked")
-    private List<TransactionSign> getSigs() {
-        return firstNonNull(signatures, Collections.emptyList());
-    }
+    public Long totalBytes;
+    @SerializedName("transactions")
+    public List<HistoryTransaction> items = Collections.emptyList();
 }

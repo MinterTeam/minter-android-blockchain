@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -35,16 +35,17 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import network.minter.blockchain.MinterBlockChainApi;
-import network.minter.blockchain.api.BlockChainTransactionEndpoint;
-import network.minter.blockchain.models.BCResult;
+import io.reactivex.rxjava3.core.Observable;
+import network.minter.blockchain.MinterBlockChainSDK;
+import network.minter.blockchain.api.NodeTransactionEndpoint;
 import network.minter.blockchain.models.HistoryTransaction;
+import network.minter.blockchain.models.HistoryTransactionList;
 import network.minter.blockchain.models.TransactionCommissionValue;
+import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.UnconfirmedTransactions;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
@@ -53,16 +54,16 @@ import network.minter.core.crypto.MinterHash;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.data.DataRepository;
-import retrofit2.Call;
 
+import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
 
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class BlockChainTransactionRepository extends DataRepository<BlockChainTransactionEndpoint> implements DataRepository.Configurator {
-    public BlockChainTransactionRepository(@Nonnull ApiService.Builder apiBuilder) {
+public class NodeTransactionRepository extends DataRepository<NodeTransactionEndpoint> implements DataRepository.Configurator {
+    public NodeTransactionRepository(@Nonnull ApiService.Builder apiBuilder) {
         super(apiBuilder);
     }
 
@@ -72,7 +73,7 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
      * @return
      * @see TQuery
      */
-    public Call<BCResult<List<HistoryTransaction>>> getTransactions(@Nonnull TQuery query) {
+    public Observable<HistoryTransactionList> getTransactions(@Nonnull TQuery query) {
         return getInstantService(this).getTransactions(checkNotNull(query, "Query required").build());
     }
 
@@ -82,8 +83,24 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
      * @return
      * @see #getTransaction(String)
      */
-    public Call<BCResult<HistoryTransaction>> getTransaction(MinterHash hash) {
+    public Observable<HistoryTransaction> getTransaction(MinterHash hash) {
         return getTransaction(hash.toString());
+    }
+
+    /**
+     * SendCoin transaction
+     * @param transactionSign Raw signed TX
+     * @return Prepared request
+     * @see TransactionSendResult
+     */
+    public Observable<TransactionSendResult> sendTransaction(@Nonnull TransactionSign transactionSign) {
+        //TODO: move it to sign
+        String sig = transactionSign.getTxSign();
+        if (!sig.startsWith("0x")) {
+            sig = "0x" + sig;
+        }
+        transactionSign.clear();
+        return getInstantService().sendTransaction(sig);
     }
 
     /**
@@ -91,7 +108,7 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
      * @param txHash Valid transaction hash with prefix "Mt"
      * @return
      */
-    public Call<BCResult<HistoryTransaction>> getTransaction(String txHash) {
+    public Observable<HistoryTransaction> getTransaction(String txHash) {
         return getInstantService(this).getTransaction(txHash);
     }
 
@@ -103,11 +120,11 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
 
     /**
      * Resolve transaction commission before sending it
-     * @param sign Transaction sign is NOT A TRANSACTION HASH, it's a valid transaction and valid to send
+     * @param sign Transaction sign is NOT A TRANSACTION HASH, it's a valid transaction and it's ready to send
      * @return
-     * @see network.minter.blockchain.models.operational.Transaction#sign(PrivateKey)
+     * @see network.minter.blockchain.models.operational.Transaction#signSingle(PrivateKey)
      */
-    public Call<BCResult<TransactionCommissionValue>> getTransactionCommission(TransactionSign sign) {
+    public Observable<TransactionCommissionValue> getTransactionCommission(TransactionSign sign) {
         return getTransactionCommission(sign.getTxSign());
     }
 
@@ -116,7 +133,12 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
      * @param sign
      * @return
      */
-    public Call<BCResult<TransactionCommissionValue>> getTransactionCommission(String sign) {
+    public Observable<TransactionCommissionValue> getTransactionCommission(String sign) {
+        checkArgument(sign != null && sign.length() > 2, "Invalid signature");
+        if (!sign.substring(0, 2).toLowerCase().equals("mt")) {
+            return getInstantService().getTxCommission("Mt" + sign);
+        }
+
         return getInstantService().getTxCommission(sign);
     }
 
@@ -125,14 +147,23 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
      * Use result as collection
      * @return
      */
-    public Call<BCResult<UnconfirmedTransactions>> getUnconfirmedList() {
-        return getInstantService().getUnconfirmed();
+    public Observable<UnconfirmedTransactions> getUnconfirmedList() {
+        return getInstantService().getUnconfirmed(null);
+    }
+
+    /**
+     * Get unconfirmed transactions signatures
+     * Use result as collection
+     * @return
+     */
+    public Observable<UnconfirmedTransactions> getUnconfirmedList(int limit) {
+        return getInstantService().getUnconfirmed(limit);
     }
 
     @Nonnull
     @Override
-    protected Class<BlockChainTransactionEndpoint> getServiceClass() {
-        return BlockChainTransactionEndpoint.class;
+    protected Class<NodeTransactionEndpoint> getServiceClass() {
+        return NodeTransactionEndpoint.class;
     }
 
     public static final class TransactionSignDeserializer implements JsonDeserializer<TransactionSign> {
@@ -157,10 +188,13 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
                 return null;
             }
 
-            final Gson gson = MinterBlockChainApi.getInstance().getGsonBuilder().create();
+            final Gson gson = MinterBlockChainSDK.getInstance().getGsonBuilder().create();
 
             final HistoryTransaction out = gson.fromJson(json, HistoryTransaction.class);
             JsonObject data = json.getAsJsonObject().get("data").getAsJsonObject();
+            if (out.type == null) {
+                throw new IllegalStateException(String.format("Unknown transaction type %s", json.getAsJsonObject().get("type").getAsString()));
+            }
             out.data = gson.fromJson(data, out.type.getOpClass());
 
             return out;
@@ -183,12 +217,17 @@ public class BlockChainTransactionRepository extends DataRepository<BlockChainTr
         }
 
         public TQuery setTo(String to) {
-            mData.put("tx.to", normalizeAddress(to));
+            mData.put("tags.tx.to", normalizeAddress(to));
             return this;
         }
 
         public TQuery setFrom(String from) {
-            mData.put("tx.from", normalizeAddress(from));
+            mData.put("tags.tx.from", normalizeAddress(from));
+            return this;
+        }
+
+        public TQuery setCustomTag(String key, String value) {
+            mData.put(key, value);
             return this;
         }
 

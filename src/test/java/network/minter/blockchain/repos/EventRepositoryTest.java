@@ -30,12 +30,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import network.minter.blockchain.MinterBlockChainApi;
-import network.minter.blockchain.models.BCResult;
+import network.minter.blockchain.MinterBlockChainSDK;
 import network.minter.blockchain.models.EventList;
-import network.minter.blockchain.repo.BlockChainEventRepository;
-import retrofit2.Call;
-import retrofit2.Response;
+import network.minter.blockchain.repo.NodeEventRepository;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -48,35 +45,37 @@ public class EventRepositoryTest {
 
     @Test
     public void testGetEventsWithReward() throws IOException {
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
 
-        BlockChainEventRepository repository = MinterBlockChainApi.getInstance().event();
+        NodeEventRepository repository = MinterBlockChainSDK.getInstance().event();
 
-        long blockHeight = 1000;
-        Call<BCResult<EventList>> request = repository.getEvents(blockHeight);
+        long blockHeight = 120;
+        EventList response = repository.getEvents(blockHeight).blockingFirst();
 
-        Response<BCResult<EventList>> response = request.execute();
-
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
-
-        assertNotNull(response.body().result);
+        assertNotNull(response.events);
+        boolean hasReward = false;
+        for (EventList.EventItem item : response.events) {
+            if (item.type == EventList.Type.Reward) {
+                hasReward = true;
+            }
+        }
+        assertTrue(hasReward);
     }
 
     @Test
     public void testGetEventsWithSlashes() throws IOException {
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
-
-        BlockChainEventRepository repository = MinterBlockChainApi.getInstance().event();
-
-        long blockHeight = 59415;
-        Call<BCResult<EventList>> request = repository.getEvents(blockHeight);
-
-        Response<BCResult<EventList>> response = request.execute();
-
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
-
-        assertNotNull(response.body().result);
+//        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
+//
+//        NodeEventRepository repository = MinterBlockChainSDK.getInstance().event();
+//
+//        long blockHeight = 59415;
+//        Call<NodeResult<EventList>> request = repository.getEvents(blockHeight);
+//
+//        Response<NodeResult<EventList>> response = request.execute();
+//
+//        assertTrue(response.isSuccessful());
+//        assertTrue(response.body().isOk());
+//
+//        assertNotNull(response.body().result);
     }
 }

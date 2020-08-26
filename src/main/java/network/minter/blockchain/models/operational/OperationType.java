@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -68,6 +68,16 @@ public enum OperationType {
     Multisend((byte) 0x0D, TxMultisend.class, /*commission: 10+(n-1)*5 units*/ 0D),
     @SerializedName("14")
     EditCandidate((byte) 0x0E, TxEditCandidate.class, 10000D),
+    @SerializedName("15")
+    SetHaltBlock((byte) 0x0F, TxSetHaltBlock.class, -1),
+    @SerializedName("16")
+    RecreateCoin((byte) 0x10, TxRecreateCoin.class, 0D),
+    @SerializedName("17")
+    ChangeCoinOwner((byte) 0x11, TxChangeCoinOwner.class, 0d),
+    @SerializedName("18")
+    EditMultisigOwnersData((byte) 0x12, TxEditMultisigOwnersData.class, -1),
+    @SerializedName("19")
+    PriceVote((byte) 0x13, null, 10d),
 
     ;
 

@@ -30,10 +30,11 @@ import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.List;
 
+import network.minter.blockchain.models.operational.Transaction;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 
@@ -42,32 +43,71 @@ import network.minter.core.crypto.MinterPublicKey;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @Parcel
-public class CandidateItem {
-
+public class CandidateItem extends NodeResult {
     @SerializedName("reward_address")
     public MinterAddress rewardAddress;
     @SerializedName("owner_address")
     public MinterAddress ownerAddress;
+    @SerializedName("control_address")
+    public MinterAddress controlAddress;
     @SerializedName("total_stake")
     public BigInteger totalStake;
-    @SerializedName("pub_key")
-    public MinterPublicKey pubKey;
-    @SerializedName("commission")
+    @SerializedName("public_key")
+    public MinterPublicKey publicKey;
     public int commission;
-    @SerializedName("stakes")
-    public List<StakeInfo> stakes = Collections.emptyList();
-    @SerializedName("status")
-    public int status;
+    @SerializedName("used_slots")
+    public BigInteger usedSlots;
+    @SerializedName("uniq_users")
+    public BigInteger uniqueUsers;
+    @SerializedName("min_stake")
+    public BigInteger minStake;
+    public List<StakeInfo> stakes;
+    public Status status;
+
+    public enum Status {
+        @SerializedName("0")
+        Unknown(0),
+        @SerializedName("1")
+        CandidateOff(1),
+        @SerializedName("2")
+        CandidateOn(2),
+        @SerializedName("3")
+        ValidatorOn(3);
+
+        private final int val;
+
+        Status(int v) {
+            val = v;
+        }
+
+        public int getValue() {
+            return val;
+        }
+    }
+
+    public BigDecimal getTotalStakeDecimal() {
+        return Transaction.humanizeValue(totalStake);
+    }
+
+    @Parcel
+    public static class StakeCoin {
+        public BigInteger id;
+        public String symbol;
+    }
 
     @Parcel
     public static class StakeInfo {
-        @SerializedName("owner")
         public MinterAddress owner;
-        @SerializedName("coin")
-        public String coin;
-        @SerializedName("value")
+        public StakeCoin coin;
         public BigInteger value;
-        @SerializedName("bip_value")
         public BigInteger bipValue;
+
+        public BigDecimal getValueDecimal() {
+            return Transaction.humanizeValue(value);
+        }
+
+        public BigDecimal getBipValueDecimal() {
+            return Transaction.humanizeValue(bipValue);
+        }
     }
 }

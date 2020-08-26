@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -38,12 +38,12 @@ import network.minter.blockchain.models.operational.SignatureSingleData;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TxUnbound;
 import network.minter.core.MinterSDK;
-import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.TestCase.assertNotNull;
+import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -62,17 +62,17 @@ public class TxUnbondTest {
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
-        final BigInteger nonce = new BigInteger("1");
-	    final String validTx = "f88f0102018a4d4e540000000000000008b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b844f8421ca0ff5766c85847b37a276f3f9d027fb7c99745920fa395c7bd399cedd8265c5e1d9f791bcdfe4d1bc1e73ada7bf833103c828f22d83189dad2b22ad28a54aacf2a";
-        final PrivateKey privateKey = new PrivateKey("6e1df6ec69638d152f563c5eca6c13cdb5db4055861efc11ec1cdd578afd96bf");
+        final BigInteger nonce = new BigInteger("7");
+        final String validTx = "f87c0701018008aceba00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe880880e92596fd6290000808001b845f8431ba00d60995f30fccc40de871a7264c748a21220ee3cd8f88e8bc893163f4f735d04a0103498704eeb2368a9b95b7baf60a2c92f949aa98be9acd78b0fb8999b75a8fd";
+        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
-                .setGasCoin("MNT")
-                .setBlockchainId(BlockchainID.TestNet)
+                .setGasCoinId(DEFAULT_COIN_ID)
+                .setBlockchainId(BlockchainID.MainNet)
                 .unbound()
-                .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
-                .setCoin("MNT")
-                .setValue("10")
+                .setPublicKey(new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8"))
+                .setCoinId(DEFAULT_COIN_ID)
+                .setValue("1.05")
                 .build();
 
         assertNotNull(tx);
@@ -85,23 +85,19 @@ public class TxUnbondTest {
 
     @Test
     public void testDecodeSingle() {
-        final BigInteger nonce = new BigInteger("1");
-	    final String validTx = "f88f0102018a4d4e540000000000000008b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b844f8421ca0ff5766c85847b37a276f3f9d027fb7c99745920fa395c7bd399cedd8265c5e1d9f791bcdfe4d1bc1e73ada7bf833103c828f22d83189dad2b22ad28a54aacf2a";
+        final BigInteger nonce = new BigInteger("7");
+        final String validTx = "f87c0701018008aceba00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe880880e92596fd6290000808001b845f8431ba00d60995f30fccc40de871a7264c748a21220ee3cd8f88e8bc893163f4f735d04a0103498704eeb2368a9b95b7baf60a2c92f949aa98be9acd78b0fb8999b75a8fd";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);
 
         assertEquals(nonce, tx.getNonce());
-        assertEquals("MNT", tx.getGasCoin());
+        assertEquals(DEFAULT_COIN_ID, tx.getGasCoinId());
         assertEquals(OperationType.Unbound, tx.getType());
         TxUnbound data = tx.getData();
 
         assertNotNull(data);
-        assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), data.getPublicKey());
-        assertEquals(new BigDecimal("10"), data.getValue());
-
-        System.out.println("R: " + (new BytesData(tx.getSignatureData(SignatureSingleData.class).getR().getData()).toHexString()));
-        System.out.println("S: " + (new BytesData(tx.getSignatureData(SignatureSingleData.class).getS().getData()).toHexString()));
-        System.out.println("V: " + (new BytesData(tx.getSignatureData(SignatureSingleData.class).getV().getData()).toHexString()));
+        assertEquals(new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8"), data.getPublicKey());
+        assertEquals(new BigDecimal("1.05"), data.getValueDecimal());
     }
 }

@@ -37,12 +37,11 @@ import network.minter.blockchain.models.operational.Transaction;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  * @link <a href="https://github.com/edwardstock">Github</a>
  */
 @Parcel
-public class ExchangeSellValue {
+public class ExchangeSellValue extends NodeResult {
     @SerializedName("will_get")
     public BigInteger willGet;
     public BigInteger commission;

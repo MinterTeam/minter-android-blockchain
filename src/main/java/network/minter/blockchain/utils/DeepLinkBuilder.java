@@ -40,7 +40,7 @@ public class DeepLinkBuilder {
     public static final String BIP_WALLET_MAINNET = "https://bip.to";
     public static final String BIP_WALLET_TESTNET = "https://testnet.bip.to";
     public static String BIP_WALLET_URL = BIP_WALLET_MAINNET;
-    private ExternalTransaction mExternalTransaction;
+    private final ExternalTransaction mExternalTransaction;
     private String mBaseUrl = BIP_WALLET_URL;
     private String mCheckPass = null;
 
@@ -54,7 +54,7 @@ public class DeepLinkBuilder {
         redeemCheck.setProof(CheckTransaction.makeProof(pk.getPublicKey().toMinter(), passphrase).toHexString());
         mExternalTransaction = new ExternalTransaction.Builder()
                 .setData(redeemCheck)
-                .setGasCoin(checkTransaction.getGasCoin())
+                .setGasCoinId(checkTransaction.getGasCoinId())
                 .setGasPrice(BigInteger.ONE)
                 .setNonce(BigInteger.ZERO)
                 .build();
@@ -65,7 +65,7 @@ public class DeepLinkBuilder {
         redeemCheck.setRawCheck(checkTransaction.sign(pk).getTxSign());
         mExternalTransaction = new ExternalTransaction.Builder()
                 .setData(redeemCheck)
-                .setGasCoin(checkTransaction.getGasCoin())
+                .setGasCoinId(checkTransaction.getGasCoinId())
                 .setGasPrice(BigInteger.ONE)
                 .setNonce(BigInteger.ZERO)
                 .build();

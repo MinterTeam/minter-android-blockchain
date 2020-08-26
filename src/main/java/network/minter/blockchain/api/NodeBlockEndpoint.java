@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,22 +26,17 @@
 
 package network.minter.blockchain.api;
 
-import java.util.List;
-
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.NetworkStatus;
-import retrofit2.Call;
+import io.reactivex.rxjava3.core.Observable;
+import network.minter.blockchain.models.BlockInfo;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 /**
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public interface BlockChainStatusEndpoint {
+public interface NodeBlockEndpoint {
 
-    @GET("/status")
-    Call<BCResult<NetworkStatus>> status();
-
-    @GET("/validators")
-    Call<BCResult<List<NetworkStatus.Validator>>> validators();
+    @GET("/block/{height}")
+    Observable<BlockInfo> getByHeight(@Path("height") String blockNumber);
 }

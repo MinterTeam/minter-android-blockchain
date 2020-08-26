@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -43,6 +43,7 @@ import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 
 /**
  * minter-android-blockchain. 2019
@@ -60,63 +61,54 @@ public class TxMultisendTest {
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
-        PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
-
-        String gasCoin = "MNT";
-        String payload = "";
-
-        final String encodedTransaction = "f8b30102018a4d4e54000000000000000db858f856f854e98a4d4e540000000000000094fe60014a6e9ac91618f5d1cab3fd58cded61ee9988016345785d8a0000e98a4d4e540000000000000094ddab6281766ad86497741ff91b6b48fe85012e3c8802c68af0bb140000808001b845f8431ca0b15dcf2e013df1a2aea02e36a17af266d8ee129cdcb3e881d15b70c9457e7571a0226af7bdaca9d42d6774c100b22e0c7ba4ec8dd664d17986318e905613013283";
-        BigInteger nonce = new BigInteger("1");
+        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
+        String validTx = "f895060101800db844f842f840df809467691076548b20234461ff6fd2bc9c64393eb8fc8801b4fbd92b5f8000df8094d82558ea00eb81d35f2654953598f5d51737d31d8804746bcc9ce68000808001b845f8431ba0a936ac922d8d67f06efc996f50f3d2af55a77453f521bc96d73158de16b530baa0192f5d1f2feb520b38d92513ed89fc1ede26353ce3660502f61721ea6232b261";
+        BigInteger nonce = new BigInteger("6");
 
         Transaction tx = new Transaction.Builder(nonce)
-                .setGasCoin(gasCoin)
-                .setBlockchainId(BlockchainID.TestNet)
-                .setPayload(payload)
+                .setGasCoinId(DEFAULT_COIN_ID)
+                .setBlockchainId(BlockchainID.MainNet)
                 .multiSend()
-                .addItem("MNT", "Mxfe60014a6e9ac91618f5d1cab3fd58cded61ee99", "0.1")
-                .addItem("MNT", "Mxddab6281766ad86497741ff91b6b48fe85012e3c", "0.2")
+                .addItem(DEFAULT_COIN_ID, "Mx67691076548b20234461ff6fd2bc9c64393eb8fc", "0.123")
+                .addItem(DEFAULT_COIN_ID, "Mxd82558ea00eb81d35f2654953598f5d51737d31d", "0.321")
                 .build();
 
         assertNotNull(tx);
         TransactionSign sign = tx.signSingle(privateKey);
         assertNotNull(sign);
-        assertEquals(encodedTransaction, sign.getTxSign());
+        assertEquals(validTx, sign.getTxSign());
 
 
     }
 
     @Test
     public void testDecodeSingle() {
-        PrivateKey privateKey = new PrivateKey("07bc17abdcee8b971bb8723e36fe9d2523306d5ab2d683631693238e0f9df142");
+        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
+        final String validTx = "f895060101800db844f842f840df809467691076548b20234461ff6fd2bc9c64393eb8fc8801b4fbd92b5f8000df8094d82558ea00eb81d35f2654953598f5d51737d31d8804746bcc9ce68000808001b845f8431ba0a936ac922d8d67f06efc996f50f3d2af55a77453f521bc96d73158de16b530baa0192f5d1f2feb520b38d92513ed89fc1ede26353ce3660502f61721ea6232b261";
+        BigInteger nonce = new BigInteger("6");
 
-        String gasCoin = "MNT";
-        String payload = "";
-
-        final String encodedTransaction = "f8b30102018a4d4e54000000000000000db858f856f854e98a4d4e540000000000000094fe60014a6e9ac91618f5d1cab3fd58cded61ee9988016345785d8a0000e98a4d4e540000000000000094ddab6281766ad86497741ff91b6b48fe85012e3c8802c68af0bb140000808001b845f8431ca0b15dcf2e013df1a2aea02e36a17af266d8ee129cdcb3e881d15b70c9457e7571a0226af7bdaca9d42d6774c100b22e0c7ba4ec8dd664d17986318e905613013283";
-        BigInteger nonce = new BigInteger("1");
-
-        Transaction tx = Transaction.fromEncoded(encodedTransaction);
+        Transaction tx = Transaction.fromEncoded(validTx);
 
         assertNotNull(tx);
         TransactionSign sign = tx.signSingle(privateKey);
         assertNotNull(sign);
-        assertEquals(encodedTransaction, sign.getTxSign());
+        assertEquals(validTx, sign.getTxSign());
 
-        assertEquals(gasCoin, tx.getGasCoin());
+        assertEquals(DEFAULT_COIN_ID, tx.getGasCoinId());
         assertEquals(nonce, tx.getNonce());
-        assertEquals(payload, tx.getPayloadString());
+        assertEquals("", tx.getPayloadString());
 
         TxMultisend data = tx.getData(TxMultisend.class);
         assertEquals(2, data.getItems().size());
         TxSendCoin item1 = data.getItem(0);
-        assertEquals("MNT", item1.getCoin());
-        assertEquals(new BigDecimal("0.1"), item1.getValue());
-        assertEquals("Mxfe60014a6e9ac91618f5d1cab3fd58cded61ee99", item1.getTo().toString());
+        assertEquals(DEFAULT_COIN_ID, item1.getCoinId());
+        assertEquals(new BigDecimal("0.123"), item1.getValue());
+        assertEquals("Mx67691076548b20234461ff6fd2bc9c64393eb8fc", item1.getTo().toString());
 
         TxSendCoin item2 = data.getItem(1);
-        assertEquals("MNT", item2.getCoin());
-        assertEquals(new BigDecimal("0.2"), item2.getValue());
-        assertEquals("Mxddab6281766ad86497741ff91b6b48fe85012e3c", item2.getTo().toString());
+        assertEquals(DEFAULT_COIN_ID, item2.getCoinId());
+        assertEquals(new BigDecimal("0.321"), item2.getValue());
+        assertEquals("Mxd82558ea00eb81d35f2654953598f5d51737d31d", item2.getTo().toString());
     }
 
 }

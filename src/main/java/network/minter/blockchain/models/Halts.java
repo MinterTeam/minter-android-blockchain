@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,36 +24,20 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.api;
+package network.minter.blockchain.models;
 
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.Balance;
-import network.minter.blockchain.models.TransactionSendResult;
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import com.google.gson.annotations.SerializedName;
+
+import org.parceler.Parcel;
+
+import java.util.List;
 
 /**
- * minter-android-blockchain. 2018
- * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * minter-android-blockchain. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-public interface BlockChainAccountEndpoint {
-
-    /**
-     * Returns current balance of an account
-     * @param address Address of an account
-     * @return
-     */
-    @GET("/address")
-    Call<BCResult<Balance>> getBalance(@Query("address") String address);
-
-    /**
-     * Broadcasts transaction onto Minter network
-     * @param data
-     * @return
-     */
-    @GET("/send_transaction")
-    Call<BCResult<TransactionSendResult>> sendTransaction(@Query("tx") String signedTxHash);
-
-
+@Parcel
+public class Halts extends NodeResult {
+    @SerializedName("votes")
+    public List<String> items;
 }

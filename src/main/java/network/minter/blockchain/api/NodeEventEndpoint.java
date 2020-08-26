@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -24,43 +24,19 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.repo;
+package network.minter.blockchain.api;
 
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
-import network.minter.blockchain.api.BlockChainStatusEndpoint;
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.NetworkStatus;
-import network.minter.core.internal.api.ApiService;
-import network.minter.core.internal.data.DataRepository;
-import retrofit2.Call;
+import io.reactivex.rxjava3.core.Observable;
+import network.minter.blockchain.models.EventList;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 /**
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class BlockChainStatusRepository extends DataRepository<BlockChainStatusEndpoint> {
-    public BlockChainStatusRepository(@Nonnull ApiService.Builder apiBuilder) {
-        super(apiBuilder);
-    }
+public interface NodeEventEndpoint {
 
-    /**
-     * This endpoint shows current state of the node. You also can use it to check if node is running in normal mode.
-     * @return Network status info object
-     */
-    public Call<BCResult<NetworkStatus>> getNetworkStatus() {
-        return getInstantService().status();
-    }
-
-    public Call<BCResult<List<NetworkStatus.Validator>>> getValidators() {
-        return getInstantService().validators();
-    }
-
-    @Nonnull
-    @Override
-    protected Class<BlockChainStatusEndpoint> getServiceClass() {
-        return BlockChainStatusEndpoint.class;
-    }
+    @GET("/events/{height}")
+    Observable<EventList> getByHeight(@Path("height") String blockNumber);
 }

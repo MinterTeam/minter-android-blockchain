@@ -28,36 +28,85 @@ package network.minter.blockchain.repos;
 
 import org.junit.Test;
 
-import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
-import network.minter.blockchain.MinterBlockChainApi;
-import network.minter.blockchain.models.BCResult;
+import network.minter.blockchain.MinterBlockChainSDK;
 import network.minter.blockchain.models.Coin;
-import network.minter.blockchain.repo.BlockChainCoinRepository;
-import retrofit2.Response;
+import network.minter.blockchain.models.ExchangeBuyValue;
+import network.minter.blockchain.models.ExchangeSellValue;
+import network.minter.blockchain.models.operational.OperationType;
+import network.minter.blockchain.repo.NodeCoinRepository;
+import network.minter.core.crypto.MinterAddress;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
- * minter-android-blockchain. 2019
- * @author Eduard Maximovich [edward.vstock@gmail.com]
+ * minter-android-blockchain. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 public class CoinRepositoryTest {
 
     @Test
-    public void testGetCoinInfo() throws IOException {
-        String coin = "TESTCOIN";
+    public void testGetCoinInfo() {
+        String coin = "KLIM";
 
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
 
-        BlockChainCoinRepository repo = MinterBlockChainApi.getInstance().coin();
+        NodeCoinRepository repo = MinterBlockChainSDK.getInstance().coin();
 
-        Response<BCResult<Coin>> response = repo.getCoinInfo(coin).execute();
+        Coin response = repo.getCoinInfo(coin).blockingFirst();
 
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
+        assertNotNull(response.id);
+        assertEquals(new BigInteger("1"), response.id);
+        assertEquals("KLIM", response.symbol);
+        assertEquals("", response.name);
+        assertEquals(new BigInteger("1000000000000000000"), response.volume);
+        assertEquals(10, response.crr);
+        assertEquals(new BigInteger("10000000000000000000000"), response.reserveBalance);
+        assertEquals(new BigInteger("10000000000000000000"), response.maxSupply);
+        assertEquals(new MinterAddress("Mx6ab3a04c2f4d6022163f36a73840980cc8fc6a8b"), response.owner);
+    }
 
-        assertNotNull(response.body().result);
+    @Test
+    public void testGetCoinInfoById() {
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
+
+        NodeCoinRepository repo = MinterBlockChainSDK.getInstance().coin();
+
+        Coin response = repo.getCoinInfoById(new BigInteger("1")).blockingFirst();
+
+        assertNotNull(response.id);
+        assertEquals(new BigInteger("1"), response.id);
+        assertEquals("KLIM", response.symbol);
+        assertEquals("", response.name);
+        assertEquals(new BigInteger("1000000000000000000"), response.volume);
+        assertEquals(10, response.crr);
+        assertEquals(new BigInteger("10000000000000000000000"), response.reserveBalance);
+        assertEquals(new BigInteger("10000000000000000000"), response.maxSupply);
+        assertEquals(new MinterAddress("Mx6ab3a04c2f4d6022163f36a73840980cc8fc6a8b"), response.owner);
+    }
+
+    @Test
+    public void testEstimateCoinToSell() {
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
+
+        NodeCoinRepository repo = MinterBlockChainSDK.getInstance().coin();
+        ExchangeSellValue value = repo.getCoinExchangeCurrencyToSell(new BigInteger("0"), new BigDecimal("1"), new BigInteger("1")).blockingFirst();
+        assertNotNull(value.commission);
+        assertNotNull(value.willGet);
+        assertEquals(OperationType.SellCoin.getFee().stripTrailingZeros(), value.getCommission().stripTrailingZeros());
+    }
+
+    @Test
+    public void testEstimateCoinToBuy() {
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
+
+        NodeCoinRepository repo = MinterBlockChainSDK.getInstance().coin();
+        ExchangeBuyValue value = repo.getCoinExchangeCurrencyToBuy(new BigInteger("0"), new BigDecimal("1"), new BigInteger("1")).blockingFirst();
+        assertNotNull(value.commission);
+        assertNotNull(value.willPay);
+        assertEquals(OperationType.BuyCoin.getFee().stripTrailingZeros(), value.getCommission().stripTrailingZeros());
     }
 }

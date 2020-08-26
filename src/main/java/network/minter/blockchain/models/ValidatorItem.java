@@ -24,29 +24,24 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.api;
+package network.minter.blockchain.models;
 
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.CandidateItem;
-import network.minter.blockchain.models.CandidateStatus;
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import org.parceler.Parcel;
+
+import java.math.BigInteger;
+
+import network.minter.core.crypto.MinterPublicKey;
 
 /**
- * minter-android-blockchain. 2019
- * @author Eduard Maximovich [edward.vstock@gmail.com]
+ * minter-android-blockchain. 2020
+ * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-public interface BlockChainCandidateEndpoint {
-
-    @GET("/candidate")
-    Call<BCResult<CandidateItem>> getCandidate(@Query("pub_key") String pubKey);
-
-    @GET("/candidate")
-    Call<BCResult<CandidateItem>> getCandidate(@Query("pub_key") String pubKey, long blockHeight);
-
-    @GET("/candidates")
-    Call<BCResult<List<CandidateStatus>>> getCandidates(@Query("height") long blockHeight);
+@Parcel
+public class ValidatorItem extends NodeResult {
+    @SerializedName("public_key")
+    public MinterPublicKey pubKey;
+    @SerializedName("voting_power")
+    public BigInteger votingPower;
 }

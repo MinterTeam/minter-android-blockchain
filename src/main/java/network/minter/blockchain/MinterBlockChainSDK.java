@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -32,13 +32,14 @@ import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
 
-import network.minter.blockchain.repo.BlockChainAccountRepository;
-import network.minter.blockchain.repo.BlockChainBlockRepository;
-import network.minter.blockchain.repo.BlockChainCandidateRepository;
-import network.minter.blockchain.repo.BlockChainCoinRepository;
-import network.minter.blockchain.repo.BlockChainEventRepository;
-import network.minter.blockchain.repo.BlockChainStatusRepository;
-import network.minter.blockchain.repo.BlockChainTransactionRepository;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import network.minter.blockchain.repo.NodeAddressRepository;
+import network.minter.blockchain.repo.NodeBlockRepository;
+import network.minter.blockchain.repo.NodeCoinRepository;
+import network.minter.blockchain.repo.NodeEventRepository;
+import network.minter.blockchain.repo.NodeStatusRepository;
+import network.minter.blockchain.repo.NodeTransactionRepository;
+import network.minter.blockchain.repo.NodeValidatorRepository;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterHash;
@@ -49,35 +50,57 @@ import network.minter.core.internal.api.converters.BytesDataJsonConverter;
 import network.minter.core.internal.api.converters.MinterAddressJsonConverter;
 import network.minter.core.internal.api.converters.MinterHashJsonConverter;
 import network.minter.core.internal.api.converters.MinterPublicKeyJsonConverter;
+import network.minter.core.internal.common.Acceptor;
 import network.minter.core.internal.log.Mint;
 import network.minter.core.internal.log.TimberLogger;
+import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class MinterBlockChainApi {
+public class MinterBlockChainSDK {
     private final static String BASE_NODE_URL = BuildConfig.BASE_NODE_URL;
-    private static MinterBlockChainApi INSTANCE;
+    private static MinterBlockChainSDK INSTANCE;
     private final ApiService.Builder mApiService;
-    private BlockChainAccountRepository mAccountRepository;
-    private BlockChainCoinRepository mCoinRepository;
-    private BlockChainTransactionRepository mTransactionRepository;
-    private BlockChainBlockRepository mBlockRepository;
-    private BlockChainCandidateRepository mBlockChainCandidateRepository;
-    private BlockChainStatusRepository mStatusRepository;
-    private BlockChainEventRepository mEventRepository;
+    private NodeAddressRepository mAccountRepository;
+    private NodeCoinRepository mCoinRepository;
+    private NodeTransactionRepository mTransactionRepository;
+    private NodeBlockRepository mBlockRepository;
+    private NodeValidatorRepository mCandidateRepository;
+    private NodeStatusRepository mStatusRepository;
+    private NodeEventRepository mEventRepository;
 
-    private MinterBlockChainApi() {
+    private MinterBlockChainSDK() {
         this(BASE_NODE_URL);
     }
 
-    private MinterBlockChainApi(@Nonnull String baseNodeApiUrl) {
+    private MinterBlockChainSDK(@Nonnull String baseNodeApiUrl) {
         mApiService = new ApiService.Builder(baseNodeApiUrl, getGsonBuilder());
+        mApiService.setRetrofitClientConfig(new Acceptor<Retrofit.Builder>() {
+            @Override
+            public void accept(Retrofit.Builder builder) {
+                builder.addCallAdapterFactory(RxJava3CallAdapterFactory.createWithScheduler(Schedulers.io()));
+            }
+        });
         mApiService.addHeader("Content-Type", "application/json");
         mApiService.addHeader("X-Minter-Client-Name", "MinterAndroid");
         mApiService.addHeader("X-Minter-Client-Version", BuildConfig.VERSION_NAME);
+        mApiService.addHttpInterceptor(chain -> {
+            Request request = chain.request();
+            Response response = chain.proceed(request);
+            if (response.body() != null && response.body().contentType() != null && response.body().contentType().toString().toLowerCase().equals("application/json")) {
+                Response.Builder b = response.newBuilder();
+                b.code(200);
+
+                return b.build();
+            }
+            return response;
+        });
     }
 
     public static void initialize() {
@@ -91,11 +114,11 @@ public class MinterBlockChainApi {
      * @param logger
      * @return
      */
-    public static MinterBlockChainApi createInstance(String baseNodeApiUrl, boolean debug, Mint.Leaf logger) {
+    public static MinterBlockChainSDK createInstance(String baseNodeApiUrl, boolean debug, Mint.Leaf logger) {
         if (debug) {
             Mint.brew(logger);
         }
-        MinterBlockChainApi api = new MinterBlockChainApi(baseNodeApiUrl);
+        MinterBlockChainSDK api = new MinterBlockChainSDK(baseNodeApiUrl);
         api.mApiService.setDebug(debug);
         if (debug) {
             api.mApiService.setDebugRequestLevel(HttpLoggingInterceptor.Level.BODY);
@@ -112,7 +135,7 @@ public class MinterBlockChainApi {
         if (debug) {
             Mint.brew(logger);
         }
-        INSTANCE = new MinterBlockChainApi(baseNodeApiUrl);
+        INSTANCE = new MinterBlockChainSDK(baseNodeApiUrl);
         INSTANCE.mApiService.setDebug(debug);
         if (debug) {
             INSTANCE.mApiService.setDebugRequestLevel(HttpLoggingInterceptor.Level.BODY);
@@ -127,7 +150,7 @@ public class MinterBlockChainApi {
         initialize(baseNodeApiUrl, false, new TimberLogger());
     }
 
-    public static MinterBlockChainApi getInstance() {
+    public static MinterBlockChainSDK getInstance() {
         if (INSTANCE == null) {
             throw new IllegalStateException("You forget to call MinterBlockchainApi.initialize");
         }
@@ -149,57 +172,57 @@ public class MinterBlockChainApi {
         return out;
     }
 
-    public BlockChainEventRepository event() {
+    public NodeEventRepository event() {
         if (mEventRepository == null) {
-            mEventRepository = new BlockChainEventRepository(mApiService);
+            mEventRepository = new NodeEventRepository(mApiService);
         }
 
         return mEventRepository;
     }
 
-    public BlockChainStatusRepository status() {
+    public NodeStatusRepository status() {
         if (mStatusRepository == null) {
-            mStatusRepository = new BlockChainStatusRepository(mApiService);
+            mStatusRepository = new NodeStatusRepository(mApiService);
         }
 
         return mStatusRepository;
     }
 
-    public BlockChainCandidateRepository candidate() {
-        if (mBlockChainCandidateRepository == null) {
-            mBlockChainCandidateRepository = new BlockChainCandidateRepository(mApiService);
+    public NodeValidatorRepository validator() {
+        if (mCandidateRepository == null) {
+            mCandidateRepository = new NodeValidatorRepository(mApiService);
         }
 
-        return mBlockChainCandidateRepository;
+        return mCandidateRepository;
     }
 
-    public BlockChainBlockRepository block() {
+    public NodeBlockRepository block() {
         if (mBlockRepository == null) {
-            mBlockRepository = new BlockChainBlockRepository(mApiService);
+            mBlockRepository = new NodeBlockRepository(mApiService);
         }
 
         return mBlockRepository;
     }
 
-    public BlockChainAccountRepository account() {
+    public NodeAddressRepository account() {
         if (mAccountRepository == null) {
-            mAccountRepository = new BlockChainAccountRepository(mApiService);
+            mAccountRepository = new NodeAddressRepository(mApiService);
         }
 
         return mAccountRepository;
     }
 
-    public BlockChainTransactionRepository transactions() {
+    public NodeTransactionRepository transactions() {
         if (mTransactionRepository == null) {
-            mTransactionRepository = new BlockChainTransactionRepository(mApiService);
+            mTransactionRepository = new NodeTransactionRepository(mApiService);
         }
 
         return mTransactionRepository;
     }
 
-    public BlockChainCoinRepository coin() {
+    public NodeCoinRepository coin() {
         if (mCoinRepository == null) {
-            mCoinRepository = new BlockChainCoinRepository(mApiService);
+            mCoinRepository = new NodeCoinRepository(mApiService);
         }
 
         return mCoinRepository;

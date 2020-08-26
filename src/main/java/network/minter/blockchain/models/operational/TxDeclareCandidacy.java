@@ -37,14 +37,12 @@ import javax.annotation.Nullable;
 
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
-import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
 import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
@@ -67,7 +65,7 @@ public final class TxDeclareCandidacy extends Operation {
     private MinterAddress mAddress;
     private MinterPublicKey mPubKey;
     private Integer mCommission;
-    private String mCoin;
+    private BigInteger mCoinId;
     private BigInteger mStake;
 
     public TxDeclareCandidacy() {
@@ -82,7 +80,7 @@ public final class TxDeclareCandidacy extends Operation {
         mAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
         mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
         mCommission = in.readByte() == 0x00 ? null : in.readInt();
-        mCoin = in.readString();
+        mCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mStake = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
 
@@ -97,7 +95,7 @@ public final class TxDeclareCandidacy extends Operation {
             dest.writeByte((byte) (0x01));
             dest.writeInt(mCommission);
         }
-        dest.writeString(mCoin);
+        dest.writeValue(mCoinId);
         dest.writeValue(mStake);
     }
 
@@ -143,18 +141,22 @@ public final class TxDeclareCandidacy extends Operation {
     }
 
     public TxDeclareCandidacy setCommission(Integer commission) {
-        checkArgument(commission >= 0, "Commission must be unsigned integer");
+        checkArgument(commission >= 0 && commission <= 100, "Commission should be between 0 and 100");
         mCommission = commission;
         return this;
     }
 
-    public String getCoin() {
-        return mCoin.replace("\0", "");
+    public BigInteger getCoinId() {
+        return mCoinId;
     }
 
-    public TxDeclareCandidacy setCoin(String coinName) {
-        mCoin = StringHelper.strrpad(10, coinName.toUpperCase());
+    public TxDeclareCandidacy setCoinId(BigInteger coinId) {
+        mCoinId = coinId;
         return this;
+    }
+
+    public TxDeclareCandidacy setCoinId(long coinId) {
+        return setCoinId(BigInteger.valueOf(coinId));
     }
 
     /**
@@ -188,10 +190,10 @@ public final class TxDeclareCandidacy extends Operation {
     @Override
     protected FieldsValidationResult validate() {
         return new FieldsValidationResult()
-                .addResult("mAddress", mAddress != null, "Recipient mAddress must be set")
+                .addResult("mAddress", mAddress != null, "Recipient address must be set")
                 .addResult("mPubKey", mPubKey != null, "Node public key must be set")
-                .addResult("mCommission", mCommission != null && mCommission > 0 && mCommission <= 100, "Commission must be set (in percents)")
-                .addResult("mCoin", mCoin != null && mCoin.length() > 2 && mCoin.length() < 11, "Coin symbol length must be from 3 to 10 chars")
+                .addResult("mCommission", mCommission != null && mCommission >= 0 && mCommission <= 100, "Commission should be between 0 and 100")
+                .addResult("mCoinId", mCoinId != null, "Coin ID must be set")
                 .addResult("mStake", mStake != null && mStake.compareTo(new BigInteger("0")) > 0, "Stake must be set (more than 0)");
     }
 
@@ -202,7 +204,7 @@ public final class TxDeclareCandidacy extends Operation {
                 mAddress,
                 mPubKey,
                 mCommission,
-                mCoin,
+                mCoinId,
                 mStake
         });
     }
@@ -214,7 +216,7 @@ public final class TxDeclareCandidacy extends Operation {
         mAddress = new MinterAddress(fromRawRlp(0, decoded));
         mPubKey = new MinterPublicKey(fromRawRlp(1, decoded));
         mCommission = fixBigintSignedByte(fromRawRlp(2, decoded)).intValue();
-        mCoin = charsToString(fromRawRlp(3, decoded));
+        mCoinId = fixBigintSignedByte(fromRawRlp(3, decoded));
         mStake = fixBigintSignedByte(fromRawRlp(4, decoded));
     }
 }

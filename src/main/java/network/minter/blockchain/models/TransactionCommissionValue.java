@@ -28,6 +28,8 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -37,7 +39,8 @@ import network.minter.blockchain.models.operational.Transaction;
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TransactionCommissionValue {
+@Parcel
+public class TransactionCommissionValue extends NodeResult {
     @SerializedName("commission")
     public BigInteger value;
 
@@ -45,23 +48,15 @@ public class TransactionCommissionValue {
      * BigDecimal value
      * @return commission
      */
-    public BigDecimal getValue() {
+    public BigDecimal getValueDecimal() {
         return Transaction.humanizeValue(value);
-    }
-
-    /**
-     * Double value
-     * @return commission
-     */
-    public double getValueDouble() {
-        return getValue().doubleValue();
     }
 
     /**
      * Source value multiplied by {@link Transaction#VALUE_MUL}
      * @return commission
      */
-    public BigInteger getValueBigInteger() {
+    public BigInteger getValue() {
         return value;
     }
 }

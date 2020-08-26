@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,12 +26,15 @@
 
 package network.minter.blockchain.models;
 
+import org.parceler.Parcel;
+
 import java.math.BigInteger;
 
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
+@Parcel
 public class CountableData {
     public BigInteger count;
 }

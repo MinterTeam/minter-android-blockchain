@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -37,12 +37,12 @@ import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.core.crypto.MinterCheck;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
 import network.minter.core.util.FastByteComparisons;
 
 import static junit.framework.TestCase.assertTrue;
+import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -60,75 +60,39 @@ public class CheckTransactionTest {
     }
 
     @Test
-    public void testEncodeDecodeNumericNonce() {
-        PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
-        MinterAddress address = new MinterAddress("Mx5f0b55330e289490efa54c92e2120d6ebb6514ca");
-
-        CheckTransaction check = new CheckTransaction.Builder(new BigInteger("128"), "hello")
-                .setChainId(BlockchainID.TestNet)
-                .setCoin("MNT")
-                .setGasCoin("MNT")
-                .setDueBlock(new BigInteger("999999999"))
-                .setValue("128")
-                .build();
-        TransactionSign sign = check.sign(privateKey);
-
-        MinterCheck checkData = new MinterCheck(sign.getTxSign());
-
-        final String validCheckData = "Mcf8b08331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b20000008a4d4e5400000000000000b841b59c9a11ee79a5dbe6e40383a5db5a90960b452e5fddc63cc8f3d092ebf7e39303340d8f42bda3b55a681b9ece3229f9cf718d717ef0c2cb818c52a9b93f27d9001ca0afe5f4c59f1a1f64bd2d7bb97f0fc0cbb9cf1b40d12dc59f948dc419bbad51f8a05033b98e743a9d2af329e890933ea585785573d3a40f52aaa76858083d68654e";
-        CheckTransaction validCheck = CheckTransaction.fromEncoded(validCheckData);
-
-        CheckTransaction decoded = CheckTransaction.fromEncoded(checkData.toString());
-        assertEquals(validCheck.getNonce(), decoded.getNonce());
-        assertEquals("MNT", decoded.getGasCoin());
-        assertEquals(validCheck.getGasCoin(), decoded.getGasCoin());
-        assertEquals(validCheck.getChainId(), decoded.getChainId());
-        assertEquals(validCheck.getCoin(), decoded.getCoin());
-        assertEquals(validCheck.getDueBlock(), decoded.getDueBlock());
-        assertEquals(validCheck.getValue(), decoded.getValue());
-
-        assertEquals("Invalid lock in decoded check", validCheck.getLock(), decoded.getLock());
-        assertEquals("Invalid lock in raw check", validCheck.getLock(), check.getLock());
-
-
-        assertTrue(validCheck.getSignature().equals(decoded.getSignature()));
-        assertTrue(validCheck.getSignature().equals(check.getSignature()));
-
-
-        assertEquals(validCheckData, sign.getTxSign());
-    }
-
-    @Test
     public void testSignCheck() {
-        PrivateKey privateKey = PrivateKey.fromMnemonic("december wedding engage learn plate lion phone lemon hill grocery effort dismiss");
-        MinterAddress address = new MinterAddress("Mx5f0b55330e289490efa54c92e2120d6ebb6514ca");
-        String pass = "hello";
-        String validCheck = "Mcf8b08331323802843b9ac9ff8a4d4e54000000000000008906f05b59d3b20000008a4d4e5400000000000000b841b59c9a11ee79a5dbe6e40383a5db5a90960b452e5fddc63cc8f3d092ebf7e39303340d8f42bda3b55a681b9ece3229f9cf718d717ef0c2cb818c52a9b93f27d9001ca0afe5f4c59f1a1f64bd2d7bb97f0fc0cbb9cf1b40d12dc59f948dc419bbad51f8a05033b98e743a9d2af329e890933ea585785573d3a40f52aaa76858083d68654e";
+        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
+        MinterAddress address = new MinterAddress("Mx67691076548b20234461ff6fd2bc9c64393eb8fc");
+        String pass = "pass";
+        String validCheck = "Mcf89a8334383001830f423f80888ac7230489e8000080b84191ea56636b6667bb9da14bd412d492b90b9ae29799a90d0d69a637f3894c8ba246aae2b466fe76acab0a65cc6791ab2ae29d155b56efe84a929e089a22e15615001ba0d88c6543ac5d791428d46f8625c0af8e908fde3ec339e3d77ecb585e7c507ea8a021debf60dd96497d430b3cd92dac7bf22a00b4518f39d084c1dc50ba4c8b0d3b";
+        String validProof = "7afddf8a86013784a056a3fa7ce3b5b07e259870e686c5f3df4eb656f8e6800c732bd8cb13fbdca0100433d98a760a8736249a41ad34b8af445b807ba53974f500";
 
-        CheckTransaction check = new CheckTransaction.Builder(new BigInteger("128"), pass)
-                .setChainId(BlockchainID.TestNet)
-                .setGasCoin("MNT")
-                .setCoin("MNT")
-                .setDueBlock(new BigInteger("999999999"))
-                .setValue("128")
+
+        CheckTransaction check = new CheckTransaction.Builder(new BigInteger("480"), pass)
+                .setChainId(BlockchainID.MainNet)
+                .setGasCoin(DEFAULT_COIN_ID)
+                .setCoinId(DEFAULT_COIN_ID)
+                .setDueBlock(new BigInteger("999999"))
+                .setValue("10")
                 .build();
 
         TransactionSign sign = check.sign(privateKey);
 
         CheckTransaction decoded = CheckTransaction.fromEncoded(sign.getTxSign());
-        assertEquals(new BigInteger("128"), decoded.getNonceNumeric());
-        assertTrue(FastByteComparisons.equal("128".getBytes(), decoded.getNonce().getBytes()));
-        assertEquals(BlockchainID.TestNet, decoded.getChainId());
-        assertEquals("MNT", decoded.getCoin());
-        assertEquals("MNT", decoded.getGasCoin());
-        assertEquals(new BigInteger("999999999"), decoded.getDueBlock());
-        assertEquals(new BigDecimal("128"), decoded.getValue());
+        assertEquals(new BigInteger("480"), decoded.getNonceNumeric());
+        assertTrue(FastByteComparisons.equal("480".getBytes(), decoded.getNonce().getBytes()));
+        assertEquals(BlockchainID.MainNet, decoded.getChainId());
+        assertEquals(DEFAULT_COIN_ID, decoded.getCoinId());
+        assertEquals(DEFAULT_COIN_ID, decoded.getGasCoinId());
+        assertEquals(new BigInteger("999999"), decoded.getDueBlock());
+        assertEquals(new BigDecimal("10"), decoded.getValue());
 
         CheckTransaction validDec = CheckTransaction.fromEncoded(validCheck);
 
         assertEquals(validCheck, sign.getTxSign());
 
         BytesData proof = CheckTransaction.makeProof(address, pass);
+        assertEquals(validProof, proof.toHexString());
         System.out.println(proof.toHexString());
 
     }

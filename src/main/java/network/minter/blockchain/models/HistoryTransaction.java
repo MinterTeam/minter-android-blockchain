@@ -46,7 +46,7 @@ import network.minter.core.crypto.MinterPublicKey;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Parcel
-public class HistoryTransaction {
+public class HistoryTransaction extends NodeResult {
     public BytesData hash;
     @SerializedName("raw_tx")
     public BytesData rawTx;
@@ -54,11 +54,11 @@ public class HistoryTransaction {
     public Long index;
     public MinterAddress from;
     public BigInteger nonce;
-    public int gas;
+    public BigInteger gas;
     @SerializedName("gas_price")
-    public int gasPrice;
+    public BigInteger gasPrice;
     @SerializedName("gas_coin")
-    public String gasCoin;
+    public BigInteger gasCoinId;
     public Type type;
     public TxBaseResult data;
     public String payload;
@@ -110,13 +110,26 @@ public class HistoryTransaction {
     public static class TxBaseResult {
     }
 
+    @Parcel
+    public static class CoinData {
+        public BigInteger id;
+        public String symbol;
+
+        public String getSymbol() {
+            if (symbol == null) {
+                return null;
+            }
+            return symbol.toUpperCase();
+        }
+    }
+
     /**
      * Data model for sending transaction
      */
     @Parcel
     public static class TxSendCoinResult extends TxBaseResult {
         public MinterAddress to;
-        public String coin;
+        public CoinData coin;
         @SerializedName("value")
         public BigInteger amount;
 
@@ -124,11 +137,13 @@ public class HistoryTransaction {
             return to;
         }
 
+        /**
+         * @return coin symbol uppercase
+         * @deprecated use {@link TxSendCoinResult#coin}
+         */
+        @Deprecated
         public String getCoin() {
-            if (coin == null) {
-                return null;
-            }
-            return coin.toUpperCase();
+            return coin != null ? coin.symbol.toUpperCase() : null;
         }
 
         public BigDecimal getAmount() {
@@ -183,9 +198,9 @@ public class HistoryTransaction {
     @Parcel
     public static class TxConvertCoinResult extends TxBaseResult {
         @SerializedName("coin_to_sell")
-        public String coinToSell;
+        public BigInteger coinToSell;
         @SerializedName("coin_to_buy")
-        public String coinToBuy;
+        public BigInteger coinToBuy;
         @SerializedName("value_to_buy")
         public BigInteger valueToBuy;
         @SerializedName("value_to_sell")
@@ -196,19 +211,19 @@ public class HistoryTransaction {
         public BigInteger maxValueToSell;
 
 
-        public String getCoinToSell() {
-            if (coinToSell == null) {
-                return null;
-            }
-            return coinToSell.toUpperCase();
-        }
-
-        public String getCoinToBuy() {
-            if (coinToBuy == null) {
-                return null;
-            }
-            return coinToBuy.toUpperCase();
-        }
+//        public String getCoinToSell() {
+//            if (coinToSell == null) {
+//                return null;
+//            }
+//            return coinToSell.toUpperCase();
+//        }
+//
+//        public String getCoinToBuy() {
+//            if (coinToBuy == null) {
+//                return null;
+//            }
+//            return coinToBuy.toUpperCase();
+//        }
 
         public BigDecimal getValueToBuy() {
             if (valueToBuy == null) {

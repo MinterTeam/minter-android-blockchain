@@ -40,15 +40,12 @@ import network.minter.core.crypto.HashUtil;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterCheck;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
 import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.charsToStringSafe;
-import static network.minter.core.internal.helpers.StringHelper.strrpad;
 
 /**
  * minter-android-blockchain. 2018
@@ -59,22 +56,22 @@ public class CheckTransaction {
     private BytesData mNonce;
     private BlockchainID mChainId;
     private BigInteger mDueBlock;
-    private String mCoin;
+    private BigInteger mCoinId;
     private BigInteger mValue;
-    private String mGasCoin;
+    private BigInteger mGasCoinId;
     private BytesData mLock;
     private SignatureSingleData mSignature;
 
     CheckTransaction(BytesData nonce, String passphrase) {
-        mGasCoin = StringHelper.strrpad(10, MinterSDK.DEFAULT_COIN);
-        mCoin = mGasCoin;
+        mGasCoinId = MinterSDK.DEFAULT_COIN_ID;
+        mCoinId = mGasCoinId;
         mNonce = nonce;
         mPassphrase = passphrase;
     }
 
     CheckTransaction() {
-        mGasCoin = StringHelper.strrpad(10, MinterSDK.DEFAULT_COIN);
-        mCoin = mGasCoin;
+        mGasCoinId = MinterSDK.DEFAULT_COIN_ID;
+        mCoinId = mGasCoinId;
         mNonce = new BytesData("1".getBytes());
     }
 
@@ -141,14 +138,14 @@ public class CheckTransaction {
         mPassphrase = null;
         mNonce = null;
         mDueBlock = null;
-        mCoin = null;
+        mCoinId = null;
         mValue = null;
         mLock = null;
         mSignature = null;
     }
 
-    public String getCoin() {
-        return mCoin.replace("\0", "");
+    public BigInteger getCoinId() {
+        return mCoinId;
     }
 
     /**
@@ -239,8 +236,8 @@ public class CheckTransaction {
         return mLock;
     }
 
-    public String getGasCoin() {
-        return mGasCoin.replace("\0", "");
+    public BigInteger getGasCoinId() {
+        return mGasCoinId;
     }
 
     char[] fromRawRlp(int idx, Object[] raw) {
@@ -256,9 +253,9 @@ public class CheckTransaction {
         mNonce = new BytesData((char[]) raw[idx++]);
         mChainId = BlockchainID.valueOf(fixBigintSignedByte(fromRawRlp(idx++, raw)));
         mDueBlock = fixBigintSignedByte(raw[idx++]);
-        mCoin = charsToStringSafe(fromRawRlp(idx++, raw), 10);
+        mCoinId = fixBigintSignedByte(raw[idx++]);
         mValue = fixBigintSignedByte(raw[idx++]);
-        mGasCoin = charsToStringSafe(fromRawRlp(idx++, raw), 10);
+        mGasCoinId = fixBigintSignedByte(raw[idx++]);
         mLock = new BytesData((char[]) raw[idx++]);
         mSignature = new SignatureSingleData();
 
@@ -275,9 +272,9 @@ public class CheckTransaction {
                     mNonce,
                     BigInteger.valueOf(mChainId.getId()),
                     mDueBlock,
-                    mCoin,
+                    mCoinId,
                     mValue,
-                    mGasCoin,
+                    mGasCoinId,
             });
         }
 
@@ -287,9 +284,9 @@ public class CheckTransaction {
                     mNonce,
                     BigInteger.valueOf(mChainId.getId()),
                     mDueBlock,
-                    mCoin,
+                    mCoinId,
                     mValue,
-                    mGasCoin,
+                    mGasCoinId,
                     lock,
                     mSignature.getV().getData(),
                     mSignature.getR().getData(),
@@ -301,15 +298,15 @@ public class CheckTransaction {
                 mNonce,
                 BigInteger.valueOf(mChainId.getId()),
                 mDueBlock,
-                mCoin,
+                mCoinId,
                 mValue,
-                mGasCoin,
+                mGasCoinId,
                 lock
         });
     }
 
     public static final class Builder {
-        private CheckTransaction mCheck;
+        private final CheckTransaction mCheck;
 
         /**
          * @param nonce BigInteger will be interpreted as char[] instead of getting bytes of BigInteger
@@ -334,10 +331,8 @@ public class CheckTransaction {
             return this;
         }
 
-        public Builder setCoin(@Nonnull String coin) {
-            //noinspection ConstantConditions
-            checkArgument(coin != null && coin.length() >= 3 && coin.length() <= 10, String.format("Invalid coin passed: %s", coin));
-            mCheck.mCoin = strrpad(10, coin);
+        public Builder setCoinId(BigInteger coinId) {
+            mCheck.mCoinId = coinId;
             return this;
         }
 
@@ -355,8 +350,8 @@ public class CheckTransaction {
             return this;
         }
 
-        public Builder setGasCoin(String gasCoin) {
-            mCheck.mGasCoin = StringHelper.strrpad(10, gasCoin);
+        public Builder setGasCoin(BigInteger gasCoinId) {
+            mCheck.mGasCoinId = gasCoinId;
             return this;
         }
 

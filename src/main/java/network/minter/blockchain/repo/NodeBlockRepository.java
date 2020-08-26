@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -30,59 +30,42 @@ import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
 
-import network.minter.blockchain.api.BlockChainBlockEndpoint;
-import network.minter.blockchain.models.BCResult;
+import io.reactivex.rxjava3.core.Observable;
+import network.minter.blockchain.api.NodeBlockEndpoint;
 import network.minter.blockchain.models.BlockInfo;
 import network.minter.core.internal.api.ApiService;
 import network.minter.core.internal.data.DataRepository;
-import retrofit2.Call;
 
 /**
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class BlockChainBlockRepository extends DataRepository<BlockChainBlockEndpoint> {
-    public BlockChainBlockRepository(@Nonnull ApiService.Builder apiBuilder) {
+public class NodeBlockRepository extends DataRepository<NodeBlockEndpoint> {
+    public NodeBlockRepository(@Nonnull ApiService.Builder apiBuilder) {
         super(apiBuilder);
     }
 
     /**
      * Resolve block info by its height
-     * @param height
+     * @param blockNumber block number
      * @return
      */
-    public Call<BCResult<BlockInfo>> getByHeight(long height) {
-        return getInstantService().getByHeight(height);
+    public Observable<BlockInfo> getByHeight(int blockNumber) {
+        return getByHeight(new BigInteger(String.valueOf(blockNumber)));
     }
 
     /**
-     * Get current minimum gas price to send transaction
+     * Resolve block info by its height
+     * @param blockNumber block number
      * @return
      */
-    public Call<BCResult<BigInteger>> getMinGasPrice() {
-        return getInstantService().getMinGas();
-    }
-
-    /**
-     * Get current maximum gas price to send transaction
-     * @return
-     */
-    public Call<BCResult<BigInteger>> getMaxGasPrice() {
-        return getInstantService().getMaxGas();
-    }
-
-    /**
-     * Get block maximum gas price
-     * @param blockHeight
-     * @return
-     */
-    public Call<BCResult<BigInteger>> getMaxGasPrice(long blockHeight) {
-        return getInstantService().getMaxGasByHeight(blockHeight);
+    public Observable<BlockInfo> getByHeight(BigInteger blockNumber) {
+        return getInstantService().getByHeight(blockNumber.toString());
     }
 
     @Nonnull
     @Override
-    protected Class<BlockChainBlockEndpoint> getServiceClass() {
-        return BlockChainBlockEndpoint.class;
+    protected Class<NodeBlockEndpoint> getServiceClass() {
+        return NodeBlockEndpoint.class;
     }
 }

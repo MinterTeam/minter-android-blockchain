@@ -57,8 +57,6 @@ import static network.minter.core.internal.common.Preconditions.checkNotNull;
 import static network.minter.core.internal.common.Preconditions.firstNonNull;
 import static network.minter.core.internal.helpers.BytesHelper.charsToBytes;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.charsToString;
-import static network.minter.core.internal.helpers.StringHelper.strrpad;
 
 /**
  * minter-android-blockchain. 2018
@@ -81,8 +79,8 @@ public class Transaction implements Parcelable {
     };
     BigInteger mNonce;
     BlockchainID mChainId;
-    BigInteger mGasPrice = new BigInteger("1");
-    String mGasCoin = MinterSDK.DEFAULT_COIN;
+    BigInteger mGasPrice = BigInteger.ONE;
+    BigInteger mGasCoinId = MinterSDK.DEFAULT_COIN_ID;
     OperationType mType = OperationType.SendCoin;
     Operation mOperationData;
     // max - 1024 bytes (1 kilobyte)
@@ -133,7 +131,7 @@ public class Transaction implements Parcelable {
         mNonce = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mChainId = (BlockchainID) in.readValue(BlockchainID.class.getClassLoader());
         mGasPrice = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mGasCoin = in.readString();
+        mGasCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mType = (OperationType) in.readValue(OperationType.class.getClassLoader());
         mOperationData = (Operation) in.readValue(Operation.class.getClassLoader());
         mPayload = (BytesData) in.readValue(BytesData.class.getClassLoader());
@@ -198,7 +196,7 @@ public class Transaction implements Parcelable {
         mNonce = null;
         mChainId = null;
         mGasPrice = null;
-        mGasCoin = null;
+        mGasCoinId = null;
         mType = null;
         mOperationData = null;
         mPayload = null;
@@ -462,8 +460,8 @@ public class Transaction implements Parcelable {
      * Returns gas coin without zero-bytes
      * @return
      */
-    public String getGasCoin() {
-        return mGasCoin.replace("\0", "");
+    public BigInteger getGasCoinId() {
+        return mGasCoinId;
     }
 
     /**
@@ -492,7 +490,7 @@ public class Transaction implements Parcelable {
         dest.writeValue(mNonce);
         dest.writeValue(mChainId);
         dest.writeValue(mGasPrice);
-        dest.writeString(mGasCoin);
+        dest.writeValue(mGasCoinId);
         dest.writeValue(mType);
         dest.writeValue(mOperationData);
         dest.writeValue(mPayload);
@@ -516,7 +514,7 @@ public class Transaction implements Parcelable {
         mNonce = fixBigintSignedByte(raw[0]);
         mChainId = BlockchainID.valueOf(fixBigintSignedByte(fromRawRlp(1, raw)));
         mGasPrice = fixBigintSignedByte((raw[2]));
-        mGasCoin = charsToString(fromRawRlp(3, raw), 10);
+        mGasCoinId = fixBigintSignedByte((raw[3]));
         mType = OperationType.findByValue(new BigInteger(charsToBytes(fromRawRlp(4, raw))));
         /**
          * ha, where is the 5th index?
@@ -536,7 +534,7 @@ public class Transaction implements Parcelable {
 
         if (excludeSignature) {
             return RLPBoxed.encode(new Object[]{
-                    mNonce, BigInteger.valueOf(mChainId.getId()), mGasPrice, mGasCoin, mOperationData.getType().getValue(),
+                    mNonce, BigInteger.valueOf(mChainId.getId()), mGasPrice, mGasCoinId, mOperationData.getType().getValue(),
                     data,
                     mPayload.getData(),
                     mServiceData.getData(),
@@ -547,7 +545,7 @@ public class Transaction implements Parcelable {
         final char[] signData = mSignatureData.encodeRLP();
 
         return RLPBoxed.encode(new Object[]{
-                mNonce.toByteArray(), BigInteger.valueOf(mChainId.getId()), mGasPrice, mGasCoin, mOperationData.getType().getValue(),
+                mNonce.toByteArray(), BigInteger.valueOf(mChainId.getId()), mGasPrice, mGasCoinId, mOperationData.getType().getValue(),
                 data,
                 mPayload.getData(),
                 mServiceData.getData(),
@@ -559,7 +557,8 @@ public class Transaction implements Parcelable {
     FieldsValidationResult validate() {
         return new FieldsValidationResult("Invalid transaction data")
                 .addResult("nonce", mNonce != null, "Nonce must be set")
-                .addResult("gasPrice", mGasCoin != null, "Gas coin must be set")
+                .addResult("gasCoin", mGasCoinId != null, "Gas coin must be set")
+                .addResult("gasPrice", mGasPrice != null, "Gas price must be set")
                 .addResult("operationData", mOperationData !=
                         null, "Operation data does not set! Check your operation model.");
     }
@@ -580,10 +579,10 @@ public class Transaction implements Parcelable {
             mTx.mType = externalTransaction.getType();
             mTx.mOperationData = externalTransaction.mOperationData;
             mTx.mPayload = firstNonNull(externalTransaction.getPayload(), new BytesData(new char[0]));
-            if (externalTransaction.getGasCoin() == null || externalTransaction.getGasCoin().equals("")) {
-                mTx.mGasCoin = strrpad(10, MinterSDK.DEFAULT_COIN);
+            if (externalTransaction.getGasCoinId() == null) {
+                mTx.mGasCoinId = MinterSDK.DEFAULT_COIN_ID;
             } else {
-                mTx.mGasCoin = strrpad(10, externalTransaction.getGasCoin());
+                mTx.mGasCoinId = externalTransaction.getGasCoinId();
             }
 
             if (externalTransaction.getGasPrice() == null || externalTransaction.getGasPrice().equals(BigInteger.ZERO)) {
@@ -632,13 +631,13 @@ public class Transaction implements Parcelable {
         }
 
         /**
-         * Set fee coin. By default if not set, using {@link MinterSDK#DEFAULT_COIN}
-         * @param coin string coin name. Min length: 3, maximum: 10
+         * Set fee coin. By default if not set, using {@link MinterSDK#DEFAULT_COIN_ID}
+         * @param coinId BigInteger coin identifier
          * @return {@link Builder}
          */
-        public Builder setGasCoin(@Nonnull String coin) {
-            checkArgument(coin != null, "Gas coin can't be null");
-            mTx.mGasCoin = strrpad(10, coin);
+        public Builder setGasCoinId(@Nonnull BigInteger coinId) {
+            checkArgument(coinId != null, "Gas coin can't be null");
+            mTx.mGasCoinId = coinId;
             return this;
         }
 
@@ -664,6 +663,15 @@ public class Transaction implements Parcelable {
                 return this;
             }
             return setPayload(new BytesData(data, true));
+        }
+
+        public Builder setPayloadString(String s) {
+            if (s == null || s.isEmpty()) {
+                mTx.mPayload = null;
+                return this;
+            }
+            BytesData pl = new BytesData(s.getBytes());
+            return setPayload(pl);
         }
 
         /**
@@ -778,6 +786,14 @@ public class Transaction implements Parcelable {
         }
 
         /**
+         * Recreate coin with new parameters
+         * @return {@link TxRecreateCoin}
+         */
+        public TxRecreateCoin recreateCoin() {
+            return new TxRecreateCoin(mTx);
+        }
+
+        /**
          * Create "Declare candidacy" transaction builder
          * @return {@link TxDeclareCandidacy}
          */
@@ -818,6 +834,14 @@ public class Transaction implements Parcelable {
         }
 
         /**
+         * Edit multisig address owners data
+         * @return {@link TxEditMultisigOwnersData}
+         */
+        public TxEditMultisigOwnersData editMultisigOwnersData() {
+            return new TxEditMultisigOwnersData(mTx);
+        }
+
+        /**
          * Create "Multiple send coins" transaction builder
          * @return {@link TxMultisend}
          */
@@ -826,7 +850,7 @@ public class Transaction implements Parcelable {
         }
 
         /**
-         * Create "Validator candidate editing" transaction builder
+         * Create "ValidatorItem candidate editing" transaction builder
          * @return {@link TxEditCandidate}
          */
         public TxEditCandidate editCandidate() {
@@ -855,6 +879,22 @@ public class Transaction implements Parcelable {
          */
         public TxUnbound unbound() {
             return new TxUnbound(mTx);
+        }
+
+        /**
+         * Create transaction that changes created coin owner
+         * @return {@link TxChangeCoinOwner}
+         */
+        public TxChangeCoinOwner changeCoinOwner() {
+            return new TxChangeCoinOwner(mTx);
+        }
+
+        /**
+         * Create transaction that planning to stop network (by validator votes)
+         * @return {@link TxSetHaltBlock}
+         */
+        public TxSetHaltBlock setHaltBlock() {
+            return new TxSetHaltBlock(mTx);
         }
     }
 

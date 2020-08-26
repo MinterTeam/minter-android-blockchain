@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,72 +26,49 @@
 
 package network.minter.blockchain.models;
 
-import com.google.common.base.Objects;
 import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
-import network.minter.blockchain.models.operational.Transaction;
+import static network.minter.blockchain.models.operational.Transaction.humanizeValue;
 
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Parcel
-public class Balance {
-    public Map<String, CoinBalance> coins;
+public class AddressInfo extends NodeResult {
+    // contains each coin balance
+    public List<CoinBalance> balance = Collections.emptyList();
+    // contains summary balance grouped by coin
+    public List<CoinBalance> total = Collections.emptyList();
     @SerializedName("transaction_count")
-    public BigInteger txCount;
+    public BigInteger txCount = BigInteger.ZERO;
+    public BigInteger bipValue = BigInteger.ZERO;
 
-    public CoinBalance get(String coin) {
-        return coins.get(coin.toUpperCase());
-    }
-
-    public BigDecimal getFor(String coin) {
-        if (!coins.containsKey(coin.toUpperCase())) {
-            return new BigDecimal("0");
-        }
-
-        return coins.get(coin.toUpperCase()).getBalance();
+    public BigDecimal getBipValueDecimal() {
+        return humanizeValue(bipValue);
     }
 
     @Parcel
     public static class CoinBalance {
-        public String coin;
-        public BigInteger balance;
+        // This object will contains only ID and SYMBOL values, as "/address" result does not results nothing else
+        public Coin coin;
+        public BigInteger value;
+        @SerializedName("bip_value")
+        public BigInteger bipValue;
 
-        /**
-         * @return Coin name
-         */
-        public String getCoin() {
-            return coin;
+        public BigDecimal getValueDecimal() {
+            return humanizeValue(value);
         }
 
-        /**
-         * @return Current balance in coins for specified address
-         * @throws NumberFormatException
-         */
-        public BigDecimal getBalance() {
-            return new BigDecimal(balance).setScale(18, RoundingMode.UNNECESSARY).divide(Transaction.VALUE_MUL_DEC, BigDecimal.ROUND_UNNECESSARY);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(coin, balance);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            CoinBalance balance1 = (CoinBalance) o;
-            return Objects.equal(coin, balance1.coin) &&
-                    Objects.equal(balance, balance1.balance);
+        public BigDecimal getBipValueDecimal() {
+            return humanizeValue(bipValue);
         }
     }
 

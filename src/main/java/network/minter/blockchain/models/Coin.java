@@ -34,14 +34,15 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.Transaction;
+import network.minter.core.crypto.MinterAddress;
 
 /**
- * minter-android-blockchain. 2018
- *
+ * minter-android-blockchain. 2020
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 @Parcel
-public class Coin {
+public class Coin extends NodeResult {
+    public BigInteger id;
     public String name;
     public String symbol;
     public BigInteger volume;
@@ -50,6 +51,8 @@ public class Coin {
     public BigInteger reserveBalance;
     @SerializedName("max_supply")
     public BigInteger maxSupply;
+    @SerializedName("owner_address")
+    public MinterAddress owner;
 
     public String getSymbol() {
         return symbol.toUpperCase();

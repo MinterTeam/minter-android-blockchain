@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,58 +26,80 @@
 
 package network.minter.blockchain.api;
 
-import network.minter.blockchain.models.BCResult;
+import io.reactivex.rxjava3.core.Observable;
 import network.minter.blockchain.models.Coin;
 import network.minter.blockchain.models.ExchangeBuyValue;
 import network.minter.blockchain.models.ExchangeSellValue;
-import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public interface BlockChainCoinEndpoint {
+public interface NodeCoinEndpoint {
 
     /**
      * Get information about coin
-     *
      * @param coin Coin Symbol (min: 3, max 10 chars)
      * @return Coin information pojo
      */
-    @GET("/coin_info")
-    Call<BCResult<Coin>> getCoinInformation(@Query("symbol") String coin);
+    @GET("/coin_info/{symbol}")
+    Observable<Coin> getCoinInformation(@Path("symbol") String coin);
+
+    /**
+     * Get information about coin by ID
+     * @param coin Coin Symbol (min: 3, max 10 chars)
+     * @return Coin information pojo
+     */
+    @GET("/coin_info_by_id/{id}")
+    Observable<Coin> getCoinInformationById(@Path("id") String id);
 
     /**
      * Give an estimation about coin exchange (selling)
-     *
-     * @param coinToSell  coin to convert from
+     * @param coinIdToSell coin to convert from
      * @param valueToSell BigInteger string value
-     * @param coinToBuy   coin to convert to
+     * @param coinIdToBuy coin to convert to
      * @return
      */
     @GET("/estimate_coin_sell")
-    Call<BCResult<ExchangeSellValue>> getCoinExchangeCurrencyToSell(
-            @Query("coin_to_sell") String coinToSell,
+    Observable<ExchangeSellValue> getCoinExchangeCurrencyToSell(
+            @Query("coin_id_to_sell") String coinIdToSell,
             @Query("value_to_sell") String valueToSell,
-            @Query("coin_to_buy") String coinToBuy
+            @Query("coin_id_to_buy") String coinIdToBuy
+    );
+
+    /**
+     * Give an estimation about coin exchange (selling ALL)
+     * @param coinIdToSell coin to convert from
+     * @param valueToSell BigInteger string value
+     * @param coinIdToBuy coin to convert to
+     * @param gasPrice pass current network gas price
+     * @param height pass block number or null
+     * @return
+     */
+    @GET("/estimate_coin_sell_all")
+    Observable<ExchangeSellValue> getCoinExchangeCurrencyToSellAll(
+            @Query("coin_id_to_sell") String coinIdToSell,
+            @Query("value_to_sell") String valueToSell,
+            @Query("coin_id_to_buy") String coinIdToBuy,
+            @Query("gas_price") String gasPrice,
+            @Query("height") String height
     );
 
     /**
      * Give an estimation about coin exchange (buying)
-     *
-     * @param coinToSell coin to convert from
+     * @param coinIdToSell coin to convert from
      * @param valueToBuy BigInteger string value
-     * @param coinToBuy  coin to convert to
+     * @param coinIdToBuy coin to convert to
      * @return
      */
     @GET("/estimate_coin_buy")
-    Call<BCResult<ExchangeBuyValue>> getCoinExchangeCurrencyToBuy(
-            @Query("coin_to_sell") String coinToSell,
+    Observable<ExchangeBuyValue> getCoinExchangeCurrencyToBuy(
+            @Query("coin_id_to_sell") String coinIdToSell,
             @Query("value_to_buy") String valueToBuy,
-            @Query("coin_to_buy") String coinToBuy
+            @Query("coin_id_to_buy") String coinIdToBuy
     );
 
 }

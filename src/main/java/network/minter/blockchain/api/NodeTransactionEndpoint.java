@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,52 +26,58 @@
 
 package network.minter.blockchain.api;
 
-import java.util.List;
-
-import network.minter.blockchain.models.BCResult;
+import io.reactivex.rxjava3.core.Observable;
 import network.minter.blockchain.models.HistoryTransaction;
+import network.minter.blockchain.models.HistoryTransactionList;
 import network.minter.blockchain.models.TransactionCommissionValue;
+import network.minter.blockchain.models.TransactionSendResult;
 import network.minter.blockchain.models.UnconfirmedTransactions;
-import retrofit2.Call;
+import network.minter.blockchain.repo.NodeTransactionRepository;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public interface BlockChainTransactionEndpoint {
+public interface NodeTransactionEndpoint {
 
-	/**
-	 * Get list of transactions filtered by given query
-	 *
-	 * @param urlEncodedQuery
-	 * @return
-	 * @see network.minter.blockchain.repo.BlockChainTransactionRepository.TQuery
-	 */
+    /**
+     * Get list of transactions filtered by given query
+     * @param urlEncodedQuery
+     * @return
+     * @see NodeTransactionRepository.TQuery
+     */
     @GET("/transactions")
-	Call<BCResult<List<HistoryTransaction>>> getTransactions(@Query("query") String urlEncodedQuery);
+    Observable<HistoryTransactionList> getTransactions(@Query("query") String urlEncodedQuery);
 
-	/**
-	 * Get full information about transaction
-	 *
-	 * @param txHash Transaction hash (hex bytes with prefix: Mt)
-	 * @return
-	 * @see network.minter.core.MinterSDK#PREFIX_TX
-	 */
-    @GET("/transaction")
-	Call<BCResult<HistoryTransaction>> getTransaction(@Query("hash") String txHash);
+    /**
+     * Get full information about transaction
+     * @param txHash Transaction hash (hex bytes with prefix: Mt)
+     * @return
+     * @see network.minter.core.MinterSDK#PREFIX_TX
+     */
+    @GET("/transaction/{hash}")
+    Observable<HistoryTransaction> getTransaction(@Path("hash") String txHash);
 
     /**
      * Calculates signed transaction commission
      * @param signedTx Valid transaction, signed with private key
      * @return
      */
-    @GET("/estimate_tx_commission")
-    Call<BCResult<TransactionCommissionValue>> getTxCommission(@Query("tx") String signedTx);
+    @GET("/estimate_tx_commission/{tx}")
+    Observable<TransactionCommissionValue> getTxCommission(@Path("tx") String signedTx);
 
 
     @GET("/unconfirmed_txs")
-    Call<BCResult<UnconfirmedTransactions>> getUnconfirmed();
+    Observable<UnconfirmedTransactions> getUnconfirmed(@Query("limit") Integer limit);
+
+    /**
+     * Broadcasts transaction onto Minter network
+     * @param data
+     * @return
+     */
+    @GET("/send_transaction")
+    Observable<TransactionSendResult> sendTransaction(@Query("tx") String signedTxHash);
 }

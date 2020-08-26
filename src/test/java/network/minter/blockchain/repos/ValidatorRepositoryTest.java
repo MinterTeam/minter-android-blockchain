@@ -29,15 +29,12 @@ package network.minter.blockchain.repos;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
 
-import network.minter.blockchain.MinterBlockChainApi;
-import network.minter.blockchain.models.BCResult;
+import network.minter.blockchain.MinterBlockChainSDK;
 import network.minter.blockchain.models.CandidateItem;
-import network.minter.blockchain.models.CandidateStatus;
-import network.minter.blockchain.repo.BlockChainCandidateRepository;
-import retrofit2.Call;
-import retrofit2.Response;
+import network.minter.blockchain.models.CandidateList;
+import network.minter.blockchain.repo.NodeValidatorRepository;
+import network.minter.core.internal.log.StdLogger;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -46,40 +43,33 @@ import static org.junit.Assert.assertTrue;
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class CandidateRepositoryTest {
+public class ValidatorRepositoryTest {
 
     @Test
     public void testGetCandidates() throws IOException {
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843", true, new StdLogger());
 
-        BlockChainCandidateRepository repository = MinterBlockChainApi.getInstance().candidate();
+        NodeValidatorRepository repository = MinterBlockChainSDK.getInstance().validator();
 
         // Get candidate by Public Key
-        Call<BCResult<List<CandidateStatus>>> request = repository.getBlockCandidates(0);
+        CandidateList response = repository.getCandidates(0).blockingFirst();
 
-        Response<BCResult<List<CandidateStatus>>> response = request.execute();
-
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
-
-        assertNotNull(response.body().result);
+        assertNotNull(response.items);
+        assertTrue(response.items.size() > 0);
+//        assertNotNull(response.body().result);
     }
 
     @Test
     public void testGetCandidate() throws IOException {
         //Mp738da41ba6a7b7d69b7294afa158b89c5a1b410cbf0c2443c85c5fe24ad1dd1c
-        MinterBlockChainApi.initialize("https://minter-node-1.testnet.minter.network:8841");
+        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
 
-        BlockChainCandidateRepository repository = MinterBlockChainApi.getInstance().candidate();
+        NodeValidatorRepository repository = MinterBlockChainSDK.getInstance().validator();
 
         // Get candidate by Public Key
-        Call<BCResult<CandidateItem>> request = repository.getCandidate("Mpf17328239cd81453b9e9393f66137e5442fb108c7b4fc36b6acfd838f7e6e0c4");
+        CandidateItem response = repository.getCandidate("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8").blockingFirst();
 
-        Response<BCResult<CandidateItem>> response = request.execute();
 
-        assertTrue(response.isSuccessful());
-        assertTrue(response.body().isOk());
-
-        assertNotNull(response.body().result);
+        assertNotNull(response.publicKey);
     }
 }

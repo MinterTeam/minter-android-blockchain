@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -49,7 +49,12 @@ public abstract class RLPSerializable {
     protected char[][] objArrToByteArrArr(Object[] input) {
         char[][] out = new char[input.length][];
         for (int i = 0; i < input.length; i++) {
-            out[i] = (char[]) input[i];
+            if (input[i] instanceof String) {
+                out[i] = new char[0];
+            } else {
+                out[i] = (char[]) input[i];
+            }
+
         }
 
         return out;

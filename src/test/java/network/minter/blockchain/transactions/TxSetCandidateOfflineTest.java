@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -41,6 +41,7 @@ import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.TestCase.assertNotNull;
+import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -59,15 +60,15 @@ public class TxSetCandidateOfflineTest {
 
     @Test
     public void testEncode() throws OperationInvalidDataException {
-        final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f87c0102018a4d4e54000000000000000ba2e1a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43808001b845f8431ca02ac45817f167c34b55b8afa0b6d9692be28e2aa41dd28a134663d1f5bebb5ad8a06d5f161a625701d506db20c497d24e9939c2e342a6ff7d724cb1962267bd4ba5";
-        final PrivateKey privateKey = new PrivateKey("05ddcd4e6f7d248ed1388f0091fe345bf9bf4fc2390384e26005e7675c98b3c1");
+        final BigInteger nonce = new BigInteger("14");
+        final String validTx = "f8720e0101800ba2e1a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0808001b845f8431ba024c5fc033d9d6ad2bfecb37680db84a897839813fd0ad5583254b69180954fb9a022728b74156536acc44c3ef572cc20947a1a015c94b13e36068e1089c95d025b";
+        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
-                .setBlockchainId(BlockchainID.TestNet)
-                .setGasCoin("MNT")
+                .setBlockchainId(BlockchainID.MainNet)
+                .setGasCoinId(DEFAULT_COIN_ID)
                 .setCandidateOffline()
-                .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
+                .setPublicKey(new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0"))
                 .build();
 
         assertNotNull(tx);
@@ -77,18 +78,18 @@ public class TxSetCandidateOfflineTest {
 
     @Test
     public void testDecode() {
-        final BigInteger nonce = new BigInteger("1");
-        final String validTx = "f87c0102018a4d4e54000000000000000ba2e1a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43808001b845f8431ca02ac45817f167c34b55b8afa0b6d9692be28e2aa41dd28a134663d1f5bebb5ad8a06d5f161a625701d506db20c497d24e9939c2e342a6ff7d724cb1962267bd4ba5";
+        final BigInteger nonce = new BigInteger("14");
+        final String validTx = "f8720e0101800ba2e1a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0808001b845f8431ba024c5fc033d9d6ad2bfecb37680db84a897839813fd0ad5583254b69180954fb9a022728b74156536acc44c3ef572cc20947a1a015c94b13e36068e1089c95d025b";
 
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);
 
         assertEquals(nonce, tx.getNonce());
-        assertEquals("MNT", tx.getGasCoin());
+        assertEquals(DEFAULT_COIN_ID, tx.getGasCoinId());
         assertEquals(OperationType.SetCandidateOffline, tx.getType());
         TxSetCandidateOffline data = tx.getData();
 
         assertNotNull(data);
-        assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), data.getPublicKey());
+        assertEquals(new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0"), data.getPublicKey());
     }
 }

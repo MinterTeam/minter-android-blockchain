@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -26,11 +26,11 @@
 
 package network.minter.blockchain.api;
 
-import java.math.BigInteger;
-
-import network.minter.blockchain.models.BCResult;
-import network.minter.blockchain.models.BlockInfo;
-import retrofit2.Call;
+import io.reactivex.rxjava3.core.Observable;
+import network.minter.blockchain.models.Halts;
+import network.minter.blockchain.models.MaxGasValue;
+import network.minter.blockchain.models.MinGasValue;
+import network.minter.blockchain.models.NetworkStatus;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
@@ -38,17 +38,19 @@ import retrofit2.http.Query;
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public interface BlockChainBlockEndpoint {
+public interface NodeStatusEndpoint {
 
-    @GET("/block")
-    Call<BCResult<BlockInfo>> getByHeight(@Query("height") long height);
+    @GET("/status")
+    Observable<NetworkStatus> getStatus();
 
-    @GET("/max_gas")
-    Call<BCResult<BigInteger>> getMaxGas();
-
-    @GET("/max_gas")
-    Call<BCResult<BigInteger>> getMaxGasByHeight(@Query("height") long height);
+    @GET("/halts")
+    Observable<Halts> getHalts(@Query("height") String blockNumber);
 
     @GET("/min_gas_price")
-    Call<BCResult<BigInteger>> getMinGas();
+    Observable<MinGasValue> getMinGas();
+
+    @GET("/max_gas")
+    Observable<MaxGasValue> getMaxGas(@Query("height") String blockNumber);
+
+
 }

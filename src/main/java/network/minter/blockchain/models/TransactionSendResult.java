@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2018
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -28,14 +28,16 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
 import network.minter.core.crypto.MinterHash;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TransactionSendResult extends BCResult<Void> {
+@Parcel
+public class TransactionSendResult extends NodeResult {
     @SerializedName("hash")
     public MinterHash txHash;
 }

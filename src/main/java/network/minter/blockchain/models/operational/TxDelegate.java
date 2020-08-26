@@ -36,13 +36,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import network.minter.core.crypto.MinterPublicKey;
-import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
 import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
 import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
@@ -62,7 +60,7 @@ public final class TxDelegate extends Operation {
         }
     };
     private MinterPublicKey mPubKey;
-    private String mCoin;
+    private BigInteger mCoinId;
     private BigInteger mStake;
 
     public TxDelegate() {
@@ -75,7 +73,7 @@ public final class TxDelegate extends Operation {
     protected TxDelegate(Parcel in) {
         super(in);
         mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-        mCoin = in.readString();
+        mCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mStake = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
 
@@ -83,7 +81,7 @@ public final class TxDelegate extends Operation {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeValue(mPubKey);
-        dest.writeString(mCoin);
+        dest.writeValue(mCoinId);
         dest.writeValue(mStake);
     }
 
@@ -106,20 +104,24 @@ public final class TxDelegate extends Operation {
         return this;
     }
 
-    public String getCoin() {
-        return mCoin.replace("\0", "");
+    public BigInteger getCoinId() {
+        return mCoinId;
     }
 
-    public TxDelegate setCoin(String coinName) {
-        mCoin = StringHelper.strrpad(10, coinName.toUpperCase());
+    public TxDelegate setCoinId(BigInteger coinId) {
+        mCoinId = coinId;
         return this;
     }
 
-    public BigInteger getStakeBigInteger() {
+    public TxDelegate setCoinId(long coinId) {
+        return setCoinId(BigInteger.valueOf(coinId));
+    }
+
+    public BigInteger getStake() {
         return mStake;
     }
 
-    public BigDecimal getStake() {
+    public BigDecimal getStakeDecimal() {
         return Transaction.humanizeValue(mStake);
     }
 
@@ -147,7 +149,7 @@ public final class TxDelegate extends Operation {
     protected FieldsValidationResult validate() {
         return new FieldsValidationResult()
                 .addResult("mPubKey", mPubKey != null, "Node public key must be set")
-                .addResult("mCoin", mCoin != null && mCoin.length() > 2 && mCoin.length() < 11, "Coin symbol length must be from 3 to 10 chars")
+                .addResult("mCoin", mCoinId != null, "Coin ID must be set")
                 .addResult("mStake", mStake != null && mStake.compareTo(new BigInteger("0")) > 0, "Stake must be set (more than 0)");
     }
 
@@ -156,7 +158,7 @@ public final class TxDelegate extends Operation {
     protected char[] encodeRLP() {
         return RLPBoxed.encode(new Object[]{
                 mPubKey,
-                mCoin,
+                mCoinId,
                 mStake
         });
     }
@@ -166,7 +168,7 @@ public final class TxDelegate extends Operation {
         final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mPubKey = new MinterPublicKey(fromRawRlp(0, decoded));
-        mCoin = charsToString(fromRawRlp(1, decoded));
+        mCoinId = fixBigintSignedByte(fromRawRlp(1, decoded));
         mStake = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 

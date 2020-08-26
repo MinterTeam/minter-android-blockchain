@@ -37,15 +37,12 @@ import javax.annotation.Nullable;
 
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.core.internal.helpers.BytesHelper;
-import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
 import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
-import static network.minter.core.internal.common.Preconditions.checkArgument;
 import static network.minter.core.internal.common.Preconditions.checkNotNull;
-import static network.minter.core.internal.helpers.StringHelper.charsToString;
+import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
 
 /**
  * minter-android-blockchain. 2018
@@ -64,7 +61,7 @@ public final class TxSendCoin extends Operation {
             return new TxSendCoin[size];
         }
     };
-    private String mCoin = MinterSDK.DEFAULT_COIN;
+    private BigInteger mCoinId = MinterSDK.DEFAULT_COIN_ID;
     private MinterAddress mTo;
     private BigInteger mValue;
 
@@ -77,7 +74,7 @@ public final class TxSendCoin extends Operation {
 
     protected TxSendCoin(Parcel in) {
         super(in);
-        mCoin = in.readString();
+        mCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
         mTo = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
         mValue = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
@@ -116,14 +113,10 @@ public final class TxSendCoin extends Operation {
 		return this;
 	}
 
-	public String getCoinRaw() {
-		return mCoin;
-	}
-
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeString(mCoin);
+        dest.writeValue(mCoinId);
         dest.writeValue(mTo);
         dest.writeValue(mValue);
     }
@@ -149,26 +142,19 @@ public final class TxSendCoin extends Operation {
         return setTo(new MinterAddress(address));
     }
 
-    public String getCoin() {
-        return mCoin.replace("\0", "");
+    public BigInteger getCoinId() {
+        return mCoinId;
     }
 
-    public TxSendCoin setCoin(final String coin) {
-        checkArgument(coin != null && coin.length() >= 3 && coin.length() <= 10, String.format("Invalid coin passed: %s", coin));
-
-        mCoin = StringHelper.strrpad(10, coin.toUpperCase());
+    public TxSendCoin setCoinId(final BigInteger coinId) {
+        mCoinId = coinId;
         return this;
     }
 
-    /**
-     * You MUST multiply this rawValue on {@link Transaction#VALUE_MUL} by yourself
-     * @param rawValue
-     * @param radix
-     * @return
-     */
-    public TxSendCoin setRawValue(String rawValue, int radix) {
-        return setValue(new BigInteger(rawValue, radix));
+    public TxSendCoin setCoinId(long coinId) {
+        return setCoinId(BigInteger.valueOf(coinId));
     }
+
 
     @Override
     public OperationType getType() {
@@ -179,8 +165,7 @@ public final class TxSendCoin extends Operation {
     @Override
     protected FieldsValidationResult validate() {
         return new FieldsValidationResult()
-                .addResult("mCoin", mCoin != null && mCoin.length() > 2 &&
-                        mCoin.length() < 11, "Coin symbol length must be from 3 mTo 10 chars")
+                .addResult("mCoinId", mCoinId != null, "Coin ID must be set")
                 .addResult("mTo", mTo != null, "Recipient address must be set")
                 .addResult("mValue", mValue != null, "Value must be set");
     }
@@ -188,23 +173,23 @@ public final class TxSendCoin extends Operation {
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    return RLPBoxed.encode(new Object[]{mCoin, mTo, mValue});
+        return RLPBoxed.encode(new Object[]{mCoinId, mTo, mValue});
     }
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-	    mCoin = charsToString(fromRawRlp(0, decoded));
+        mCoinId = fixBigintSignedByte(fromRawRlp(0, decoded));
         mTo = new MinterAddress(fromRawRlp(1, decoded));
-        mValue = BytesHelper.fixBigintSignedByte(fromRawRlp(2, decoded));
+        mValue = fixBigintSignedByte(fromRawRlp(2, decoded));
     }
 
-	protected void decodeRaw(char[][] vrs) {
-        mCoin = new String(vrs[0]);
-        mTo = new MinterAddress(vrs[1]);
-        mValue = BytesHelper.fixBigintSignedByte(vrs[2]);
+    protected void decodeRaw(char[][] data) {
+        mCoinId = fixBigintSignedByte(data[0]);
+        mTo = new MinterAddress(data[1]);
+        mValue = fixBigintSignedByte(data[2]);
     }
 
 

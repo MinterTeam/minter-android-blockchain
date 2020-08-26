@@ -1,5 +1,11 @@
 # Release notes
 
+## 1.0.0
+ - **BREAKING CHANGES**
+ - Now communication with node api works with RxJava3
+ - Base API response now in root of json, so BcResult<T> is just NodeResult and each response object inherits this class
+
+
 ## 0.13.1
  - Ability to reset transaction data and payload in external transaction builder
 

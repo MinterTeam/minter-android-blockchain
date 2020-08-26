@@ -230,7 +230,7 @@ public final class TxCreateCoin extends Operation {
     }
 
     public TxCreateCoin setConstantReserveRatio(Integer ratio) {
-        checkArgument(ratio >= 0 && ratio <= 100, "Ratio must be unsigned integer (from 1 to 100%)");
+        checkArgument(ratio >= 10 && ratio <= 100, "Constant Reserve Ratio should be between 10 and 100");
         mConstantReserveRatio = ratio;
         return this;
     }
@@ -244,13 +244,13 @@ public final class TxCreateCoin extends Operation {
     @Override
     protected FieldsValidationResult validate() {
         return new FieldsValidationResult()
-                .addResult("mName", mName != null, "Coin mName must be set")
-                .addResult("mSymbol", mSymbol != null && mSymbol.length() > 2 && mSymbol.length() < 11, "Coin mSymbol length must be from 3 to 10 chars")
+                .addResult("mName", mName == null || mName.getBytes().length <= 64, "Coin name cannot be longer than 64 bytes")
+                .addResult("mSymbol", mSymbol != null && mSymbol.length() >= 3 && mSymbol.length() <= 10, "Coin symbol length must be from 3 to 10 chars")
                 .addResult("mInitialAmount", mInitialAmount != null, "Initial Amount must be set")
                 .addResult("mInitialReserve", mInitialReserve != null, "Initial Reserve must be set")
                 .addResult("mMaxSupply", mMaxSupply != null, "Maximum supply value must be set")
                 .addResult("mConstantReserveRatio", mConstantReserveRatio != null, "Reserve ratio must be set")
-                .addResult("mConstantReserveRatio", mConstantReserveRatio != null && mConstantReserveRatio > 1 && mConstantReserveRatio <= 100, "Reserve ratio must from 1% to 100%");
+                .addResult("mConstantReserveRatio", mConstantReserveRatio != null && mConstantReserveRatio >= 10 && mConstantReserveRatio <= 100, "Constant Reserve Ratio should be between 10 and 100");
     }
 
     @Nonnull

@@ -62,9 +62,9 @@ public class TxCreateMultisigAddress extends Operation {
             return new TxCreateMultisigAddress[size];
         }
     };
-    private BigInteger mThreshold;
-    private List<BigInteger> mWeights = new LinkedList<>();
-    private List<MinterAddress> mAddresses = new LinkedList<>();
+    protected BigInteger mThreshold;
+    protected List<BigInteger> mWeights = new LinkedList<>();
+    protected List<MinterAddress> mAddresses = new LinkedList<>();
 
     public TxCreateMultisigAddress() {
     }

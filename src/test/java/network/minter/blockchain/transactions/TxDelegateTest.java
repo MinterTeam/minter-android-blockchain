@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -42,6 +42,7 @@ import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.TestCase.assertNotNull;
+import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -60,17 +61,17 @@ public class TxDelegateTest {
 
     @Test
     public void testEncode() throws OperationInvalidDataException {
-        final BigInteger nonce = new BigInteger("1");
-	    final String validTx = "f8900102018a4d4e540000000000000007b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ba01c2c8f702d80cf64da1e9bf1f07a52e2fee8721aebe419aa9f62260a98983f89a07ed297d71d9dc37a57ffe9bb16915dccc703d8c09f30da8aadb9d5dbab8c7da9";
-        final PrivateKey privateKey = new PrivateKey("6e1df6ec69638d152f563c5eca6c13cdb5db4055861efc11ec1cdd578afd96bf");
+        final BigInteger nonce = new BigInteger("5");
+        final String validTx = "f87e0501018007aeeda00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8808a021e19e0c9bab2400000808001b845f8431ba0b23e03cb8d8f87dc0716ce4a42f6fbad50c173562e29fc2ee4610691c6d131eda022593f96278c49319b28b4651201ae6ae8777a34739841ac55c40c3bcae96a07";
+        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
-                .setGasCoin("MNT")
-                .setBlockchainId(BlockchainID.TestNet)
+                .setGasCoinId(DEFAULT_COIN_ID)
+                .setBlockchainId(BlockchainID.MainNet)
                 .delegate()
-                .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
-                .setCoin("MNT")
-                .setStake("10")
+                .setPublicKey(new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8"))
+                .setCoinId(DEFAULT_COIN_ID)
+                .setStake("10000")
                 .build();
 
         assertNotNull(tx);
@@ -80,39 +81,39 @@ public class TxDelegateTest {
 
     @Test
     public void testDecode() {
-	    final BigInteger nonce = new BigInteger("1");
-	    final String validTx = "f8900102018a4d4e540000000000000007b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ba01c2c8f702d80cf64da1e9bf1f07a52e2fee8721aebe419aa9f62260a98983f89a07ed297d71d9dc37a57ffe9bb16915dccc703d8c09f30da8aadb9d5dbab8c7da9";
+        final BigInteger nonce = new BigInteger("5");
+        final String validTx = "f87e0501018007aeeda00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8808a021e19e0c9bab2400000808001b845f8431ba0b23e03cb8d8f87dc0716ce4a42f6fbad50c173562e29fc2ee4610691c6d131eda022593f96278c49319b28b4651201ae6ae8777a34739841ac55c40c3bcae96a07";
 
-	    Transaction tx = Transaction.fromEncoded(validTx);
-	    assertNotNull(tx);
+        Transaction tx = Transaction.fromEncoded(validTx);
+        assertNotNull(tx);
 
-	    assertEquals(nonce, tx.getNonce());
-	    assertEquals("MNT", tx.getGasCoin());
-	    assertEquals(OperationType.Delegate, tx.getType());
-	    TxDelegate data = tx.getData();
+        assertEquals(nonce, tx.getNonce());
+        assertEquals(DEFAULT_COIN_ID, tx.getGasCoinId());
+        assertEquals(OperationType.Delegate, tx.getType());
+        TxDelegate data = tx.getData();
 
-	    assertNotNull(data);
-	    assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), data.getPublicKey());
-	    assertEquals("MNT", data.getCoin());
-	    assertEquals(new BigDecimal(10), data.getStake());
-        assertEquals(new BigDecimal("10"), data.getStake());
+        assertNotNull(data);
+        assertEquals(new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8"), data.getPublicKey());
+        assertEquals(DEFAULT_COIN_ID, data.getCoinId());
+        assertEquals(new BigDecimal(10000), data.getStakeDecimal());
+        assertEquals(new BigDecimal("10000"), data.getStakeDecimal());
     }
 
 	@Test
 	public void testEncode128()
 			throws OperationInvalidDataException {
-		final BigInteger nonce = new BigInteger("128");
-		final String validTx = "f891818002018a4d4e540000000000000007b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ba0b2f5870e2a7a56b8e5342f3afeaa2f7bedcdd9ce404d5dac8f5c1388313870caa0451ee311c9a3b93a03f95221384b81eb243e16224e1a270726d088012d980b54";
-		final PrivateKey privateKey = new PrivateKey("6e1df6ec69638d152f563c5eca6c13cdb5db4055861efc11ec1cdd578afd96bf");
+        final BigInteger nonce = new BigInteger("128");
+        final String validTx = "f87d818002018007aceba00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a4380888ac7230489e80000808001b845f8431ca0691d06a6ce6642aaefb48ea10e1d580c19b55932217d26fcbd0b76849188bab1a057156fd777db9a81da480cae03515903ca6bdb0eaa289849212e6f3a0be942ea";
+        final PrivateKey privateKey = new PrivateKey("6e1df6ec69638d152f563c5eca6c13cdb5db4055861efc11ec1cdd578afd96bf");
 
-		Transaction tx = new Transaction.Builder(nonce)
+        Transaction tx = new Transaction.Builder(nonce)
                 .setBlockchainId(BlockchainID.TestNet)
-				.setGasCoin("MNT")
-				.delegate()
-				.setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
-				.setCoin("MNT")
+                .setGasCoinId(DEFAULT_COIN_ID)
+                .delegate()
+                .setPublicKey(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"))
+                .setCoinId(DEFAULT_COIN_ID)
                 .setStake("10")
-				.build();
+                .build();
 
 		assertNotNull(tx);
 		final String resultTx = tx.signSingle(privateKey).getTxSign();
@@ -121,21 +122,21 @@ public class TxDelegateTest {
 
 	@Test
 	public void testDecode128() {
-		final BigInteger nonce = new BigInteger("128");
-		final String validTx = "f891818002018a4d4e540000000000000007b6f5a00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a438a4d4e5400000000000000888ac7230489e80000808001b845f8431ba0b2f5870e2a7a56b8e5342f3afeaa2f7bedcdd9ce404d5dac8f5c1388313870caa0451ee311c9a3b93a03f95221384b81eb243e16224e1a270726d088012d980b54";
+        final BigInteger nonce = new BigInteger("128");
+        final String validTx = "f87d818002018007aceba00eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a4380888ac7230489e80000808001b845f8431ca0691d06a6ce6642aaefb48ea10e1d580c19b55932217d26fcbd0b76849188bab1a057156fd777db9a81da480cae03515903ca6bdb0eaa289849212e6f3a0be942ea";
 
-		Transaction tx = Transaction.fromEncoded(validTx);
-		assertNotNull(tx);
+        Transaction tx = Transaction.fromEncoded(validTx);
+        assertNotNull(tx);
 
-		assertEquals(nonce, tx.getNonce());
-		assertEquals("MNT", tx.getGasCoin());
-		assertEquals(OperationType.Delegate, tx.getType());
-		TxDelegate data = tx.getData();
+        assertEquals(nonce, tx.getNonce());
+        assertEquals(DEFAULT_COIN_ID, tx.getGasCoinId());
+        assertEquals(OperationType.Delegate, tx.getType());
+        TxDelegate data = tx.getData();
 
-		assertNotNull(data);
-		assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), data.getPublicKey());
-		assertEquals("MNT", data.getCoin());
-		assertEquals(new BigDecimal(10), data.getStake());
-        assertEquals(new BigDecimal("10"), data.getStake());
-	}
+        assertNotNull(data);
+        assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), data.getPublicKey());
+        assertEquals(DEFAULT_COIN_ID, data.getCoinId());
+        assertEquals(new BigDecimal(10), data.getStakeDecimal());
+        assertEquals(new BigDecimal("10"), data.getStakeDecimal());
+    }
 }
