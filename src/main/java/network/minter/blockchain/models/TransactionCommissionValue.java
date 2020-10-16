@@ -48,7 +48,7 @@ public class TransactionCommissionValue extends NodeResult {
      * BigDecimal value
      * @return commission
      */
-    public BigDecimal getValueDecimal() {
+    public BigDecimal getValue() {
         return Transaction.humanizeValue(value);
     }
 
@@ -56,7 +56,7 @@ public class TransactionCommissionValue extends NodeResult {
      * Source value multiplied by {@link Transaction#VALUE_MUL}
      * @return commission
      */
-    public BigInteger getValue() {
+    public BigInteger getValueBigInteger() {
         return value;
     }
 }

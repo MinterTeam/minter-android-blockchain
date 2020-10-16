@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -99,6 +99,11 @@ public final class TxRedeemCheck extends Operation {
 
     public TxRedeemCheck setRawCheck(String hexString) {
         mRawCheck = new MinterCheck(hexString);
+        return this;
+    }
+
+    public TxRedeemCheck setRawCheck(MinterCheck check) {
+        mRawCheck = check;
         return this;
     }
 

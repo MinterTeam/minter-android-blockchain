@@ -63,6 +63,7 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class Transaction implements Parcelable {
+    private final static Object sNativeLock = new Object();
     public final static BigInteger VALUE_MUL = new BigInteger("1000000000000000000", 10);
     public final static BigDecimal VALUE_MUL_DEC = new BigDecimal("1000000000000000000");
     @SuppressWarnings("unused")
@@ -81,7 +82,7 @@ public class Transaction implements Parcelable {
     BlockchainID mChainId;
     BigInteger mGasPrice = BigInteger.ONE;
     BigInteger mGasCoinId = MinterSDK.DEFAULT_COIN_ID;
-    OperationType mType = OperationType.SendCoin;
+    OperationType mType;
     Operation mOperationData;
     // max - 1024 bytes (1 kilobyte)
     BytesData mPayload = new BytesData(new char[0]);
@@ -279,17 +280,19 @@ public class Transaction implements Parcelable {
 
         final List<SignatureSingleData> signaturesData = new ArrayList<>(privateKeys.size());
 
-        long ctx = NativeSecp256k1.contextCreate();
-        try {
-            for (final PrivateKey pk : privateKeys) {
-                final NativeSecp256k1.RecoverableSignature signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), pk.getBytes());
-                final SignatureSingleData signatureData = new SignatureSingleData();
-                signatureData.setSign(signature);
-                signaturesData.add(signatureData);
+        synchronized (sNativeLock) {
+            long ctx = NativeSecp256k1.contextCreate();
+            try {
+                for (final PrivateKey pk : privateKeys) {
+                    final NativeSecp256k1.RecoverableSignature signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), pk.getBytes());
+                    final SignatureSingleData signatureData = new SignatureSingleData();
+                    signatureData.setSign(signature);
+                    signaturesData.add(signatureData);
+                }
+            } finally {
+                // DON'T forget cleanup to avoid leaks
+                NativeSecp256k1.contextCleanup(ctx);
             }
-        } finally {
-            // DON'T forget cleanup to avoid leaks
-            NativeSecp256k1.contextCleanup(ctx);
         }
 
         mSignatureData = new SignatureMultiData();
@@ -346,12 +349,14 @@ public class Transaction implements Parcelable {
 
         NativeSecp256k1.RecoverableSignature signature;
 
-        long ctx = NativeSecp256k1.contextCreate();
-        try {
-            signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getBytes());
-        } finally {
-            // DON'T forget cleanup to avoid leaks
-            NativeSecp256k1.contextCleanup(ctx);
+        synchronized (sNativeLock) {
+            long ctx = NativeSecp256k1.contextCreate();
+            try {
+                signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getBytes());
+            } finally {
+                // DON'T forget cleanup to avoid leaks
+                NativeSecp256k1.contextCleanup(ctx);
+            }
         }
 
         if (signature == null) {
@@ -378,12 +383,14 @@ public class Transaction implements Parcelable {
 
         NativeSecp256k1.RecoverableSignature signature;
 
-        long ctx = NativeSecp256k1.contextCreate();
-        try {
-            signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getBytes());
-        } finally {
-            // DON'T forget cleanup to avoid leaks
-            NativeSecp256k1.contextCleanup(ctx);
+        synchronized (sNativeLock) {
+            long ctx = NativeSecp256k1.contextCreate();
+            try {
+                signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getBytes());
+            } finally {
+                // DON'T forget cleanup to avoid leaks
+                NativeSecp256k1.contextCleanup(ctx);
+            }
         }
 
         if (signature == null) {
@@ -407,12 +414,14 @@ public class Transaction implements Parcelable {
 
         NativeSecp256k1.RecoverableSignature signature;
 
-        long ctx = NativeSecp256k1.contextCreate();
-        try {
-            signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getBytes());
-        } finally {
-            // DON'T forget cleanup to avoid leaks
-            NativeSecp256k1.contextCleanup(ctx);
+        synchronized (sNativeLock) {
+            long ctx = NativeSecp256k1.contextCreate();
+            try {
+                signature = NativeSecp256k1.signRecoverableSerialized(ctx, charsToBytes(hash.getData()), privateKey.getBytes());
+            } finally {
+                // DON'T forget cleanup to avoid leaks
+                NativeSecp256k1.contextCleanup(ctx);
+            }
         }
 
         if (signature == null) {
@@ -557,10 +566,10 @@ public class Transaction implements Parcelable {
     FieldsValidationResult validate() {
         return new FieldsValidationResult("Invalid transaction data")
                 .addResult("nonce", mNonce != null, "Nonce must be set")
-                .addResult("gasCoin", mGasCoinId != null, "Gas coin must be set")
+                .addResult("gasCoinId", mGasCoinId != null, "Gas coin ID must be set")
                 .addResult("gasPrice", mGasPrice != null, "Gas price must be set")
                 .addResult("operationData", mOperationData !=
-                        null, "Operation data does not set! Check your operation model.");
+                        null, "Transaction data does not set! Check your operation model.");
     }
 
     public static class Builder {
@@ -835,10 +844,10 @@ public class Transaction implements Parcelable {
 
         /**
          * Edit multisig address owners data
-         * @return {@link TxEditMultisigOwnersData}
+         * @return {@link TxEditMultisig}
          */
-        public TxEditMultisigOwnersData editMultisigOwnersData() {
-            return new TxEditMultisigOwnersData(mTx);
+        public TxEditMultisig editMultisig() {
+            return new TxEditMultisig(mTx);
         }
 
         /**
@@ -855,6 +864,14 @@ public class Transaction implements Parcelable {
          */
         public TxEditCandidate editCandidate() {
             return new TxEditCandidate(mTx);
+        }
+
+        /**
+         * Create transaction that changes candidate public key
+         * @return {@link TxEditCandidatePublicKey}
+         */
+        public TxEditCandidatePublicKey editCandidatePublicKey() {
+            return new TxEditCandidatePublicKey(mTx);
         }
 
         /**
@@ -883,10 +900,10 @@ public class Transaction implements Parcelable {
 
         /**
          * Create transaction that changes created coin owner
-         * @return {@link TxChangeCoinOwner}
+         * @return {@link TxEditCoinOwner}
          */
-        public TxChangeCoinOwner changeCoinOwner() {
-            return new TxChangeCoinOwner(mTx);
+        public TxEditCoinOwner editCoinOwner() {
+            return new TxEditCoinOwner(mTx);
         }
 
         /**
@@ -895,6 +912,10 @@ public class Transaction implements Parcelable {
          */
         public TxSetHaltBlock setHaltBlock() {
             return new TxSetHaltBlock(mTx);
+        }
+
+        public TxPriceVote priceVote() {
+            return new TxPriceVote(mTx);
         }
     }
 

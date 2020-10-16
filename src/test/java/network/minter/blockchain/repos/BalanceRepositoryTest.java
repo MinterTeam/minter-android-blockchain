@@ -31,13 +31,14 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.schedulers.Schedulers;
 import network.minter.blockchain.MinterBlockChainSDK;
 import network.minter.blockchain.models.AddressInfo;
 import network.minter.blockchain.repo.NodeAddressRepository;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.internal.exceptions.NativeLoadException;
+import network.minter.core.internal.log.StdLogger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -60,7 +61,7 @@ public class BalanceRepositoryTest {
 
     @Test
     public void testGetBalance() throws IOException {
-        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
+        MinterBlockChainSDK.initialize(true, new StdLogger());
 
 //        MinterAddress address = PrivateKey.fromMnemonic("toss disease race hour social anger oblige squeeze grant novel gown reveal").getPublicKey().toMinter();
         MinterAddress address = new MinterAddress("Mx6ab3a04c2f4d6022163f36a73840980cc8fc6a8b");
@@ -88,7 +89,7 @@ public class BalanceRepositoryTest {
 
     @Test
     public void testGetBalanceError() throws IOException {
-        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
+        MinterBlockChainSDK.initialize(true, new StdLogger());
 
         NodeAddressRepository repo = MinterBlockChainSDK.getInstance().account();
 

@@ -102,7 +102,7 @@ public class CandidateItem extends NodeResult {
         public BigInteger value;
         public BigInteger bipValue;
 
-        public BigDecimal getValueDecimal() {
+        public BigDecimal getValue() {
             return Transaction.humanizeValue(value);
         }
 

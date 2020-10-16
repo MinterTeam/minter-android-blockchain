@@ -34,7 +34,7 @@ import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.blockchain.models.operational.TxEditCandidate;
+import network.minter.blockchain.models.operational.TxEditCandidatePublicKey;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
@@ -46,8 +46,7 @@ import static org.junit.Assert.assertNotNull;
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class TxEditCandidateTest extends BaseTxTest {
-
+public class TxEditCandidatePublicKeyTest extends BaseTxTest {
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
@@ -55,17 +54,15 @@ public class TxEditCandidateTest extends BaseTxTest {
         MinterAddress address = new MinterAddress("Mxd82558ea00eb81d35f2654953598f5d51737d31d");
         MinterPublicKey pubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0");
         MinterPublicKey nPubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe1");
-        String validTx = "f8b3100101800eb862f860a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe094d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d808001b845f8431ba021c0f2da522422607325e32fa3915ea29d23559f0e20464da688bb45b04a59a8a06e235dc9fe780dfa4cb349062041be95d7bc656c7ff52a571507de7989c4a8b1";
+        String validTx = "f8951001018014b844f842a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe1808001b845f8431ca0ce7bef38ec15604c100f923c7b0c4c57f18ead5d432cda5ded45cf11d4adbac3a059367227d818d25826df77517f2951001f993f0094072dbe7d9587221e9a7324";
 
         BigInteger nonce = new BigInteger("16");
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoinId(MinterSDK.DEFAULT_COIN_ID)
                 .setBlockchainId(BlockchainID.MainNet)
-                .editCandidate()
+                .editCandidatePublicKey()
                 .setPublicKey(pubKey)
-                .setRewardAddress(address)
-                .setOwnerAddress(address)
-                .setControlAddress(address)
+                .setNewPublicKey(nPubKey)
                 .build();
 
         TransactionSign sign = tx.signSingle(UNIT_KEY);
@@ -77,20 +74,18 @@ public class TxEditCandidateTest extends BaseTxTest {
         MinterAddress address = new MinterAddress("Mxd82558ea00eb81d35f2654953598f5d51737d31d");
         MinterPublicKey pubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0");
         MinterPublicKey nPubKey = new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe1");
-        String validTx = "f8b3100101800eb862f860a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe094d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d94d82558ea00eb81d35f2654953598f5d51737d31d808001b845f8431ba021c0f2da522422607325e32fa3915ea29d23559f0e20464da688bb45b04a59a8a06e235dc9fe780dfa4cb349062041be95d7bc656c7ff52a571507de7989c4a8b1";
+        String validTx = "f8951001018014b844f842a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe0a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe1808001b845f8431ca0ce7bef38ec15604c100f923c7b0c4c57f18ead5d432cda5ded45cf11d4adbac3a059367227d818d25826df77517f2951001f993f0094072dbe7d9587221e9a7324";
 
         BigInteger nonce = new BigInteger("16");
         Transaction tx = Transaction.fromEncoded(validTx);
         assertNotNull(tx);
         assertEquals(nonce, tx.getNonce());
 
-        TxEditCandidate data = tx.getData();
+        TxEditCandidatePublicKey data = tx.getData();
 
 
         assertEquals(pubKey, data.getPublicKey());
-        assertEquals(address, data.getOwnerAddress());
-        assertEquals(address, data.getRewardAddress());
-        assertEquals(address, data.getControlAddress());
+        assertEquals(nPubKey, data.getNewPublicKey());
 
     }
 }

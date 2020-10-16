@@ -35,51 +35,50 @@ import javax.annotation.Nullable;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public enum OperationType {
 
     @SerializedName("1")
-    SendCoin((byte) 0x01, TxSendCoin.class, 10D),
+    SendCoin((byte) 0x01, TxSendCoin.class, 10d),
     @SerializedName("2")
-    SellCoin((byte) 0x02, TxCoinSell.class, 100D),
+    SellCoin((byte) 0x02, TxCoinSell.class, 100d),
     @SerializedName("3")
-    SellAllCoins((byte) 0x03, TxCoinSellAll.class, 100D),
+    SellAllCoins((byte) 0x03, TxCoinSellAll.class, 100d),
     @SerializedName("4")
-    BuyCoin((byte) 0x04, TxCoinBuy.class, 100D),
+    BuyCoin((byte) 0x04, TxCoinBuy.class, 100d),
     @SerializedName("5")
-    CreateCoin((byte) 0x05, TxCreateCoin.class, 1000D),
+    CreateCoin((byte) 0x05, TxCreateCoin.class, 1000d),
     @SerializedName("6")
-    DeclareCandidacy((byte) 0x06, TxDeclareCandidacy.class, 10000D),
+    DeclareCandidacy((byte) 0x06, TxDeclareCandidacy.class, 10000d),
     @SerializedName("7")
-    Delegate((byte) 0x07, TxDelegate.class, 200D),
+    Delegate((byte) 0x07, TxDelegate.class, 200d),
     @SerializedName("8")
-    Unbound((byte) 0x08, TxUnbound.class, 200D),
+    Unbound((byte) 0x08, TxUnbound.class, 200d),
     @SerializedName("9")
-    RedeemCheck((byte) 0x09, TxRedeemCheck.class, 30D),
+    RedeemCheck((byte) 0x09, TxRedeemCheck.class, 30d),
     @SerializedName("10")
-    SetCandidateOnline((byte) 0x0A, TxSetCandidateOnline.class, 100D),
+    SetCandidateOnline((byte) 0x0A, TxSetCandidateOnline.class, 100d),
     @SerializedName("11")
-    SetCandidateOffline((byte) 0x0B, TxSetCandidateOffline.class, 100D),
+    SetCandidateOffline((byte) 0x0B, TxSetCandidateOffline.class, 100d),
     @SerializedName("12")
-    CreateMultisigAddress((byte) 0x0C, TxCreateMultisigAddress.class, 100D),
+    CreateMultisigAddress((byte) 0x0C, TxCreateMultisigAddress.class, 100d),
     @SerializedName("13")
-    Multisend((byte) 0x0D, TxMultisend.class, /*commission: 10+(n-1)*5 units*/ 0D),
+    Multisend((byte) 0x0D, TxMultisend.class, /*commission: 10+(n-1)*5 units*/ 0d),
     @SerializedName("14")
-    EditCandidate((byte) 0x0E, TxEditCandidate.class, 10000D),
+    EditCandidate((byte) 0x0E, TxEditCandidate.class, 10000d),
     @SerializedName("15")
-    SetHaltBlock((byte) 0x0F, TxSetHaltBlock.class, -1),
+    SetHaltBlock((byte) 0x0F, TxSetHaltBlock.class, 1000d),
     @SerializedName("16")
-    RecreateCoin((byte) 0x10, TxRecreateCoin.class, 0D),
+    RecreateCoin((byte) 0x10, TxRecreateCoin.class, 10000000d),
     @SerializedName("17")
-    ChangeCoinOwner((byte) 0x11, TxChangeCoinOwner.class, 0d),
+    EditCoinOwner((byte) 0x11, TxEditCoinOwner.class, 10000000d),
     @SerializedName("18")
-    EditMultisigOwnersData((byte) 0x12, TxEditMultisigOwnersData.class, -1),
+    EditMultisig((byte) 0x12, TxEditMultisig.class, 1000d),
     @SerializedName("19")
-    PriceVote((byte) 0x13, null, 10d),
-
-    ;
+    PriceVote((byte) 0x13, TxPriceVote.class, 10d),
+    @SerializedName("20")
+    EditCandidatePublicKey((byte) 0x14, TxEditCandidatePublicKey.class, 10000000d);
 
     private final static String FEE_BASE_STRING = "0.001";
     public final static BigDecimal FEE_BASE = new BigDecimal(FEE_BASE_STRING);

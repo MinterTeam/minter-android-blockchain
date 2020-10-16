@@ -50,7 +50,7 @@ public class DeepLinkBuilder {
 
     public DeepLinkBuilder(CheckTransaction checkTransaction, PrivateKey pk, String passphrase) {
         TxRedeemCheck redeemCheck = new TxRedeemCheck();
-        redeemCheck.setRawCheck(checkTransaction.sign(pk).getTxSign());
+        redeemCheck.setRawCheck(checkTransaction.sign(pk));
         redeemCheck.setProof(CheckTransaction.makeProof(pk.getPublicKey().toMinter(), passphrase).toHexString());
         mExternalTransaction = new ExternalTransaction.Builder()
                 .setData(redeemCheck)
@@ -62,7 +62,7 @@ public class DeepLinkBuilder {
 
     public DeepLinkBuilder(CheckTransaction checkTransaction, PrivateKey pk) {
         TxRedeemCheck redeemCheck = new TxRedeemCheck();
-        redeemCheck.setRawCheck(checkTransaction.sign(pk).getTxSign());
+        redeemCheck.setRawCheck(checkTransaction.sign(pk));
         mExternalTransaction = new ExternalTransaction.Builder()
                 .setData(redeemCheck)
                 .setGasCoinId(checkTransaction.getGasCoinId())

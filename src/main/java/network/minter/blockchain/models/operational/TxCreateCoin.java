@@ -49,7 +49,9 @@ import static network.minter.core.internal.helpers.StringHelper.charsToString;
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public final class TxCreateCoin extends Operation {
+public class TxCreateCoin extends Operation {
+    public final static int MAX_COIN_NAME_BYTES = 64;
+
     @SuppressWarnings("unused")
     public static final Parcelable.Creator<TxCreateCoin> CREATOR = new Parcelable.Creator<TxCreateCoin>() {
         @Override
@@ -62,13 +64,13 @@ public final class TxCreateCoin extends Operation {
             return new TxCreateCoin[size];
         }
     };
-    private String mName;
-    private String mSymbol;
-    private BigInteger mInitialAmount;
-    private BigInteger mInitialReserve;
+    protected String mName;
+    protected String mSymbol;
+    protected BigInteger mInitialAmount;
+    protected BigInteger mInitialReserve;
     // unsigned!!!
-    private Integer mConstantReserveRatio;
-    private BigInteger mMaxSupply = new BigDecimal("1000000000000000").multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
+    protected Integer mConstantReserveRatio;
+    protected BigInteger mMaxSupply = new BigDecimal("1000000000000000").multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
 
     public TxCreateCoin() {
     }

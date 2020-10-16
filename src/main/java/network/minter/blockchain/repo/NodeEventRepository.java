@@ -41,7 +41,7 @@ import java.util.ArrayList;
 
 import javax.annotation.Nonnull;
 
-import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.Observable;
 import network.minter.blockchain.MinterBlockChainSDK;
 import network.minter.blockchain.api.NodeEventEndpoint;
 import network.minter.blockchain.models.EventList;

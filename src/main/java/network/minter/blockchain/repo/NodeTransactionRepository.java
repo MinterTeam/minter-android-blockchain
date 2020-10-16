@@ -39,7 +39,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.Observable;
 import network.minter.blockchain.MinterBlockChainSDK;
 import network.minter.blockchain.api.NodeTransactionEndpoint;
 import network.minter.blockchain.models.HistoryTransaction;
@@ -105,7 +105,7 @@ public class NodeTransactionRepository extends DataRepository<NodeTransactionEnd
 
     /**
      * Get full transaction information
-     * @param txHash Valid transaction hash with prefix "Mt"
+     * @param txHash Valid transaction hash with prefix "0x"
      * @return
      */
     public Observable<HistoryTransaction> getTransaction(String txHash) {
@@ -135,8 +135,8 @@ public class NodeTransactionRepository extends DataRepository<NodeTransactionEnd
      */
     public Observable<TransactionCommissionValue> getTransactionCommission(String sign) {
         checkArgument(sign != null && sign.length() > 2, "Invalid signature");
-        if (!sign.substring(0, 2).toLowerCase().equals("mt")) {
-            return getInstantService().getTxCommission("Mt" + sign);
+        if (!sign.substring(0, 2).toLowerCase().equals("0x")) {
+            return getInstantService().getTxCommission("0x" + sign);
         }
 
         return getInstantService().getTxCommission(sign);
@@ -191,11 +191,14 @@ public class NodeTransactionRepository extends DataRepository<NodeTransactionEnd
             final Gson gson = MinterBlockChainSDK.getInstance().getGsonBuilder().create();
 
             final HistoryTransaction out = gson.fromJson(json, HistoryTransaction.class);
-            JsonObject data = json.getAsJsonObject().get("data").getAsJsonObject();
-            if (out.type == null) {
-                throw new IllegalStateException(String.format("Unknown transaction type %s", json.getAsJsonObject().get("type").getAsString()));
+
+            if (json.getAsJsonObject().has("data")) {
+                JsonObject data = json.getAsJsonObject().get("data").getAsJsonObject();
+                if (out.type == null) {
+                    throw new IllegalStateException(String.format("Unknown transaction type %s", json.getAsJsonObject().get("type").getAsString()));
+                }
+                out.data = gson.fromJson(data, out.type.getOpClass());
             }
-            out.data = gson.fromJson(data, out.type.getOpClass());
 
             return out;
         }

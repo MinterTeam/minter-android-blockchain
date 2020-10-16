@@ -37,8 +37,6 @@ import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TxCreateCoin;
 import network.minter.core.MinterSDK;
-import network.minter.core.crypto.PrivateKey;
-import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -47,21 +45,12 @@ import static org.junit.Assert.assertEquals;
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TxCreateCoinTest {
-
-    static {
-        try {
-            MinterSDK.initialize();
-        } catch (NativeLoadException e) {
-            e.printStackTrace();
-        }
-    }
+public class TxCreateCoinTest extends BaseTxTest {
 
     @Test
     public void testEncode() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("9");
         final String validTx = "f88b0901018005b83af8388a535550455220544553548a535550455254455354318a021e19e0c9bab24000008a021e19e0c9bab2400000638a021e27c1806e59a40000808001b845f8431ba03c4678e9549256b9413827dc617de9b054b3c02ea72eb5b99d038ad49c600dcca02c54da56153d766ed1c9bc1917d82b6c56029e9f889e4d0d1e945eafeca9991b";
-        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoinId(MinterSDK.DEFAULT_COIN_ID)
@@ -77,7 +66,7 @@ public class TxCreateCoinTest {
                 .build();
 
         assertNotNull(tx);
-        final String resultTx = tx.signSingle(privateKey).getTxSign();
+        final String resultTx = tx.signSingle(UNIT_KEY).getTxSign();
         assertEquals(validTx, resultTx);
     }
 

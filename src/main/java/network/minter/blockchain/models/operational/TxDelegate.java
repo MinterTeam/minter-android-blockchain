@@ -117,11 +117,11 @@ public final class TxDelegate extends Operation {
         return setCoinId(BigInteger.valueOf(coinId));
     }
 
-    public BigInteger getStake() {
+    public BigInteger getStakeBigInteger() {
         return mStake;
     }
 
-    public BigDecimal getStakeDecimal() {
+    public BigDecimal getStake() {
         return Transaction.humanizeValue(mStake);
     }
 

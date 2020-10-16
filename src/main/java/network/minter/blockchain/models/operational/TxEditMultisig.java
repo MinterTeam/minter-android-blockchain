@@ -38,56 +38,56 @@ import network.minter.core.crypto.MinterAddress;
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-public class TxEditMultisigOwnersData extends TxCreateMultisigAddress {
-    public static final Creator<TxEditMultisigOwnersData> CREATOR = new Creator<TxEditMultisigOwnersData>() {
+public class TxEditMultisig extends TxCreateMultisigAddress {
+    public static final Creator<TxEditMultisig> CREATOR = new Creator<TxEditMultisig>() {
         @Override
-        public TxEditMultisigOwnersData createFromParcel(Parcel in) {
-            return new TxEditMultisigOwnersData(in);
+        public TxEditMultisig createFromParcel(Parcel in) {
+            return new TxEditMultisig(in);
         }
 
         @Override
-        public TxEditMultisigOwnersData[] newArray(int size) {
-            return new TxEditMultisigOwnersData[size];
+        public TxEditMultisig[] newArray(int size) {
+            return new TxEditMultisig[size];
         }
     };
 
-    public TxEditMultisigOwnersData() {
+    public TxEditMultisig() {
     }
 
-    public TxEditMultisigOwnersData(@Nonnull Transaction rawTx) {
+    public TxEditMultisig(@Nonnull Transaction rawTx) {
         super(rawTx);
     }
 
-    protected TxEditMultisigOwnersData(Parcel in) {
+    protected TxEditMultisig(Parcel in) {
         super(in);
     }
 
     @Override
-    public TxEditMultisigOwnersData setThreshold(long threshold) {
+    public TxEditMultisig setThreshold(long threshold) {
         super.setThreshold(threshold);
         return this;
     }
 
     @Override
-    public TxEditMultisigOwnersData addWeight(long... weight) {
+    public TxEditMultisig addWeight(long... weight) {
         super.addWeight(weight);
         return this;
     }
 
     @Override
-    public TxEditMultisigOwnersData addAddress(MinterAddress address) {
+    public TxEditMultisig addAddress(MinterAddress address) {
         super.addAddress(address);
         return this;
     }
 
     @Override
-    public TxEditMultisigOwnersData addAddress(CharSequence address, long weight) {
+    public TxEditMultisig addAddress(CharSequence address, long weight) {
         super.addAddress(address, weight);
         return this;
     }
 
     @Override
-    public TxEditMultisigOwnersData addAddress(MinterAddress address, long weight) {
+    public TxEditMultisig addAddress(MinterAddress address, long weight) {
         super.addAddress(address, weight);
         return this;
     }
@@ -99,6 +99,6 @@ public class TxEditMultisigOwnersData extends TxCreateMultisigAddress {
 
     @Override
     public OperationType getType() {
-        return OperationType.EditMultisigOwnersData;
+        return OperationType.EditMultisig;
     }
 }

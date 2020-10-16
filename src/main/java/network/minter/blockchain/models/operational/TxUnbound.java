@@ -119,11 +119,11 @@ public final class TxUnbound extends Operation {
         return setCoinId(BigInteger.valueOf(coinId));
     }
 
-    public BigInteger getValue() {
+    public BigInteger getValueBigInteger() {
         return mValue;
     }
 
-    public BigDecimal getValueDecimal() {
+    public BigDecimal getValue() {
         return humanizeValue(mValue);
     }
 

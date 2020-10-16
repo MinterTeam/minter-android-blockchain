@@ -37,10 +37,7 @@ import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.SignatureSingleData;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TxUnbound;
-import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterPublicKey;
-import network.minter.core.crypto.PrivateKey;
-import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.TestCase.assertNotNull;
 import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
@@ -50,21 +47,12 @@ import static org.junit.Assert.assertEquals;
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class TxUnbondTest {
-
-    static {
-        try {
-            MinterSDK.initialize();
-        } catch (NativeLoadException e) {
-            e.printStackTrace();
-        }
-    }
+public class TxUnbondTest extends BaseTxTest {
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("7");
         final String validTx = "f87c0701018008aceba00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe880880e92596fd6290000808001b845f8431ba00d60995f30fccc40de871a7264c748a21220ee3cd8f88e8bc893163f4f735d04a0103498704eeb2368a9b95b7baf60a2c92f949aa98be9acd78b0fb8999b75a8fd";
-        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoinId(DEFAULT_COIN_ID)
@@ -76,7 +64,7 @@ public class TxUnbondTest {
                 .build();
 
         assertNotNull(tx);
-        final String resultTx = tx.signSingle(privateKey).getTxSign();
+        final String resultTx = tx.signSingle(UNIT_KEY).getTxSign();
         assertEquals(validTx, resultTx);
 
         Transaction decoded = Transaction.fromEncoded(validTx);
@@ -98,6 +86,6 @@ public class TxUnbondTest {
 
         assertNotNull(data);
         assertEquals(new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8"), data.getPublicKey());
-        assertEquals(new BigDecimal("1.05"), data.getValueDecimal());
+        assertEquals(new BigDecimal("1.05"), data.getValue());
     }
 }

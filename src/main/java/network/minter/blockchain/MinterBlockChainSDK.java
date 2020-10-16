@@ -28,11 +28,14 @@ package network.minter.blockchain;
 
 import com.google.gson.GsonBuilder;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
 
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.schedulers.Schedulers;
 import network.minter.blockchain.repo.NodeAddressRepository;
 import network.minter.blockchain.repo.NodeBlockRepository;
 import network.minter.blockchain.repo.NodeCoinRepository;
@@ -53,18 +56,20 @@ import network.minter.core.internal.api.converters.MinterPublicKeyJsonConverter;
 import network.minter.core.internal.common.Acceptor;
 import network.minter.core.internal.log.Mint;
 import network.minter.core.internal.log.TimberLogger;
+import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
 
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public class MinterBlockChainSDK {
-    private final static String BASE_NODE_URL = BuildConfig.BASE_NODE_URL;
+    private final static String BASE_NODE_URL = BuildConfig.BASE_NODE_URL + BuildConfig.BASE_NODE_VERSION + "/";
     private static MinterBlockChainSDK INSTANCE;
     private final ApiService.Builder mApiService;
     private NodeAddressRepository mAccountRepository;
@@ -84,23 +89,13 @@ public class MinterBlockChainSDK {
         mApiService.setRetrofitClientConfig(new Acceptor<Retrofit.Builder>() {
             @Override
             public void accept(Retrofit.Builder builder) {
-                builder.addCallAdapterFactory(RxJava3CallAdapterFactory.createWithScheduler(Schedulers.io()));
+                builder.addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()));
             }
         });
         mApiService.addHeader("Content-Type", "application/json");
         mApiService.addHeader("X-Minter-Client-Name", "MinterAndroid");
         mApiService.addHeader("X-Minter-Client-Version", BuildConfig.VERSION_NAME);
-        mApiService.addHttpInterceptor(chain -> {
-            Request request = chain.request();
-            Response response = chain.proceed(request);
-            if (response.body() != null && response.body().contentType() != null && response.body().contentType().toString().toLowerCase().equals("application/json")) {
-                Response.Builder b = response.newBuilder();
-                b.code(200);
-
-                return b.build();
-            }
-            return response;
-        });
+        mApiService.addHttpInterceptor(new ResponseErrorToResultInterceptor());
     }
 
     public static void initialize() {
@@ -144,6 +139,10 @@ public class MinterBlockChainSDK {
 
     public static void initialize(boolean debug) {
         initialize(BASE_NODE_URL, debug, new TimberLogger());
+    }
+
+    public static void initialize(boolean debug, Mint.Leaf logger) {
+        initialize(BASE_NODE_URL, debug, logger);
     }
 
     public static void initialize(String baseNodeApiUrl) {
@@ -226,5 +225,25 @@ public class MinterBlockChainSDK {
         }
 
         return mCoinRepository;
+    }
+
+    /**
+     * This class convert any HTTP error that contains valid json response to successful NodeResult response.
+     * It was made to help handle error messages from service and avoid manual exception extraction error body and un-json it
+     */
+    public static class ResponseErrorToResultInterceptor implements Interceptor {
+        @NotNull
+        @Override
+        public Response intercept(@NotNull Chain chain) throws IOException {
+            Request request = chain.request();
+            Response response = chain.proceed(request);
+            if (response.body() != null && response.body().contentType() != null && response.body().contentType().toString().toLowerCase().startsWith("application/json")) {
+                Response.Builder b = response.newBuilder();
+                b.code(200);
+
+                return b.build();
+            }
+            return response;
+        }
     }
 }

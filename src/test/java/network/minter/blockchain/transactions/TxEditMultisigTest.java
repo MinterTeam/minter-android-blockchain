@@ -35,11 +35,8 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
-import network.minter.blockchain.models.operational.TxEditMultisigOwnersData;
-import network.minter.core.MinterSDK;
+import network.minter.blockchain.models.operational.TxEditMultisig;
 import network.minter.core.crypto.MinterAddress;
-import network.minter.core.crypto.PrivateKey;
-import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 import static org.junit.Assert.assertEquals;
@@ -48,34 +45,24 @@ import static org.junit.Assert.assertEquals;
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-public class TxEditMultisigOwnersDataTest {
-
-    static {
-        try {
-            MinterSDK.initialize();
-        } catch (NativeLoadException e) {
-            e.printStackTrace();
-        }
-    }
-
+public class TxEditMultisigTest extends BaseTxTest {
 
     @Test
     public void testEncode() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("8");
         final String validTx = "f8800801018012b0ef03c20102ea9467691076548b20234461ff6fd2bc9c64393eb8fc94c26dbd06984949a0efce1517925ca57a8d7a2c06808001b845f8431ca02da06551a97e23cefd1f0aecdbbb4ae5a40bf412a817a38c59d89ff18c33520ca06a758b304bb363e34746284db3df1809c6f17506726eab8378d59063ddd93764";
-        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setNonce(nonce)
                 .setGasCoinId(DEFAULT_COIN_ID)
                 .setBlockchainId(BlockchainID.MainNet)
-                .editMultisigOwnersData()
+                .editMultisig()
                 .addAddress("Mx67691076548b20234461ff6fd2bc9c64393eb8fc", 1)
                 .addAddress("Mxc26dbd06984949a0efce1517925ca57a8d7a2c06", 2)
                 .setThreshold(3)
                 .build();
 
-        TransactionSign sign = tx.signSingle(privateKey);
+        TransactionSign sign = tx.signSingle(UNIT_KEY);
         assertEquals(validTx, sign.getTxSign());
     }
 
@@ -88,9 +75,9 @@ public class TxEditMultisigOwnersDataTest {
         assertEquals(new BigInteger("1"), tx.getGasPrice());
         assertEquals(DEFAULT_COIN_ID, tx.getGasCoinId());
         assertEquals(BlockchainID.MainNet, tx.getBlockchainId());
-        assertEquals(OperationType.EditMultisigOwnersData, tx.getType());
+        assertEquals(OperationType.EditMultisig, tx.getType());
 
-        TxEditMultisigOwnersData data = tx.getData();
+        TxEditMultisig data = tx.getData();
         assertEquals(2, data.getAddresses().size());
         assertEquals(2, data.getWeights().size());
         assertEquals(new MinterAddress("Mx67691076548b20234461ff6fd2bc9c64393eb8fc"), data.getAddresses().get(0));

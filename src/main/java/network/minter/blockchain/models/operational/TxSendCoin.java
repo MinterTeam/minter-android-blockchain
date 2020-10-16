@@ -110,8 +110,8 @@ public final class TxSendCoin extends Operation {
 
     private TxSendCoin setValue(BigInteger valueNormalized) {
         mValue = valueNormalized;
-		return this;
-	}
+        return this;
+    }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {

@@ -37,9 +37,6 @@ import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TxCoinSell;
 import network.minter.blockchain.models.operational.TxCoinSellAll;
-import network.minter.core.MinterSDK;
-import network.minter.core.crypto.PrivateKey;
-import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 import static org.junit.Assert.assertEquals;
@@ -47,24 +44,14 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * minter-android-blockchain. 2018
- *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TxSellCoinTest {
-
-    static {
-        try {
-            MinterSDK.initialize();
-        } catch (NativeLoadException e) {
-            e.printStackTrace();
-        }
-    }
+public class TxSellCoinTest extends BaseTxTest {
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("3");
         final String validTx = "f864030101800294d380893635c9adc5dea00000018609184e72a000808001b845f8431ba036361e8cdfe662af2285c98fbeb9aa6af1037711fbe47f580777e14ed13575eaa062ff5ce42bec17732db635c85ccf101b4faad5abd9eb9730a78247d12fc1aa34";
-        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setBlockchainId(BlockchainID.MainNet)
@@ -77,7 +64,7 @@ public class TxSellCoinTest {
                 .build();
 
         assertNotNull(tx);
-        final String resultTx = tx.signSingle(privateKey).getTxSign();
+        final String resultTx = tx.signSingle(UNIT_KEY).getTxSign();
         assertEquals(validTx, resultTx);
     }
 
@@ -106,7 +93,6 @@ public class TxSellCoinTest {
             throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("4");
         final String validTx = "f85c04010180038ccb01808801b4fbd92b5f8000808001b845f8431ba0c3a668f479a9a9ee25bc98915877e50b5b91fd38ae53a17142b85919dc9f0baba040617eccdc0b28bc8b182ae9d6cb1d1935358973cf48ebf012c0284ed2898ff9";
-        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setBlockchainId(BlockchainID.MainNet)
@@ -117,10 +103,10 @@ public class TxSellCoinTest {
                 .setMinValueToBuy("0.123")
                 .build();
 
-		assertNotNull(tx);
-		final String resultTx = tx.signSingle(privateKey).getTxSign();
-		assertEquals(validTx, resultTx);
-	}
+        assertNotNull(tx);
+        final String resultTx = tx.signSingle(UNIT_KEY).getTxSign();
+        assertEquals(validTx, resultTx);
+    }
 
     @Test
     public void testSellAllDecodeSingle() {

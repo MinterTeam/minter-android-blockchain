@@ -26,7 +26,8 @@
 
 package network.minter.blockchain.api;
 
-import io.reactivex.rxjava3.core.Observable;
+
+import io.reactivex.Observable;
 import network.minter.blockchain.models.HistoryTransaction;
 import network.minter.blockchain.models.HistoryTransactionList;
 import network.minter.blockchain.models.TransactionCommissionValue;
@@ -49,7 +50,7 @@ public interface NodeTransactionEndpoint {
      * @return
      * @see NodeTransactionRepository.TQuery
      */
-    @GET("/transactions")
+    @GET("transactions")
     Observable<HistoryTransactionList> getTransactions(@Query("query") String urlEncodedQuery);
 
     /**
@@ -58,7 +59,7 @@ public interface NodeTransactionEndpoint {
      * @return
      * @see network.minter.core.MinterSDK#PREFIX_TX
      */
-    @GET("/transaction/{hash}")
+    @GET("transaction/{hash}")
     Observable<HistoryTransaction> getTransaction(@Path("hash") String txHash);
 
     /**
@@ -66,11 +67,11 @@ public interface NodeTransactionEndpoint {
      * @param signedTx Valid transaction, signed with private key
      * @return
      */
-    @GET("/estimate_tx_commission/{tx}")
+    @GET("estimate_tx_commission/{tx}")
     Observable<TransactionCommissionValue> getTxCommission(@Path("tx") String signedTx);
 
 
-    @GET("/unconfirmed_txs")
+    @GET("unconfirmed_txs")
     Observable<UnconfirmedTransactions> getUnconfirmed(@Query("limit") Integer limit);
 
     /**
@@ -78,6 +79,6 @@ public interface NodeTransactionEndpoint {
      * @param data
      * @return
      */
-    @GET("/send_transaction")
+    @GET("send_transaction")
     Observable<TransactionSendResult> sendTransaction(@Query("tx") String signedTxHash);
 }

@@ -41,11 +41,9 @@ import network.minter.blockchain.models.operational.SignatureSingleData;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.models.operational.TxSendCoin;
-import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -55,19 +53,10 @@ import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
  * MinterWallet. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TxSendCoinTest {
-
-    static {
-        try {
-            MinterSDK.initialize();
-        } catch (NativeLoadException e) {
-            e.printStackTrace();
-        }
-    }
+public class TxSendCoinTest extends BaseTxTest {
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
-        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
         MinterAddress toAddress = new MinterAddress("Mx67691076548b20234461ff6fd2bc9c64393eb8fc");
         final String validTx = "f86f01010180019fde809467691076548b20234461ff6fd2bc9c64393eb8fc872bdbb64bc09000808001b845f8431ca08be3f0c3aecc80ec97332e8aa39f20cd9e735092c0de37eb726d8d3d0a255a66a02040a1001d1a9116317eb24aa7ee4730ed980bd08a1fc0adb4e7598425178d3a";
 
@@ -81,14 +70,13 @@ public class TxSendCoinTest {
                 .build();
 
         assertNotNull(tx);
-        TransactionSign sign = tx.signSingle(privateKey);
+        TransactionSign sign = tx.signSingle(UNIT_KEY);
         assertNotNull(sign);
         assertEquals(validTx, sign.getTxSign());
     }
 
     @Test
     public void testDecodeSingle() {
-        PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
         MinterAddress toAddress = new MinterAddress("Mx67691076548b20234461ff6fd2bc9c64393eb8fc");
         final String validTx = "f86f01010180019fde809467691076548b20234461ff6fd2bc9c64393eb8fc872bdbb64bc09000808001b845f8431ca08be3f0c3aecc80ec97332e8aa39f20cd9e735092c0de37eb726d8d3d0a255a66a02040a1001d1a9116317eb24aa7ee4730ed980bd08a1fc0adb4e7598425178d3a";
 
@@ -101,7 +89,7 @@ public class TxSendCoinTest {
         assertEquals(DEFAULT_COIN_ID, transaction.getGasCoinId());
         assertEquals("", transaction.getPayload().stringValue());
 
-        TransactionSign sign = transaction.signSingle(privateKey);
+        TransactionSign sign = transaction.signSingle(UNIT_KEY);
         assertEquals(validTx, sign.getTxSign());
     }
 
@@ -238,5 +226,32 @@ public class TxSendCoinTest {
         assertEquals(validTx, sign.getTxSign());
     }
 
+
+    @Test
+    public void testMultisigSendZeroBytes() throws OperationInvalidDataException {
+        String validTx = "f8c6010201800198d78094000000000000000000000000000000000000000080808002b8a3f8a19400105df705144b7095e9d680fc0780b78f87b3aef88af8431ba010ffe4c48b32353eb1cc7be97f29f02986a56b2ae68955cc47ce96e7a08c8e06a04c664b4d103ebb9246d999b9487b35febcd3eda968aaec776cd1661ef33eb94ff8431ba06991614d100f32fb9879c63f9a35b72fa6d46d15ccb5844e211c64966987e775a04878651dbfd66fe423c8b2775d6e9b866f70162c28a9aaed77200f9f379008de";
+        Transaction tx = new Transaction.Builder(new BigInteger("1"))
+                .setGasPrice(new BigInteger("1"))
+                .setGasCoinId(new BigInteger("0"))
+                .setBlockchainId(BlockchainID.TestNet)
+                .sendCoin()
+                .setTo("Mx0000000000000000000000000000000000000000")
+                .setCoinId(new BigInteger("0"))
+                .setValue("0")
+                .build();
+
+        MinterAddress signAddress = new MinterAddress("Mx00105df705144b7095e9d680fc0780b78f87b3ae");
+
+        TransactionSign sign = tx.signMulti(signAddress, new ArrayList<PrivateKey>() {{
+            add(QA_KEY);
+            add(TESTNET_KEY);
+        }});
+
+        assertEquals(validTx, sign.getTxSign());
+
+        Transaction decoded = Transaction.fromEncoded(validTx);
+
+
+    }
 
 }

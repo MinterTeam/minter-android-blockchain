@@ -36,10 +36,7 @@ import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.SignatureSingleData;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TxSetHaltBlock;
-import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterPublicKey;
-import network.minter.core.crypto.PrivateKey;
-import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.TestCase.assertNotNull;
 import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
@@ -49,21 +46,12 @@ import static org.junit.Assert.assertEquals;
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-public class TxSetHaltBlockTest {
-
-    static {
-        try {
-            MinterSDK.initialize();
-        } catch (NativeLoadException e) {
-            e.printStackTrace();
-        }
-    }
+public class TxSetHaltBlockTest extends BaseTxTest {
 
     @Test
     public void testEncodeSingle() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("2");
         final String validTx = "f873020101800fa3e2a00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe87b808001b845f8431ba0d48744fee3dbcabca03d495c4dffe57a67e8e44b547812d6d72e26f0322d3928a0322d7276f56b4cda3ab6c586a27edb5af01b011e313c0c8e2996b6a8e0f3397c";
-        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoinId(DEFAULT_COIN_ID)
@@ -74,7 +62,7 @@ public class TxSetHaltBlockTest {
                 .build();
 
         assertNotNull(tx);
-        final String resultTx = tx.signSingle(privateKey).getTxSign();
+        final String resultTx = tx.signSingle(UNIT_KEY).getTxSign();
         assertEquals(validTx, resultTx);
 
         Transaction decoded = Transaction.fromEncoded(validTx);

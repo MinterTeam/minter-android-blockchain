@@ -26,7 +26,8 @@
 
 package network.minter.blockchain.api;
 
-import io.reactivex.rxjava3.core.Observable;
+
+import io.reactivex.Observable;
 import network.minter.blockchain.models.EventList;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -37,6 +38,6 @@ import retrofit2.http.Path;
  */
 public interface NodeEventEndpoint {
 
-    @GET("/events/{height}")
+    @GET("events/{height}")
     Observable<EventList> getByHeight(@Path("height") String blockNumber);
 }

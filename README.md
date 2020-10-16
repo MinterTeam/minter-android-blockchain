@@ -24,7 +24,7 @@ project build.gradle
 ```groovy
 
 ext {
-    minterBlockchainSDK = "0.13.1"
+    minterBlockchainSDK = "1.0.0"
 }
 
 dependencies {
@@ -41,41 +41,48 @@ dependencies {
 
 Use our nodes
 ```java
-MinterBlockChainApi.initialize();
+MinterBlockChainSDK.initialize();
 ```
 
 Or it's HIGHLY RECOMMENDED to use you own node instead of Minter's.
 ```java
-MinterBlockChainApi.initialize("https://your-node.local");
+MinterBlockChainSDK.initialize("https://your-node.local");
 ```
 
 ### 2. Creating and signing transactions
 
 Transactions API uses **Builder** pattern, so it so easy to handle it.
 
-All transactions requires a valid **nonce** value. Nonce - is a number of transaction. To get valid transaction number, you should get current number via `BlockChainAccountRepository#getTransactionCount` and increment it:
-
 ```java
-// init object with your Minter address
-MinterAddress myAddress = new MinterAddress("Mxccc3fc91a3d47dc1ee26d62611a09831f0214d62");
+import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
+import network.minter.blockchain.MinterBlockChainSDK;
+import network.minter.blockchain.repo.NodeTransactionRepository;
+class MyClass {
+    
+    void myMethod() {
+        Transaction tx = new Transaction.Builder(new BigInteger("1"))
+                .setBlockchainId(BlockchainID.MainNet)
+                .setGasCoinId(DEFAULT_COIN_ID)
+                .sendCoin()
+                .setCoinId(DEFAULT_COIN_ID)
+                .setValue("0.012345")
+                .setTo(toAddress)
+                .build();
 
-// get account repository from SDK singleton object
-BlockChainAccountRepository repo = MinterBlockChainApi.getInstance().account();
-
-// send request
-repo.getTransactionCount(myAddress).enqueue(new Callback<BCResult<CountableData>>() {
-    @Override
-    public void onResponse(Call<BCResult<CountableData>> call, Response<BCResult<CountableData>> response) {
-        BigInteger txCount = response.body().result.count;
-
-        // use this incremented value as nonce to your transaction
-        BigInteger nonce = txCount.add(new BigInteger("1"));
+        TransactionSign sign = tx.signSingle(privateKey);
+       
+        NodeTransactionRepository txRepo = MinterBlockChainSDK.getInstance().transactions();
+        txRepo.sendTransaction(sign)
+            .observeOn(Schedulers.io())
+            .subscribeOn(Scheduler.io())
+            .subscribe(sendResult -> {
+               System.out.println(sendResult.txHash.toString());
+            }, throwable -> {
+               // handle error
+            });
     }
-
-    @Override
-    public void onFailure(Call<BCResult<CountableData>> call, Throwable t) {
-    }
-})
+}
 ```
 
 #### 2.1 Create "Send" transaction
@@ -98,14 +105,16 @@ final PrivateKey privateKey = PrivateKey.fromMnemonic("your phrase must contains
 Create transaction builder and build transaction:
 ```java
 Transaction tx = new Transaction.Builder(nonce)
+    // by default it depends on what sdk build type you used: with or without suffix "-testnet"
+    .setBlockchainId(BlockchainID.MainNet)
     // optional: available for all transactions, but not useful for some transactions
-    .setGasCoin("MNT")
+    .setGasCoinId(DEFAULT_COIN_ID)
     // here you should select what transaction you are trying to create, builder will select exact type
     .sendCoin()
-    // required: coin to send
-    .setCoin(coin)
-    // required: value to send
-    .setValue("10")
+    // required: coin to send represented by it's ID
+    .setCoinId(DEFAULT_COIN_ID)
+    // value to send
+    .setValue("0.012345")
     // required: recipient address
     .setTo(toAddress)
     // finally, build object
@@ -115,13 +124,7 @@ Transaction tx = new Transaction.Builder(nonce)
 Sign transaction using your private key
 ```java
 TransactionSign sign = tx.sign(privateKey);
-
-// get transaction hash - this hash you'll send to blockchain
-String signedTransaction = sign.getTxSign();
 ```
-
-
-So, it's easy, isn't? :)
 
 For more transaction types see `OperationType` and class `Transaction.Builder`
 
@@ -129,26 +132,25 @@ Now we'll send transaction to blockchain.
 
 #### 2.2 Send "send" transaction to the Minter blockchain
 
-To send transaction to blockchain, we need to get `BlockChainAccountRepository` from `MinterBlockChainApi`
+To send transaction to blockchain, we need to get `NodeTransactionRepository` from `MinterBlockChainSDK`
 
 ```java
-BlockChainAccountRepository accountRepo = MinterBlockChainApi.getInstance().account();
+NodeTransactionRepository accountRepo = MinterBlockChainSDK.getInstance().transactions();
 ```
 
 To send transaction, you just need to call http request
 ```java
 TransactionSign sign = ...
-accountRepo.sendTransaction(sign).enqueue(new Callback<BCResult<TransactionSendResult>>() {
-    @Override
-    public void onResponse(Call<BCResult<TransactionSendResult>> call, Response<BCResult<TransactionSendResult>> response) {
-        // handle send result
-    }
 
-    @Override
-    public void onFailure(Call<BCResult<TransactionSendResult>> call, Throwable t) {
-       // handle send error
-    }
-})
+NodeTransactionRepository txRepo = MinterBlockChainSDK.getInstance().transactions();
+txRepo.sendTransaction(sign)
+    .observeOn(Schedulers.io())
+    .subscribeOn(Scheduler.io())
+    .subscribe(sendResult -> {
+        System.out.println(sendResult.txHash.toString());
+    }, throwable -> {
+        // handle error
+    });
 ```
 
 That's all!
@@ -159,10 +161,21 @@ That's all!
 Javadoc available in code and in *.jar file at the bintray
 
 ## Build
-TODO
+To create local artifacts that you can find in your home `~/.m2` directory, just run:
+```bash
+bash project_root/publish_local.sh
+```
 
 ## Tests
-TODO
+
+To run unit tests, you must build bip39 and secp256k1 with host target
+See: [bip39](https://github.com/edwardstock/bip3x) and [secp256k1-java](https://github.com/edwardstock/native-secp256k1-java)
+
+All these test can be runned only with testnet configuration, don't use `gradlew test` directly
+```bash
+cd project_root
+./gradlew testNetTestDebugUnitTest -PnativeLibPath=/path/to/native/libs
+```
 
 ## Changelog
 

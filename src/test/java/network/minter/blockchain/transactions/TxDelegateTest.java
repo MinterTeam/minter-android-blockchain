@@ -36,10 +36,8 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TxDelegate;
-import network.minter.core.MinterSDK;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.crypto.PrivateKey;
-import network.minter.core.internal.exceptions.NativeLoadException;
 
 import static junit.framework.TestCase.assertNotNull;
 import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
@@ -49,21 +47,12 @@ import static org.junit.Assert.assertEquals;
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TxDelegateTest {
-
-    static {
-        try {
-            MinterSDK.initialize();
-        } catch (NativeLoadException e) {
-            e.printStackTrace();
-        }
-    }
+public class TxDelegateTest extends BaseTxTest {
 
     @Test
     public void testEncode() throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("5");
         final String validTx = "f87e0501018007aeeda00208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8808a021e19e0c9bab2400000808001b845f8431ba0b23e03cb8d8f87dc0716ce4a42f6fbad50c173562e29fc2ee4610691c6d131eda022593f96278c49319b28b4651201ae6ae8777a34739841ac55c40c3bcae96a07";
-        final PrivateKey privateKey = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
 
         Transaction tx = new Transaction.Builder(nonce)
                 .setGasCoinId(DEFAULT_COIN_ID)
@@ -75,7 +64,7 @@ public class TxDelegateTest {
                 .build();
 
         assertNotNull(tx);
-        final String resultTx = tx.signSingle(privateKey).getTxSign();
+        final String resultTx = tx.signSingle(UNIT_KEY).getTxSign();
         assertEquals(validTx, resultTx);
     }
 
@@ -95,8 +84,8 @@ public class TxDelegateTest {
         assertNotNull(data);
         assertEquals(new MinterPublicKey("Mp0208f8a2bd535f65ecbe4b057b3b3c5fbfef6003b0713dc37b697b1d19153fe8"), data.getPublicKey());
         assertEquals(DEFAULT_COIN_ID, data.getCoinId());
-        assertEquals(new BigDecimal(10000), data.getStakeDecimal());
-        assertEquals(new BigDecimal("10000"), data.getStakeDecimal());
+        assertEquals(new BigDecimal(10000), data.getStake());
+        assertEquals(new BigDecimal("10000"), data.getStake());
     }
 
 	@Test
@@ -136,7 +125,7 @@ public class TxDelegateTest {
         assertNotNull(data);
         assertEquals(new MinterPublicKey("Mp0eb98ea04ae466d8d38f490db3c99b3996a90e24243952ce9822c6dc1e2c1a43"), data.getPublicKey());
         assertEquals(DEFAULT_COIN_ID, data.getCoinId());
-        assertEquals(new BigDecimal(10), data.getStakeDecimal());
-        assertEquals(new BigDecimal("10"), data.getStakeDecimal());
+        assertEquals(new BigDecimal(10), data.getStake());
+        assertEquals(new BigDecimal("10"), data.getStake());
     }
 }

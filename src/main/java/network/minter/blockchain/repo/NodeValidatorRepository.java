@@ -30,7 +30,7 @@ import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
 
-import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.Observable;
 import network.minter.blockchain.api.NodeValidatorEndpoint;
 import network.minter.blockchain.models.CandidateItem;
 import network.minter.blockchain.models.CandidateList;

@@ -30,7 +30,7 @@ import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
 
-import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.Observable;
 import network.minter.blockchain.api.NodeBlockEndpoint;
 import network.minter.blockchain.models.BlockInfo;
 import network.minter.core.internal.api.ApiService;

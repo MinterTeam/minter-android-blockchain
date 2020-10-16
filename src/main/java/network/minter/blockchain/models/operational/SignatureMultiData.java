@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2019
+ * Copyright (C) by MinterTeam. 2020
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -35,8 +35,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.internal.helpers.BytesHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
+
+import static network.minter.core.internal.helpers.BytesHelper.addLeadingZeroes;
 
 /**
  * minter-android-blockchain. 2018
@@ -102,9 +105,11 @@ public final class SignatureMultiData extends SignatureData {
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
-        mSignatureAddress = new MinterAddress(fromRawRlp(0, decoded));
+
+        char[] addressData = fromRawRlp(0, decoded);
+        mSignatureAddress = new MinterAddress(addLeadingZeroes(addressData, 20));
 
         Object[] signs = (Object[]) decoded[1];
         mSignatures = new LinkedList<>();
@@ -139,14 +144,14 @@ public final class SignatureMultiData extends SignatureData {
         final Object[][] signatures = new Object[mSignatures.size()][];
         for (int i = 0; i < mSignatures.size(); i++) {
             signatures[i] = new Object[]{
-                    mSignatures.get(i).getV(),
-                    mSignatures.get(i).getR(),
-                    mSignatures.get(i).getS(),
+                    mSignatures.get(i).getV().getData(),
+                    BytesHelper.dropLeadingZeroes(mSignatures.get(i).getR().getData()),
+                    BytesHelper.dropLeadingZeroes(mSignatures.get(i).getS().getData()),
             };
         }
 
 	    return RLPBoxed.encode(new Object[]{
-                mSignatureAddress.getData(),
+                mSignatureAddress,
                 signatures
         });
     }

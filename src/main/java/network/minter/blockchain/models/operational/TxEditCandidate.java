@@ -32,7 +32,6 @@ import android.os.Parcelable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
 import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.util.DecodeResult;
@@ -43,8 +42,6 @@ import network.minter.core.util.RLPBoxed;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class TxEditCandidate extends Operation {
-
-    @SuppressWarnings("unused")
     public static final Parcelable.Creator<TxEditCandidate> CREATOR = new Parcelable.Creator<TxEditCandidate>() {
         @Override
         public TxEditCandidate createFromParcel(Parcel in) {
@@ -57,7 +54,6 @@ public class TxEditCandidate extends Operation {
         }
     };
     private MinterPublicKey mPublicKey;
-    private MinterPublicKey mNewPublicKey;
     private MinterAddress mRewardAddress;
     private MinterAddress mOwnerAddress;
     private MinterAddress mControlAddress;
@@ -72,7 +68,6 @@ public class TxEditCandidate extends Operation {
     protected TxEditCandidate(Parcel in) {
         super(in);
         mPublicKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-        mNewPublicKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
         mRewardAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
         mOwnerAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
         mControlAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
@@ -84,15 +79,6 @@ public class TxEditCandidate extends Operation {
 
     public TxEditCandidate setPublicKey(MinterPublicKey publicKey) {
         mPublicKey = publicKey;
-        return this;
-    }
-
-    public MinterPublicKey getNewPublicKey() {
-        return mNewPublicKey;
-    }
-
-    public TxEditCandidate setNewPublicKey(MinterPublicKey publicKey) {
-        mNewPublicKey = publicKey;
         return this;
     }
 
@@ -132,7 +118,6 @@ public class TxEditCandidate extends Operation {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeValue(mPublicKey);
-        dest.writeValue(mNewPublicKey);
         dest.writeValue(mRewardAddress);
         dest.writeValue(mOwnerAddress);
         dest.writeValue(mControlAddress);
@@ -158,17 +143,9 @@ public class TxEditCandidate extends Operation {
         final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
         mPublicKey = new MinterPublicKey(fromRawRlp(0, decoded));
-
-        char[] newPubKeyData = fromRawRlp(1, decoded);
-        if (newPubKeyData.length == 0) {
-            mNewPublicKey = null;
-        } else {
-            mNewPublicKey = new MinterPublicKey(newPubKeyData);
-        }
-
-        mRewardAddress = new MinterAddress(fromRawRlp(2, decoded));
-        mOwnerAddress = new MinterAddress(fromRawRlp(3, decoded));
-        mControlAddress = new MinterAddress(fromRawRlp(4, decoded));
+        mRewardAddress = new MinterAddress(fromRawRlp(1, decoded));
+        mOwnerAddress = new MinterAddress(fromRawRlp(2, decoded));
+        mControlAddress = new MinterAddress(fromRawRlp(3, decoded));
     }
 
     @Nonnull
@@ -176,7 +153,6 @@ public class TxEditCandidate extends Operation {
     protected char[] encodeRLP() {
         return RLPBoxed.encode(new Object[]{
                 mPublicKey,
-                mNewPublicKey == null ? new BytesData(0) : mNewPublicKey,
                 mRewardAddress,
                 mOwnerAddress,
                 mControlAddress

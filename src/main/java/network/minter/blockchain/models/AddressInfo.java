@@ -63,11 +63,11 @@ public class AddressInfo extends NodeResult {
         @SerializedName("bip_value")
         public BigInteger bipValue;
 
-        public BigDecimal getValueDecimal() {
+        public BigDecimal getValue() {
             return humanizeValue(value);
         }
 
-        public BigDecimal getBipValueDecimal() {
+        public BigDecimal getBipValue() {
             return humanizeValue(bipValue);
         }
     }

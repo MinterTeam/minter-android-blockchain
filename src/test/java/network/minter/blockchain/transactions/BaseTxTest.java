@@ -24,20 +24,39 @@
  * THE SOFTWARE.
  */
 
-package network.minter.blockchain.models;
+package network.minter.blockchain.transactions;
 
-import com.google.gson.annotations.SerializedName;
-
-import org.parceler.Parcel;
-
-import java.math.BigInteger;
+import network.minter.blockchain.BuildConfig;
+import network.minter.blockchain.utils.DeepLinkBuilder;
+import network.minter.core.MinterSDK;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.PrivateKey;
+import network.minter.core.internal.exceptions.NativeLoadException;
 
 /**
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-@Parcel
-public class MaxGasValue extends NodeResult {
-    @SerializedName("max_gas_price")
-    public BigInteger value;
+public abstract class BaseTxTest {
+    protected static final PrivateKey QA_KEY;
+    protected static final MinterAddress QA_ADDRESS;
+    protected static final PrivateKey TESTNET_KEY;
+    protected static final MinterAddress TESTNET_ADDRESS;
+    protected static final PrivateKey UNIT_KEY;
+    protected static final MinterAddress UNIT_ADDRESS;
+
+    static {
+        try {
+            MinterSDK.initialize();
+            DeepLinkBuilder.BIP_WALLET_URL = DeepLinkBuilder.BIP_WALLET_TESTNET;
+        } catch (NativeLoadException e) {
+            throw new RuntimeException(e);
+        }
+        QA_KEY = PrivateKey.fromMnemonic(BuildConfig.QA_MNEMONIC);
+        QA_ADDRESS = QA_KEY.getPublicKey().toMinter();
+        TESTNET_KEY = PrivateKey.fromMnemonic(BuildConfig.TESTNET_MNEMONIC);
+        TESTNET_ADDRESS = TESTNET_KEY.getPublicKey().toMinter();
+        UNIT_KEY = new PrivateKey("4daf02f92bf760b53d3c725d6bcc0da8e55d27ba5350c78d3a88f873e502bd6e");
+        UNIT_ADDRESS = UNIT_KEY.getPublicKey().toMinter();
+    }
 }

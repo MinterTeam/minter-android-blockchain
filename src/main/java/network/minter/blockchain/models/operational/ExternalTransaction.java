@@ -67,9 +67,9 @@ public class ExternalTransaction implements Parcelable {
     Operation mOperationData;
     // max - 1024 bytes (1 kilobyte)
     BytesData mPayload = new BytesData(new char[0]);
-    BigInteger mNonce;
-    BigInteger mGasPrice;
-    BigInteger mGasCoinId = MinterSDK.DEFAULT_COIN_ID;
+    BigInteger mNonce = null;
+    BigInteger mGasPrice = null;
+    BigInteger mGasCoinId = null;
 
     public ExternalTransaction(Transaction transaction) {
         mNonce = transaction.mNonce;
@@ -135,14 +135,23 @@ public class ExternalTransaction implements Parcelable {
      * @return char[] container. Use BytesData#toHexString() to get hex string
      */
     public BytesData encode() {
-        char[] res = RLPBoxed.encode(new Object[]{
-                mOperationData.getType().getValue(),
-                mOperationData.encodeRLP(),
-                mPayload.getData(),
-                firstNonNull(mNonce, BigInteger.ZERO),
-                firstNonNull(mGasPrice, new BigInteger("1")),
-                firstNonNull(mGasCoinId, MinterSDK.DEFAULT_COIN_ID),
-        });
+        Object[] empty = new Object[0];
+        Object[] toEncode = new Object[6];
+        toEncode[0] = mOperationData.getType().getValue();
+        toEncode[1] = mOperationData.encodeRLP();
+        toEncode[2] = mPayload.getData();
+        if (mNonce == null) {
+            toEncode[3] = empty;
+        } else {
+            toEncode[3] = mNonce;
+        }
+        toEncode[4] = firstNonNull(mGasPrice, new BigInteger("1"));
+        if (mGasCoinId == null) {
+            toEncode[5] = empty;
+        } else {
+            toEncode[5] = mGasCoinId;
+        }
+        char[] res = RLPBoxed.encode(toEncode);
         return new BytesData(res);
     }
 
@@ -251,12 +260,20 @@ public class ExternalTransaction implements Parcelable {
         return (char[]) raw[idx];
     }
 
+    boolean isEmptyRlpElement(int idx, Object[] raw) {
+        if (raw[idx] instanceof char[]) {
+            char[] tmp = (char[]) raw[idx];
+            return tmp.length == 0;
+        }
+        return false;
+    }
+
     void decodeRLP(Object[] raw) {
         mType = OperationType.findByValue(new BigInteger(charsToBytes(fromRawRlp(0, raw))));
         mPayload = new BytesData(fromRawRlp(2, raw));
-        mNonce = fixBigintSignedByte(raw[3]);
-        mGasPrice = fixBigintSignedByte((raw[4]));
-        mGasCoinId = fixBigintSignedByte((raw[5]));
+        mNonce = isEmptyRlpElement(3, raw) ? null : fixBigintSignedByte(raw[3]);
+        mGasPrice = fixBigintSignedByte(raw[4]);
+        mGasCoinId = isEmptyRlpElement(5, raw) ? null : fixBigintSignedByte((raw[5]));
     }
 
     public static class Builder {
@@ -267,7 +284,6 @@ public class ExternalTransaction implements Parcelable {
         }
 
         public Builder setNonce(BigInteger nonce) {
-            checkNotNull(nonce, "Nonce must be set");
             mTx.mNonce = nonce;
             return this;
         }
@@ -283,7 +299,6 @@ public class ExternalTransaction implements Parcelable {
          * @return {@link Transaction.Builder}
          */
         public Builder setGasCoinId(BigInteger coinId) {
-            checkNotNull(coinId, "CoinId must be set");
             mTx.mGasCoinId = coinId;
             return this;
         }

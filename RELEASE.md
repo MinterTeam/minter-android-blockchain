@@ -1,9 +1,13 @@
 # Release notes
 
 ## 1.0.0
- - **BREAKING CHANGES**
- - Now communication with node api works with RxJava3
- - Base API response now in root of json, so BcResult<T> is just NodeResult and each response object inherits this class
+- **BREAKING CHANGES**
+- Renamed `MinterBlockChainApi` to `MinterBlockChainSDK`
+- Now communication with node api works with RxJava2
+- Base API response now in root of json, so BcResult<T> is just NodeResult and each response object inherits this class
+- Added `synchronized` blocks to methods uses native secp256k1 context
+- `CheckTransaction#sign()` now returns `MinterCheck` instead of `TransactionSign`
+- Added `CheckTransaction#validatePassword()` method to verify check password validity offline
 
 
 ## 0.13.1

@@ -85,7 +85,7 @@ public class Genesis extends NodeResult {
         public BigInteger coinId;
         public BigInteger value;
 
-        public BigDecimal getValueDecimal() {
+        public BigDecimal getValue() {
             return Transaction.humanizeValue(value);
         }
     }

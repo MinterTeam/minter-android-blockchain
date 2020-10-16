@@ -33,6 +33,7 @@ import java.io.IOException;
 import network.minter.blockchain.MinterBlockChainSDK;
 import network.minter.blockchain.models.EventList;
 import network.minter.blockchain.repo.NodeEventRepository;
+import network.minter.core.internal.log.StdLogger;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -45,7 +46,7 @@ public class EventRepositoryTest {
 
     @Test
     public void testGetEventsWithReward() throws IOException {
-        MinterBlockChainSDK.initialize("http://68.183.211.176:8843");
+        MinterBlockChainSDK.initialize(true, new StdLogger());
 
         NodeEventRepository repository = MinterBlockChainSDK.getInstance().event();
 

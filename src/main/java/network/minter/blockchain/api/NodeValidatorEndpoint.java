@@ -26,7 +26,8 @@
 
 package network.minter.blockchain.api;
 
-import io.reactivex.rxjava3.core.Observable;
+
+import io.reactivex.Observable;
 import network.minter.blockchain.models.CandidateItem;
 import network.minter.blockchain.models.CandidateList;
 import network.minter.blockchain.models.MissedBlocks;
@@ -41,10 +42,10 @@ import retrofit2.http.Query;
  */
 public interface NodeValidatorEndpoint {
 
-    @GET("/candidates")
+    @GET("candidates")
     Observable<CandidateList> getCandidates();
 
-    @GET("/candidates")
+    @GET("candidates")
     Observable<CandidateList> getCandidates(
             @Query("height") String blockNumber,
             /* string "true" or "false" */
@@ -53,16 +54,16 @@ public interface NodeValidatorEndpoint {
             @Query("status") Integer status
     );
 
-    @GET("/candidate/{pub_key}")
+    @GET("candidate/{pub_key}")
     Observable<CandidateItem> getCandidate(
             @Path("pub_key") String publicKey,
             @Query("height") String blockHeight
     );
 
-    @GET("/validators")
+    @GET("validators")
     Observable<ValidatorList> getValidators();
 
-    @GET("/validators")
+    @GET("validators")
     Observable<ValidatorList> getValidators(
             @Query("height") String blockNumber,
             @Query("page") Integer page,
@@ -70,7 +71,7 @@ public interface NodeValidatorEndpoint {
     );
 
 
-    @GET("/missed_blocks/{public_key}")
+    @GET("missed_blocks/{public_key}")
     Observable<MissedBlocks> getMissedBlocks(
             @Path("public_key") String publicKey,
             @Query("height") String blockNumber

@@ -26,19 +26,11 @@
 
 package network.minter.blockchain.models;
 
-import com.google.gson.Gson;
+import org.parceler.Parcel;
 
-import java.io.IOException;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableSource;
-import io.reactivex.rxjava3.functions.Function;
-import network.minter.blockchain.MinterBlockChainSDK;
-import network.minter.core.internal.exceptions.NetworkException;
-import network.minter.core.internal.log.Mint;
-import retrofit2.HttpException;
 
 import static network.minter.core.internal.common.Preconditions.firstNonNull;
 
@@ -48,88 +40,47 @@ import static network.minter.core.internal.common.Preconditions.firstNonNull;
  */
 
 public class NodeResult {
-    public String error;
-    public Integer code;
-    public String message;
+    public Error error;
 
-    public static NodeResult copyError(NodeResult another) {
-        NodeResult out = new NodeResult();
-        out.code = another.code;
-        out.error = another.error;
-        out.message = another.message;
+    public int getCode() {
+        if (error == null) return 0;
 
-        return out;
+        return error.code;
     }
 
-    public static Function<? super Throwable, ? extends ObservableSource<? extends NodeResult>> toNodeError() {
-        return (Function<Throwable, ObservableSource<? extends NodeResult>>) throwable -> {
-            if (throwable instanceof HttpException) {
-                return Observable.just(createNodeError(((HttpException) throwable)));
-            }
-
-            return Observable.just(createNodeError(NetworkException.convertIfNetworking(throwable)));
-        };
-    }
-
-    public static NodeResult createNodeError(Throwable t) {
-        Throwable e = NetworkException.convertIfNetworking(t);
-        if (e instanceof NetworkException) {
-            return createNodeError(((NetworkException) e).getStatusCode(), ((NetworkException) e).getUserMessage());
+    public String getMessage() {
+        if (error == null) {
+            return null;
         }
 
-        return createNodeError(-1, e.getMessage());
+        return error.message;
     }
 
-    public static NodeResult createNodeError(final HttpException exception) {
-        final String errorBodyString;
-        try {
-            errorBodyString = ((HttpException) exception).response().errorBody().string();
-        } catch (IOException e) {
-            Mint.e(e, "Unable to resolve http exception response");
-            return createNodeError(exception.code(), exception.message());
+    public BlockchainStatus getStatus() {
+        if (error == null) {
+            return BlockchainStatus.Success;
         }
 
-        return createNodeError(errorBodyString, exception.code(), exception.message());
-    }
-
-    public static NodeResult createNodeError(final String json, int code, String message) {
-        Gson gson = MinterBlockChainSDK.getInstance().getGsonBuilder().create();
-
-        NodeResult out;
-        try {
-            if (json == null || json.isEmpty()) {
-                out = createNodeError(code, message);
-            } else {
-                out = gson.fromJson(json, NodeResult.class);
-            }
-
-        } catch (Exception e) {
-            Mint.e(e, "Unable to parse node error: %s", json);
-            out = createNodeError(code, message);
-        }
-
-        return out;
-    }
-
-    public static NodeResult createNodeError(int code, String message) {
-        NodeResult out = new NodeResult();
-        out.code = code;
-        out.error = message;
-        out.message = message;
-        return out;
+        return BlockchainStatus.findByCode(getCode());
     }
 
     public boolean isOk() {
-        return error == null && (code == null || code == 0);
+        return error == null;
     }
 
     @Nonnull
     @Override
     public String toString() {
-        return String.format("NodeResult{code=%s, error=%s, message=%s}",
-                firstNonNull(code, 0),
-                firstNonNull(error, "null"),
-                firstNonNull(message, "{no message}")
+        return String.format("NodeResult{code=%s, message=%s}",
+                firstNonNull(getCode(), 0),
+                firstNonNull(getMessage(), "OK")
         );
+    }
+
+    @Parcel
+    public static class Error {
+        public Integer code;
+        public String message;
+        public Map<String, String> data;
     }
 }

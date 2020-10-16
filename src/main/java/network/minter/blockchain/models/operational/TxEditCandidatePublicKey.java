@@ -32,77 +32,71 @@ import android.os.Parcelable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import network.minter.core.crypto.MinterAddress;
-import network.minter.core.internal.helpers.StringHelper;
+import network.minter.core.crypto.MinterPublicKey;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
-
-import static network.minter.core.internal.common.Preconditions.checkArgument;
-import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
+public class TxEditCandidatePublicKey extends Operation {
 
-public class TxChangeCoinOwner extends Operation {
-
-
-    public static final Parcelable.Creator<TxChangeCoinOwner> CREATOR = new Parcelable.Creator<TxChangeCoinOwner>() {
+    public static final Parcelable.Creator<TxEditCandidatePublicKey> CREATOR = new Parcelable.Creator<TxEditCandidatePublicKey>() {
         @Override
-        public TxChangeCoinOwner createFromParcel(Parcel in) {
-            return new TxChangeCoinOwner(in);
+        public TxEditCandidatePublicKey createFromParcel(Parcel in) {
+            return new TxEditCandidatePublicKey(in);
         }
 
         @Override
-        public TxChangeCoinOwner[] newArray(int size) {
-            return new TxChangeCoinOwner[size];
+        public TxEditCandidatePublicKey[] newArray(int size) {
+            return new TxEditCandidatePublicKey[size];
         }
     };
 
-    private String mSymbol;
-    private MinterAddress mNewOwner;
+    private MinterPublicKey mPublicKey;
+    private MinterPublicKey mNewPublicKey;
 
-    public TxChangeCoinOwner(@Nonnull Transaction rawTx) {
-        super(rawTx);
+    public TxEditCandidatePublicKey() {
     }
 
-    public TxChangeCoinOwner(Parcel in) {
-        mSymbol = in.readString();
-        mNewOwner = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
+    public TxEditCandidatePublicKey(Transaction tx) {
+        super(tx);
+    }
+
+    public TxEditCandidatePublicKey(Parcel in) {
+        super(in);
+        mPublicKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
+        mNewPublicKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeString(mSymbol);
-        dest.writeValue(mNewOwner);
+        dest.writeValue(mPublicKey);
+        dest.writeValue(mNewPublicKey);
     }
 
     @Override
     public OperationType getType() {
-        return OperationType.ChangeCoinOwner;
+        return OperationType.EditCandidatePublicKey;
     }
 
-    public String getSymbol() {
-        return mSymbol.replace("\0", "");
+    public MinterPublicKey getNewPublicKey() {
+        return mNewPublicKey;
     }
 
-    public TxChangeCoinOwner setSymbol(String symbol) {
-        checkArgument(
-                symbol != null && symbol.length() >= 3 && symbol.length() <= 10,
-                String.format("Coin %s length must be from 3 to 10 symbols", symbol)
-        );
-        mSymbol = StringHelper.strrpad(10, symbol.toUpperCase());
+    public TxEditCandidatePublicKey setNewPublicKey(MinterPublicKey publicKey) {
+        mNewPublicKey = publicKey;
         return this;
     }
 
-    public MinterAddress getNewOwner() {
-        return mNewOwner;
+    public MinterPublicKey getPublicKey() {
+        return mPublicKey;
     }
 
-    public TxChangeCoinOwner setNewOwner(MinterAddress newOwner) {
-        mNewOwner = newOwner;
+    public TxEditCandidatePublicKey setPublicKey(MinterPublicKey publicKey) {
+        mPublicKey = publicKey;
         return this;
     }
 
@@ -110,25 +104,24 @@ public class TxChangeCoinOwner extends Operation {
     @Override
     protected FieldsValidationResult validate() {
         return new FieldsValidationResult()
-                .addResult("mSymbol", mSymbol != null, "Coin symbol must be set")
-                .addResult("mNewOwner", mNewOwner != null, "New owner address must be set");
+                .addResult("mPublicKey", mPublicKey != null, "Node public key must be set")
+                .addResult("mNewPublicKey", mPublicKey != null, "Node NEW public key must be set");
     }
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
         final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
-
-        mSymbol = charsToString(fromRawRlp(0, decoded));
-        mNewOwner = new MinterAddress(fromRawRlp(1, decoded));
+        mPublicKey = new MinterPublicKey(fromRawRlp(0, decoded));
+        mNewPublicKey = new MinterPublicKey(fromRawRlp(1, decoded));
     }
 
     @Nonnull
     @Override
     protected char[] encodeRLP() {
         return RLPBoxed.encode(new Object[]{
-                mSymbol,
-                mNewOwner
+                mPublicKey,
+                mNewPublicKey
         });
     }
 }

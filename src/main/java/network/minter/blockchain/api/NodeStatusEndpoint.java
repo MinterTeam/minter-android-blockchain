@@ -26,7 +26,8 @@
 
 package network.minter.blockchain.api;
 
-import io.reactivex.rxjava3.core.Observable;
+
+import io.reactivex.Observable;
 import network.minter.blockchain.models.Halts;
 import network.minter.blockchain.models.MaxGasValue;
 import network.minter.blockchain.models.MinGasValue;
@@ -40,16 +41,16 @@ import retrofit2.http.Query;
  */
 public interface NodeStatusEndpoint {
 
-    @GET("/status")
+    @GET("status")
     Observable<NetworkStatus> getStatus();
 
-    @GET("/halts")
+    @GET("halts")
     Observable<Halts> getHalts(@Query("height") String blockNumber);
 
-    @GET("/min_gas_price")
+    @GET("min_gas_price")
     Observable<MinGasValue> getMinGas();
 
-    @GET("/max_gas")
+    @GET("max_gas_price")
     Observable<MaxGasValue> getMaxGas(@Query("height") String blockNumber);
 
 

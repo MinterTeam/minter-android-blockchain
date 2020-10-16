@@ -28,7 +28,7 @@ package network.minter.blockchain.api;
 
 import java.util.List;
 
-import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.Observable;
 import network.minter.blockchain.models.AddressInfo;
 import network.minter.blockchain.models.AddressInfoList;
 import retrofit2.http.GET;
@@ -46,7 +46,7 @@ public interface NodeAddressEndpoint {
      * @param address Address of an account
      * @return
      */
-    @GET("/address/{address}")
+    @GET("address/{address}")
     Observable<AddressInfo> getAddressInfo(@Path("address") String address);
 
     /**
@@ -54,17 +54,17 @@ public interface NodeAddressEndpoint {
      * @param address Address of an account
      * @return
      */
-    @GET("/address/{address}")
+    @GET("address/{address}")
     Observable<AddressInfo> getAddressInfo(
             @Path("address") String address,
             @Query("height") String blockNumber,
             @Query("delegated") String includeDelegatedStakes
     );
 
-    @GET("/addresses")
+    @GET("addresses")
     Observable<AddressInfoList> getAddressesInfo(@Query("addresses") List<String> addresses);
 
-    @GET("/addresses")
+    @GET("addresses")
     Observable<AddressInfoList> getAddressesInfo(
             @Query("addresses") List<String> addresses,
             @Query("height") String blockNumber,

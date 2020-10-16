@@ -157,22 +157,8 @@ public final class SignatureSingleData extends SignatureData {
 
 	protected void decodeRaw(char[][] vrs) {
         mV = new BytesData(vrs[0]);
-        if (vrs[1].length < 32) {
-            mR = new BytesData(32);
-            mR.write(0, (byte) 0x00);
-            mR.write(1, vrs[1]);
-        } else {
-            mR = new BytesData(vrs[1]);
-        }
-
-        if (vrs[2].length < 32) {
-            mS = new BytesData(32);
-            mS.write(0, (byte) 0x00);
-            mS.write(1, vrs[2]);
-        } else {
-            mS = new BytesData(vrs[2]);
-        }
-
+        mR = new BytesData(BytesHelper.addLeadingZeroes(vrs[1], 32));
+        mS = new BytesData(BytesHelper.addLeadingZeroes(vrs[2], 32));
     }
 
     @Override

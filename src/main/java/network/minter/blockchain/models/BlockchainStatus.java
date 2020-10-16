@@ -31,7 +31,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * @see https://github.com/MinterTeam/minter-go-node/blob/6fd49c9099ca6ea4adbdf04f396b0103c4865602/core/code/code.go
  */
-public enum TransactionStatus {
+public enum BlockchainStatus {
     UnknownError(-1),
     @SerializedName("0")
     Success(0),
@@ -135,12 +135,12 @@ public enum TransactionStatus {
 
     final int resVal;
 
-    TransactionStatus(int v) {
+    BlockchainStatus(int v) {
         resVal = v;
     }
 
     public static boolean isKnownError(int code) {
-        for (TransactionStatus c : TransactionStatus.values()) {
+        for (BlockchainStatus c : BlockchainStatus.values()) {
             if (code == c.getValue()) {
                 return true;
             }
@@ -149,8 +149,8 @@ public enum TransactionStatus {
         return false;
     }
 
-    public static TransactionStatus findByCode(int code) {
-        for (TransactionStatus c : TransactionStatus.values()) {
+    public static BlockchainStatus findByCode(int code) {
+        for (BlockchainStatus c : BlockchainStatus.values()) {
             if (code == c.getValue()) {
                 return c;
             }

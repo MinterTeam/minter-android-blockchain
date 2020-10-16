@@ -52,6 +52,7 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class CheckTransaction {
+    private final static Object sNativeLock = new Object();
     private String mPassphrase;
     private BytesData mNonce;
     private BlockchainID mChainId;
@@ -73,6 +74,39 @@ public class CheckTransaction {
         mGasCoinId = MinterSDK.DEFAULT_COIN_ID;
         mCoinId = mGasCoinId;
         mNonce = new BytesData("1".getBytes());
+    }
+
+    public static boolean validatePassword(final MinterCheck check, final String passphrase) {
+        return validatePassword(check, passphrase.getBytes());
+    }
+
+    /**
+     * Validate check passphrase offline
+     * @param check
+     * @param passphrase
+     * @return
+     */
+    public static boolean validatePassword(final MinterCheck check, final byte[] passphrase) {
+        final CheckTransaction tx = CheckTransaction.fromEncoded(check);
+        final BytesData hashBytes = new BytesData(tx.encode(true));
+        final BytesData hash = hashBytes.sha3Data();
+        final BytesData pk = new BytesData(passphrase).sha256Mutable();
+
+        final NativeSecp256k1.RecoverableSignature lockSig;
+
+        synchronized (sNativeLock) {
+            long ctx = NativeSecp256k1.contextCreate();
+            try {
+                lockSig = NativeSecp256k1.signRecoverableSerialized(ctx, hash.getBytes(), pk.getBytes());
+            } finally {
+                NativeSecp256k1.contextCleanup(ctx);
+            }
+        }
+
+        lockSig.v[0] = lockSig.v[0] == 27 ? 0x0 : (byte) 0x01;
+        final BytesData lock = new BytesData(lockSig.r, lockSig.s, lockSig.v);
+
+        return tx.getLock().equals(lock);
     }
 
     public static BytesData makeProof(String address, byte[] passphrase) {
@@ -98,11 +132,14 @@ public class CheckTransaction {
         BytesData encodedAddress = new BytesData(RLPBoxed.encode(new Object[]{address.getData()})).sha3Mutable();
 
         NativeSecp256k1.RecoverableSignature signature;
-        long ctx = NativeSecp256k1.contextCreate();
-        try {
-            signature = NativeSecp256k1.signRecoverableSerialized(ctx, encodedAddress.getBytes(), key.getBytes());
-        } finally {
-            NativeSecp256k1.contextCleanup(ctx);
+
+        synchronized (sNativeLock) {
+            long ctx = NativeSecp256k1.contextCreate();
+            try {
+                signature = NativeSecp256k1.signRecoverableSerialized(ctx, encodedAddress.getBytes(), key.getBytes());
+            } finally {
+                NativeSecp256k1.contextCleanup(ctx);
+            }
         }
 
         signature.v[0] = signature.v[0] == 27 ? 0x0 : (byte) 0x01;
@@ -196,32 +233,35 @@ public class CheckTransaction {
         return mSignature;
     }
 
-    public TransactionSign sign(PrivateKey privateKey) {
+    public MinterCheck sign(PrivateKey privateKey) {
         BytesData hashBytes = new BytesData(encode(true));
         BytesData hash = hashBytes.sha3Data();
         BytesData pk = new BytesData(mPassphrase.getBytes()).sha256Mutable();
 
         NativeSecp256k1.RecoverableSignature lockSig;
 
-        long ctx = NativeSecp256k1.contextCreate();
-        try {
-            lockSig = NativeSecp256k1.signRecoverableSerialized(ctx, hash.getBytes(), pk.getBytes());
-        } finally {
-            NativeSecp256k1.contextCleanup(ctx);
+        synchronized (sNativeLock) {
+            long ctx = NativeSecp256k1.contextCreate();
+            try {
+                lockSig = NativeSecp256k1.signRecoverableSerialized(ctx, hash.getBytes(), pk.getBytes());
+            } finally {
+                NativeSecp256k1.contextCleanup(ctx);
+            }
         }
 
         lockSig.v[0] = lockSig.v[0] == 27 ? 0x0 : (byte) 0x01;
-
         mLock = new BytesData(lockSig.r, lockSig.s, lockSig.v);
 
         BytesData withLock = new BytesData(encode(false)).sha3Mutable();
 
         NativeSecp256k1.RecoverableSignature rsv;
-        long ctx2 = NativeSecp256k1.contextCreate();
-        try {
-            rsv = NativeSecp256k1.signRecoverableSerialized(ctx2, withLock.getBytes(), privateKey.getBytes());
-        } finally {
-            NativeSecp256k1.contextCleanup(ctx2);
+        synchronized (sNativeLock) {
+            long ctx = NativeSecp256k1.contextCreate();
+            try {
+                rsv = NativeSecp256k1.signRecoverableSerialized(ctx, withLock.getBytes(), privateKey.getBytes());
+            } finally {
+                NativeSecp256k1.contextCleanup(ctx);
+            }
         }
 
         mSignature = new SignatureSingleData();
@@ -229,7 +269,7 @@ public class CheckTransaction {
 
         String signedCheck = new BytesData(encode(false)).toHexString(MinterSDK.PREFIX_CHECK);
 
-        return new TransactionSign(signedCheck);
+        return new MinterCheck(signedCheck);
     }
 
     public BytesData getLock() {
@@ -336,6 +376,12 @@ public class CheckTransaction {
             return this;
         }
 
+        public Builder setCoinId(long coinId) {
+            checkArgument(coinId >= 0, "Coin ID can't be negative");
+            mCheck.mCoinId = BigInteger.valueOf(coinId);
+            return this;
+        }
+
         public Builder setValue(BigDecimal value) {
             mCheck.mValue = Transaction.normalizeValue(value);
             return this;
@@ -350,9 +396,14 @@ public class CheckTransaction {
             return this;
         }
 
-        public Builder setGasCoin(BigInteger gasCoinId) {
+        public Builder setGasCoinId(BigInteger gasCoinId) {
             mCheck.mGasCoinId = gasCoinId;
             return this;
+        }
+
+        public Builder setGasCoinId(long gasCoinId) {
+            checkArgument(gasCoinId >= 0, "Coin ID can't be negative");
+            return setGasCoinId(BigInteger.valueOf(gasCoinId));
         }
 
         public CheckTransaction build() {

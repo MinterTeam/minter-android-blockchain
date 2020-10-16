@@ -33,10 +33,10 @@ import java.math.BigInteger;
 
 import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.CheckTransaction;
-import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.core.MinterSDK;
 import network.minter.core.crypto.BytesData;
 import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterCheck;
 import network.minter.core.crypto.PrivateKey;
 import network.minter.core.internal.exceptions.NativeLoadException;
 import network.minter.core.util.FastByteComparisons;
@@ -44,6 +44,7 @@ import network.minter.core.util.FastByteComparisons;
 import static junit.framework.TestCase.assertTrue;
 import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * minter-android-blockchain. 2018
@@ -70,15 +71,15 @@ public class CheckTransactionTest {
 
         CheckTransaction check = new CheckTransaction.Builder(new BigInteger("480"), pass)
                 .setChainId(BlockchainID.MainNet)
-                .setGasCoin(DEFAULT_COIN_ID)
+                .setGasCoinId(DEFAULT_COIN_ID)
                 .setCoinId(DEFAULT_COIN_ID)
                 .setDueBlock(new BigInteger("999999"))
                 .setValue("10")
                 .build();
 
-        TransactionSign sign = check.sign(privateKey);
+        MinterCheck sign = check.sign(privateKey);
 
-        CheckTransaction decoded = CheckTransaction.fromEncoded(sign.getTxSign());
+        CheckTransaction decoded = CheckTransaction.fromEncoded(sign);
         assertEquals(new BigInteger("480"), decoded.getNonceNumeric());
         assertTrue(FastByteComparisons.equal("480".getBytes(), decoded.getNonce().getBytes()));
         assertEquals(BlockchainID.MainNet, decoded.getChainId());
@@ -89,11 +90,24 @@ public class CheckTransactionTest {
 
         CheckTransaction validDec = CheckTransaction.fromEncoded(validCheck);
 
-        assertEquals(validCheck, sign.getTxSign());
+        assertEquals(validCheck, sign.toString());
 
         BytesData proof = CheckTransaction.makeProof(address, pass);
         assertEquals(validProof, proof.toHexString());
         System.out.println(proof.toHexString());
+
+    }
+
+    @Test
+    public void testPasswordValidation() {
+        MinterCheck check = new MinterCheck("Mcf89c846161613102843b9ac9ff80888ac7230489e8000080b841e3bb8b939403babefb87430c0a6ab856d0827a8932f3315571fe48af470a4a283f7d02de18d7ecfc959fb96d167576643e888f2533da62459df3b55b0530b11d011ca0a5112c82ff8add85e8dc076887f07481da47b74038bae375047b6f68e4977ebba03a389ba1529b0f61d29f7b5bedff6b5c2daa7c478512150b16e68d8be25ad254");
+        String validPassword = "pass";
+        String invalidPassword = "pass1";
+        String invalidPassword2 = "hello";
+
+        assertTrue(CheckTransaction.validatePassword(check, validPassword));
+        assertFalse(CheckTransaction.validatePassword(check, invalidPassword));
+        assertFalse(CheckTransaction.validatePassword(check, invalidPassword2));
 
     }
 }

@@ -27,91 +27,85 @@
 package network.minter.blockchain.models.operational;
 
 import android.os.Parcel;
-
-import java.math.BigInteger;
+import android.os.Parcelable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import network.minter.core.crypto.MinterPublicKey;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.internal.helpers.StringHelper;
 import network.minter.core.util.DecodeResult;
 import network.minter.core.util.RLPBoxed;
 
-import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
+import static network.minter.core.internal.common.Preconditions.checkArgument;
+import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 
-public class TxSetHaltBlock extends Operation {
-    public static final Creator<TxSetHaltBlock> CREATOR = new Creator<TxSetHaltBlock>() {
+public class TxEditCoinOwner extends Operation {
+
+
+    public static final Parcelable.Creator<TxEditCoinOwner> CREATOR = new Parcelable.Creator<TxEditCoinOwner>() {
         @Override
-        public TxSetHaltBlock createFromParcel(Parcel in) {
-            return new TxSetHaltBlock(in);
+        public TxEditCoinOwner createFromParcel(Parcel in) {
+            return new TxEditCoinOwner(in);
         }
 
         @Override
-        public TxSetHaltBlock[] newArray(int size) {
-            return new TxSetHaltBlock[size];
+        public TxEditCoinOwner[] newArray(int size) {
+            return new TxEditCoinOwner[size];
         }
     };
 
-    private MinterPublicKey mPublicKey;
-    private BigInteger mHeight;
+    private String mSymbol;
+    private MinterAddress mNewOwner;
 
-    public TxSetHaltBlock() {
+    public TxEditCoinOwner() {
     }
 
-    public TxSetHaltBlock(@Nonnull Transaction rawTx) {
+    public TxEditCoinOwner(@Nonnull Transaction rawTx) {
         super(rawTx);
     }
 
-    public TxSetHaltBlock(Parcel in) {
-        mPublicKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-        mHeight = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
+    public TxEditCoinOwner(Parcel in) {
+        mSymbol = in.readString();
+        mNewOwner = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeValue(mPublicKey);
-        dest.writeValue(mHeight);
+        dest.writeString(mSymbol);
+        dest.writeValue(mNewOwner);
     }
 
     @Override
     public OperationType getType() {
-        return OperationType.SetHaltBlock;
+        return OperationType.EditCoinOwner;
     }
 
-    public MinterPublicKey getPublicKey() {
-        return mPublicKey;
+    public String getSymbol() {
+        return mSymbol.replace("\0", "");
     }
 
-    public TxSetHaltBlock setPublicKey(MinterPublicKey publicKey) {
-        mPublicKey = publicKey;
+    public TxEditCoinOwner setSymbol(String symbol) {
+        checkArgument(
+                symbol != null && symbol.length() >= 3 && symbol.length() <= 10,
+                String.format("Coin %s length must be from 3 to 10 symbols", symbol)
+        );
+        mSymbol = StringHelper.strrpad(10, symbol.toUpperCase());
         return this;
     }
 
-    public TxSetHaltBlock setPublicKey(CharSequence publicKey) {
-        mPublicKey = new MinterPublicKey(publicKey);
-        return this;
+    public MinterAddress getNewOwner() {
+        return mNewOwner;
     }
 
-    public BigInteger getHeight() {
-        return mHeight;
-    }
-
-    public TxSetHaltBlock setHeight(long height) {
-        if (height < 1) {
-            throw new IllegalArgumentException("Height must be positive number");
-        }
-        mHeight = BigInteger.valueOf(height);
-        return this;
-    }
-
-    public TxSetHaltBlock setHeight(BigInteger height) {
-        mHeight = height;
+    public TxEditCoinOwner setNewOwner(MinterAddress newOwner) {
+        mNewOwner = newOwner;
         return this;
     }
 
@@ -119,17 +113,8 @@ public class TxSetHaltBlock extends Operation {
     @Override
     protected FieldsValidationResult validate() {
         return new FieldsValidationResult()
-                .addResult("mPublicKey", mPublicKey != null, "Public key must be set")
-                .addResult("mHeight", mHeight != null, "Block number must be set");
-    }
-
-    @Nonnull
-    @Override
-    protected char[] encodeRLP() {
-        return RLPBoxed.encode(new Object[]{
-                mPublicKey,
-                mHeight
-        });
+                .addResult("mSymbol", mSymbol != null, "Coin symbol must be set")
+                .addResult("mNewOwner", mNewOwner != null, "New owner address must be set");
     }
 
     @Override
@@ -137,7 +122,16 @@ public class TxSetHaltBlock extends Operation {
         final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
-        mPublicKey = new MinterPublicKey(fromRawRlp(0, decoded));
-        mHeight = fixBigintSignedByte(fromRawRlp(1, decoded));
+        mSymbol = charsToString(fromRawRlp(0, decoded));
+        mNewOwner = new MinterAddress(fromRawRlp(1, decoded));
+    }
+
+    @Nonnull
+    @Override
+    protected char[] encodeRLP() {
+        return RLPBoxed.encode(new Object[]{
+                mSymbol,
+                mNewOwner
+        });
     }
 }

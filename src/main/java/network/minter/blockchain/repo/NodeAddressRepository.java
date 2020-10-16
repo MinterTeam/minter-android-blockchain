@@ -32,7 +32,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.Observable;
 import network.minter.blockchain.api.NodeAddressEndpoint;
 import network.minter.blockchain.models.AddressInfo;
 import network.minter.blockchain.models.AddressInfoList;
