@@ -24,7 +24,7 @@ project build.gradle
 ```groovy
 
 ext {
-    minterBlockchainSDK = "1.0.0"
+    minterBlockchainSDK = "1.0.1"
 }
 
 dependencies {

@@ -80,7 +80,7 @@ public enum OperationType {
     @SerializedName("20")
     EditCandidatePublicKey((byte) 0x14, TxEditCandidatePublicKey.class, 10000000d);
 
-    private final static String FEE_BASE_STRING = "0.001";
+    private final static String FEE_BASE_STRING = "0.100";
     public final static BigDecimal FEE_BASE = new BigDecimal(FEE_BASE_STRING);
 
     final BigInteger mValue;

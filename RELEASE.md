@@ -1,5 +1,8 @@
 # Release notes
 
+## 1.0.1
+- Increased transaction fees up to 100x
+
 ## 1.0.0
 - **BREAKING CHANGES**
 - Renamed `MinterBlockChainApi` to `MinterBlockChainSDK`
