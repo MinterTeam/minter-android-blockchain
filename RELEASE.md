@@ -1,5 +1,8 @@
 # Release notes
 
+## 1.0.2
+- Increased EditCandidatePublicKey fee up to 10x
+
 ## 1.0.1
 - Increased transaction fees up to 100x
 

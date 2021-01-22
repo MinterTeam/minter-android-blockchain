@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -57,7 +57,7 @@ apply plugin: 'com.jfrog.bintray'
 
 
 group = 'network.minter.android'
-version = '1.0.1'
+version = '1.0.2'
 
 ext {
     minterMinSdk = 16
@@ -170,6 +170,8 @@ android {
             buildConfigField "String", "BASE_NODE_URL", '"https://minter-node.apps.minter.network/"'
             buildConfigField "String", "BASE_NODE_VERSION", '"v2"'
             buildConfigField "network.minter.blockchain.models.operational.BlockchainID", "BLOCKCHAIN_ID", "network.minter.blockchain.models.operational.BlockchainID.MainNet"
+            buildConfigField "String", "QA_MNEMONIC", '""'
+            buildConfigField "String", "TESTNET_MNEMONIC", '""'
         }
         netTest {
             dimension "env"

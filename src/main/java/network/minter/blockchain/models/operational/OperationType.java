@@ -1,5 +1,5 @@
 /*
- * Copyright (C) by MinterTeam. 2020
+ * Copyright (C) by MinterTeam. 2021
  * @link <a href="https://github.com/MinterTeam">Org Github</a>
  * @link <a href="https://github.com/edwardstock">Maintainer Github</a>
  *
@@ -78,7 +78,7 @@ public enum OperationType {
     @SerializedName("19")
     PriceVote((byte) 0x13, TxPriceVote.class, 10d),
     @SerializedName("20")
-    EditCandidatePublicKey((byte) 0x14, TxEditCandidatePublicKey.class, 10000000d);
+    EditCandidatePublicKey((byte) 0x14, TxEditCandidatePublicKey.class, 100000000d);
 
     private final static String FEE_BASE_STRING = "0.100";
     public final static BigDecimal FEE_BASE = new BigDecimal(FEE_BASE_STRING);
