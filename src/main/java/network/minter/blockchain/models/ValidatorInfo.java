@@ -28,8 +28,6 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import network.minter.core.crypto.MinterPublicKey;
 
 /**
@@ -37,7 +35,7 @@ import network.minter.core.crypto.MinterPublicKey;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 @Deprecated
-@Parcel
+
 public class ValidatorInfo {
     @SerializedName("pubkey")
     public MinterPublicKey publicKey;

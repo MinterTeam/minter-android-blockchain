@@ -26,257 +26,95 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import network.minter.core.internal.helpers.StringHelper;
-import network.minter.core.util.DecodeResult;
-import network.minter.core.util.RLPBoxed;
-
-import static network.minter.blockchain.models.operational.Transaction.humanizeValue;
-import static network.minter.blockchain.models.operational.Transaction.normalizeValue;
-import static network.minter.core.internal.common.Preconditions.checkArgument;
-import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
-import static network.minter.core.internal.helpers.StringHelper.charsToString;
-
 /**
  * minter-android-blockchain. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
+ * @deprecated Use TxCoinCreate instead for unified class names
  */
-public class TxCreateCoin extends Operation {
-    public final static int MAX_COIN_NAME_BYTES = 64;
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxCreateCoin> CREATOR = new Parcelable.Creator<TxCreateCoin>() {
-        @Override
-        public TxCreateCoin createFromParcel(Parcel in) {
-            return new TxCreateCoin(in);
-        }
-
-        @Override
-        public TxCreateCoin[] newArray(int size) {
-            return new TxCreateCoin[size];
-        }
-    };
-    protected String mName;
-    protected String mSymbol;
-    protected BigInteger mInitialAmount;
-    protected BigInteger mInitialReserve;
-    // unsigned!!!
-    protected Integer mConstantReserveRatio;
-    protected BigInteger mMaxSupply = new BigDecimal("1000000000000000").multiply(Transaction.VALUE_MUL_DEC).toBigInteger();
-
+@Deprecated
+public class TxCreateCoin extends TxCoinCreate {
     public TxCreateCoin() {
+        super();
     }
 
     public TxCreateCoin(Transaction rawTx) {
         super(rawTx);
     }
 
-    protected TxCreateCoin(Parcel in) {
-        super(in);
-        mName = in.readString();
-        mSymbol = in.readString();
-        mInitialAmount = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mInitialReserve = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mConstantReserveRatio = in.readByte() == 0x00 ? null : in.readInt();
-        mMaxSupply = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-    }
-
-    public static BigDecimal calculateCreatingCost(String coin) {
-        checkArgument(coin.length() >= 3 &&
-                coin.length() <= 10, "Coin length must be from 3 to 10 characters");
-        BigDecimal out;
-        switch (coin.length()) {
-            case 3:
-                out = new BigDecimal("1000000");
-                break;
-            case 4:
-                out = new BigDecimal("100000");
-                break;
-            case 5:
-                out = new BigDecimal("10000");
-                break;
-            case 6:
-                out = new BigDecimal("1000");
-                break;
-            default:
-                out = new BigDecimal("100");
-                break;
-        }
-
-        return out.multiply(OperationType.CreateCoin.getFee());
-    }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeString(mName);
-        dest.writeString(mSymbol);
-        dest.writeValue(mInitialAmount);
-        dest.writeValue(mInitialReserve);
-        if (mConstantReserveRatio == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeInt(mConstantReserveRatio);
-        }
-        dest.writeValue(mMaxSupply);
-    }
-
-    public String getName() {
-        return mName;
-    }
-
     public TxCreateCoin setName(String name) {
-        mName = name;
+        super.setName(name);
         return this;
     }
 
-    public String getSymbol() {
-        return mSymbol.replace("\0", "");
-    }
-
+    @Override
     public TxCreateCoin setSymbol(String coinName) {
-        mSymbol = StringHelper.strrpad(10, coinName.toUpperCase());
+        super.setSymbol(coinName);
         return this;
     }
 
-    /**
-     * Get normalized immutable initial amount as big decimal value
-     * @return big decimal normalized value
-     */
-    public BigDecimal getInitialAmount() {
-        return humanizeValue(mInitialAmount);
-    }
-
+    @Override
     public TxCreateCoin setInitialAmount(String amountDecimal) {
-        return setInitialAmount(new BigDecimal(amountDecimal));
+        super.setInitialAmount(amountDecimal);
+        return this;
     }
 
+    @Override
     public TxCreateCoin setInitialAmount(BigDecimal amount) {
-        return setInitialAmount(normalizeValue(amount));
+        super.setInitialAmount(amount);
+        return this;
     }
 
+    @Override
     public TxCreateCoin setInitialAmount(BigInteger amount) {
-        mInitialAmount = amount;
+        super.setInitialAmount(amount);
         return this;
     }
 
-    /**
-     * Get coin hardcap
-     * @return human decimal value
-     */
-    public BigDecimal getMaxSupply() {
-        return humanizeValue(mMaxSupply);
-    }
-
-    /**
-     * Coin purchase will not be possible if the limit is exceeded
-     * @param maxSupply
-     * @return self
-     */
+    @Override
     public TxCreateCoin setMaxSupply(BigInteger maxSupply) {
-        mMaxSupply = maxSupply;
+        super.setMaxSupply(maxSupply);
         return this;
     }
 
-    /**
-     * Coin purchase will not be possible if the limit is exceeded
-     * @param maxSupply Coin HardCap
-     * @return self
-     */
+    @Override
     public TxCreateCoin setMaxSupply(BigDecimal maxSupply) {
-        mMaxSupply = normalizeValue(maxSupply);
+        super.setMaxSupply(maxSupply);
         return this;
     }
 
+    @Override
     public TxCreateCoin setMaxSupply(String maxSupply) {
-        mMaxSupply = normalizeValue(new BigDecimal(maxSupply));
+        super.setMaxSupply(maxSupply);
         return this;
     }
 
-    /**
-     * Get normalized initial reserve in base coin
-     * @return big decimal normalized value
-     */
-    public BigDecimal getInitialReserve() {
-        return humanizeValue(mInitialReserve);
-    }
-
+    @Override
     public TxCreateCoin setInitialReserve(BigDecimal amount) {
-        return setInitialReserve(normalizeValue(amount));
+        super.setInitialReserve(amount);
+        return this;
     }
 
+    @Override
     public TxCreateCoin setInitialReserve(BigInteger amount) {
-        mInitialReserve = amount;
+        super.setInitialReserve(amount);
         return this;
     }
 
+    @Override
     public TxCreateCoin setInitialReserve(String amountDecimal) {
-        return setInitialReserve(new BigDecimal(amountDecimal));
-    }
-
-    /**
-     * Get constant reserve ratio (in percents)
-     * @return int value
-     */
-    public int getConstantReserveRatio() {
-        return mConstantReserveRatio;
-    }
-
-    public TxCreateCoin setConstantReserveRatio(Integer ratio) {
-        checkArgument(ratio >= 10 && ratio <= 100, "Constant Reserve Ratio should be between 10 and 100");
-        mConstantReserveRatio = ratio;
+        super.setInitialReserve(amountDecimal);
         return this;
     }
 
     @Override
-    public OperationType getType() {
-        return OperationType.CreateCoin;
-    }
-
-    @Nullable
-    @Override
-    protected FieldsValidationResult validate() {
-        return new FieldsValidationResult()
-                .addResult("mName", mName == null || mName.getBytes().length <= 64, "Coin name cannot be longer than 64 bytes")
-                .addResult("mSymbol", mSymbol != null && mSymbol.length() >= 3 && mSymbol.length() <= 10, "Coin symbol length must be from 3 to 10 chars")
-                .addResult("mInitialAmount", mInitialAmount != null, "Initial Amount must be set")
-                .addResult("mInitialReserve", mInitialReserve != null, "Initial Reserve must be set")
-                .addResult("mMaxSupply", mMaxSupply != null, "Maximum supply value must be set")
-                .addResult("mConstantReserveRatio", mConstantReserveRatio != null, "Reserve ratio must be set")
-                .addResult("mConstantReserveRatio", mConstantReserveRatio != null && mConstantReserveRatio >= 10 && mConstantReserveRatio <= 100, "Constant Reserve Ratio should be between 10 and 100");
-    }
-
-    @Nonnull
-    @Override
-    protected char[] encodeRLP() {
-        return RLPBoxed.encode(new Object[]{
-                mName,
-                mSymbol,
-                mInitialAmount,
-                mInitialReserve,
-                mConstantReserveRatio,
-                mMaxSupply
-        });
-    }
-
-    @Override
-    protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);/**/
-        final Object[] decoded = (Object[]) rlp.getDecoded();
-        mName = charsToString(fromRawRlp(0, decoded));
-        mSymbol = charsToString(fromRawRlp(1, decoded));
-        mInitialAmount = fixBigintSignedByte(fromRawRlp(2, decoded));
-        mInitialReserve = fixBigintSignedByte(fromRawRlp(3, decoded));
-        mConstantReserveRatio = fixBigintSignedByte(fromRawRlp(4, decoded)).intValue();
-        mMaxSupply = fixBigintSignedByte(fromRawRlp(5, decoded));
+    public TxCreateCoin setConstantReserveRatio(Integer ratio) {
+        super.setConstantReserveRatio(ratio);
+        return this;
     }
 }

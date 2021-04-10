@@ -28,13 +28,12 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
 
 /**
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-@Parcel
+
 public class MissedBlocks extends NodeResult {
     @SerializedName("missed_blocks")
     public String blocks;

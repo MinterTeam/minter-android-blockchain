@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -49,18 +46,6 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxSendCoin extends Operation {
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxSendCoin> CREATOR = new Parcelable.Creator<TxSendCoin>() {
-        @Override
-        public TxSendCoin createFromParcel(Parcel in) {
-            return new TxSendCoin(in);
-        }
-
-        @Override
-        public TxSendCoin[] newArray(int size) {
-            return new TxSendCoin[size];
-        }
-    };
     private BigInteger mCoinId = MinterSDK.DEFAULT_COIN_ID;
     private MinterAddress mTo;
     private BigInteger mValue;
@@ -70,13 +55,6 @@ public final class TxSendCoin extends Operation {
 
     public TxSendCoin(Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxSendCoin(Parcel in) {
-        super(in);
-        mCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mTo = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
-        mValue = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
     }
 
     /**
@@ -111,14 +89,6 @@ public final class TxSendCoin extends Operation {
     private TxSendCoin setValue(BigInteger valueNormalized) {
         mValue = valueNormalized;
         return this;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mCoinId);
-        dest.writeValue(mTo);
-        dest.writeValue(mValue);
     }
 
     public BigInteger getValueBigInteger() {

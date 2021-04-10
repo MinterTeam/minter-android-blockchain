@@ -1,5 +1,28 @@
 # Release notes
 
+## 2.0.0
+Minter 2.0 update
+- New Maven repository for android libraries: `https://minter.jfrog.io/artifactory/android/`
+- Fully removed android's Parcel implementations for better compatibility with pure java/kotlin implementation
+- Added transactions:
+    - AddLiquidity
+    - RemoveLiquidity
+    - CreateSwapPool
+    - SellSwapPool
+    - BuySwapPool
+    - SellAllSwapPool
+    - EditCandidateCommission
+    - MoveStake
+    - MintToken
+    - BurnToken
+    - CreateToken
+    - RecreateToken
+    - VoteCommission
+    - VoteUpdate
+
+- Added "Swap From" parameter to "coin estimate" endpoints
+- Deprecated `TxCreateCoin` and `TxRecreateCoin` as it's renamed to `TxCoinCreate` and `TxCoinRecreate`
+
 ## 1.0.2
 - Increased EditCandidatePublicKey fee up to 10x
 

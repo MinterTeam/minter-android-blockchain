@@ -28,8 +28,6 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -40,7 +38,7 @@ import network.minter.core.crypto.MinterAddress;
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@Parcel
+
 public class Coin extends NodeResult {
     public BigInteger id;
     public String name;

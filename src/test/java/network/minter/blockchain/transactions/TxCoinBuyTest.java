@@ -43,12 +43,14 @@ import static network.minter.core.MinterSDK.DEFAULT_COIN_ID;
 
 /**
  * minter-android-blockchain. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TxBuyCoinTest extends BaseTxTest {
+public class TxCoinBuyTest extends BaseTxTest {
 
     @Test
-    public void testEncodeSingle() throws OperationInvalidDataException {
+    public void testEncodeSingle()
+            throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("2");
         final String validTx = "f865020101800495d40187038d7ea4c680008089056bc75e2d63100000808001b845f8431ca0f64de1594ea6ea7717a2161771a429a2202e78ae4f1bf628a8c2e12a2df13e4aa04b8eb64ef9e7574983cc66960e98829fd93ab61fd2d7794c3e8810970e9e3693";
 

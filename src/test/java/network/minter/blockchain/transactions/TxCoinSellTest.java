@@ -44,12 +44,14 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * minter-android-blockchain. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TxSellCoinTest extends BaseTxTest {
+public class TxCoinSellTest extends BaseTxTest {
 
     @Test
-    public void testEncodeSingle() throws OperationInvalidDataException {
+    public void testEncodeSingle()
+            throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("3");
         final String validTx = "f864030101800294d380893635c9adc5dea00000018609184e72a000808001b845f8431ba036361e8cdfe662af2285c98fbeb9aa6af1037711fbe47f580777e14ed13575eaa062ff5ce42bec17732db635c85ccf101b4faad5abd9eb9730a78247d12fc1aa34";
 

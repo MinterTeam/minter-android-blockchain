@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-
 import com.edwardstock.secp256k1.NativeSecp256k1;
 
 import javax.annotation.Nonnull;
@@ -44,19 +42,6 @@ import static network.minter.core.internal.common.Preconditions.checkArgument;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public final class SignatureSingleData extends SignatureData {
-
-    @SuppressWarnings("unused")
-    public static final Creator<SignatureSingleData> CREATOR = new Creator<SignatureSingleData>() {
-        @Override
-        public SignatureSingleData createFromParcel(Parcel in) {
-            return new SignatureSingleData(in);
-        }
-
-        @Override
-        public SignatureSingleData[] newArray(int size) {
-            return new SignatureSingleData[size];
-        }
-    };
     private BytesData mV;
     private BytesData mR;
     private BytesData mS;
@@ -95,24 +80,6 @@ public final class SignatureSingleData extends SignatureData {
         mV = new BytesData(v);
     }
 
-    protected SignatureSingleData(Parcel in) {
-        mV = (BytesData) in.readValue(BytesData.class.getClassLoader());
-        mR = (BytesData) in.readValue(BytesData.class.getClassLoader());
-        mS = (BytesData) in.readValue(BytesData.class.getClassLoader());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mV);
-        dest.writeValue(mR);
-        dest.writeValue(mS);
-    }
-
     public BytesData getR() {
         return mR;
     }
@@ -128,6 +95,17 @@ public final class SignatureSingleData extends SignatureData {
     @Override
     public String toString() {
         return String.format("%s%s%s", mR, mS, mV);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SignatureSingleData)) {
+            return false;
+        }
+
+        SignatureSingleData sd = ((SignatureSingleData) obj);
+
+        return mV.equals(sd.getV()) && mR.equals(sd.getR()) && mS.equals(sd.getS());
     }
 
     protected void setSign(NativeSecp256k1.RecoverableSignature signature) {
@@ -155,31 +133,20 @@ public final class SignatureSingleData extends SignatureData {
         }
     }
 
-	protected void decodeRaw(char[][] vrs) {
+    protected void decodeRaw(char[][] vrs) {
         mV = new BytesData(vrs[0]);
         mR = new BytesData(BytesHelper.addLeadingZeroes(vrs[1], 32));
         mS = new BytesData(BytesHelper.addLeadingZeroes(vrs[2], 32));
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof SignatureSingleData)) {
-            return false;
-        }
-
-        SignatureSingleData sd = ((SignatureSingleData) obj);
-
-        return mV.equals(sd.getV()) && mR.equals(sd.getR()) && mS.equals(sd.getS());
-    }
-
     @Nonnull
     @Override
     protected char[] encodeRLP() {
-	    char[] v = mV.getData();
-	    char[] r = BytesHelper.dropLeadingZeroes(mR.getData());
-	    char[] s = BytesHelper.dropLeadingZeroes(mS.getData());
+        char[] v = mV.getData();
+        char[] r = BytesHelper.dropLeadingZeroes(mR.getData());
+        char[] s = BytesHelper.dropLeadingZeroes(mS.getData());
 
-	    return RLPBoxed.encode(new Object[]{v, r, s});
+        return RLPBoxed.encode(new Object[]{v, r, s});
     }
 
     /**

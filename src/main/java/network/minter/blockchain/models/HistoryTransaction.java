@@ -28,8 +28,6 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ import network.minter.core.crypto.MinterPublicKey;
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@Parcel
+
 public class HistoryTransaction extends NodeResult {
     public BytesData hash;
     @SerializedName("raw_tx")
@@ -58,7 +56,7 @@ public class HistoryTransaction extends NodeResult {
     @SerializedName("gas_price")
     public BigInteger gasPrice;
     @SerializedName("gas_coin")
-    public BigInteger gasCoinId;
+    public Coin gasCoin;
     public Type type;
     public TxBaseResult data;
     public String payload;
@@ -106,11 +104,11 @@ public class HistoryTransaction extends NodeResult {
         }
     }
 
-    @Parcel
+
     public static class TxBaseResult {
     }
 
-    @Parcel
+
     public static class CoinData {
         public BigInteger id;
         public String symbol;
@@ -126,7 +124,7 @@ public class HistoryTransaction extends NodeResult {
     /**
      * Data model for sending transaction
      */
-    @Parcel
+
     public static class TxSendCoinResult extends TxBaseResult {
         public MinterAddress to;
         public CoinData coin;
@@ -154,7 +152,7 @@ public class HistoryTransaction extends NodeResult {
     /**
      * Data model for creating coin transaction
      */
-    @Parcel
+
     public static class TxCreateCoinResult extends TxBaseResult {
         public String name;
         public String symbol;
@@ -195,7 +193,7 @@ public class HistoryTransaction extends NodeResult {
     /**
      * Data model for exchanging coins transaction
      */
-    @Parcel
+
     public static class TxConvertCoinResult extends TxBaseResult {
         @SerializedName("coin_to_sell")
         public BigInteger coinToSell;
@@ -243,7 +241,7 @@ public class HistoryTransaction extends NodeResult {
     /**
      * Data model for declaring validator candidacy
      */
-    @Parcel
+
     public static class TxDeclareCandidacyResult extends TxBaseResult {
         public MinterAddress address;
         @SerializedName("pub_key")
@@ -282,7 +280,7 @@ public class HistoryTransaction extends NodeResult {
     /**
      * Data model for enabling validator transaction
      */
-    @Parcel
+
     public static class TxSetCandidateOnlineOfflineResult extends TxBaseResult {
         @SerializedName("pub_key")
         public MinterPublicKey publicKey;
@@ -295,7 +293,7 @@ public class HistoryTransaction extends NodeResult {
     /**
      * Data model for delegating and unbonding transactions
      */
-    @Parcel
+
     public static class TxDelegateUnbondResult extends TxBaseResult {
         @SerializedName("pub_key")
         public MinterPublicKey publicKey;
@@ -335,7 +333,7 @@ public class HistoryTransaction extends NodeResult {
     /**
      * Data model for redeeming checks transactions
      */
-    @Parcel
+
     public static class TxRedeemCheckResult extends TxBaseResult {
         @SerializedName("raw_check")
         public String rawCheck;
@@ -361,20 +359,20 @@ public class HistoryTransaction extends NodeResult {
     /**
      * To get created multisig address, use {@link HistoryTransaction.tags['tx.created_multisig']}
      */
-    @Parcel
+
     public static class TxCreateMultisigResult extends TxBaseResult {
         public BigInteger threshold;
         public List<BigInteger> weights = new ArrayList<>();
         public List<MinterAddress> addresses = new ArrayList<>();
     }
 
-    @Parcel
+
     public static class TxMultisendResult extends TxBaseResult {
         @SerializedName("list")
         public List<TxSendCoinResult> items;
     }
 
-    @Parcel
+
     public static class TxEditCandidateResult extends TxBaseResult {
         @SerializedName("reward_address")
         public MinterAddress rewardAddress;

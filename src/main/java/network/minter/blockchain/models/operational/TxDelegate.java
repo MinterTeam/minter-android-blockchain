@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -47,18 +44,6 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxDelegate extends Operation {
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxDelegate> CREATOR = new Parcelable.Creator<TxDelegate>() {
-        @Override
-        public TxDelegate createFromParcel(Parcel in) {
-            return new TxDelegate(in);
-        }
-
-        @Override
-        public TxDelegate[] newArray(int size) {
-            return new TxDelegate[size];
-        }
-    };
     private MinterPublicKey mPubKey;
     private BigInteger mCoinId;
     private BigInteger mStake;
@@ -68,21 +53,6 @@ public final class TxDelegate extends Operation {
 
     public TxDelegate(Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxDelegate(Parcel in) {
-        super(in);
-        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-        mCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mStake = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mPubKey);
-        dest.writeValue(mCoinId);
-        dest.writeValue(mStake);
     }
 
     public MinterPublicKey getPublicKey() {

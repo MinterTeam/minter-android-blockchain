@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -49,18 +46,6 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxUnbound extends Operation {
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxUnbound> CREATOR = new Parcelable.Creator<TxUnbound>() {
-        @Override
-        public TxUnbound createFromParcel(Parcel in) {
-            return new TxUnbound(in);
-        }
-
-        @Override
-        public TxUnbound[] newArray(int size) {
-            return new TxUnbound[size];
-        }
-    };
     private MinterPublicKey mPubKey;
     private BigInteger mCoinId;
     private BigInteger mValue;
@@ -70,21 +55,6 @@ public final class TxUnbound extends Operation {
 
     public TxUnbound(Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxUnbound(Parcel in) {
-        super(in);
-        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-        mCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mValue = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mPubKey);
-        dest.writeValue(mCoinId);
-        dest.writeValue(mValue);
     }
 
     public MinterPublicKey getPublicKey() {

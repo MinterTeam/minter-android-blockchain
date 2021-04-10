@@ -35,7 +35,7 @@ import network.minter.blockchain.models.operational.BlockchainID;
 import network.minter.blockchain.models.operational.OperationInvalidDataException;
 import network.minter.blockchain.models.operational.OperationType;
 import network.minter.blockchain.models.operational.Transaction;
-import network.minter.blockchain.models.operational.TxCreateCoin;
+import network.minter.blockchain.models.operational.TxCoinCreate;
 import network.minter.core.MinterSDK;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -43,12 +43,14 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * minter-android-blockchain. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class TxRecreateCoinTest extends BaseTxTest {
+public class TxCoinRecreateTest extends BaseTxTest {
 
     @Test
-    public void testEncode() throws OperationInvalidDataException {
+    public void testEncode()
+            throws OperationInvalidDataException {
         final BigInteger nonce = new BigInteger("9");
         final String validTx = "f88b0901018010b83af8388a535550455220544553548a535550455254455354318a021e19e0c9bab24000008a021e19e0c9bab2400000638a021e27c1806e59a40000808001b845f8431ba096aa8fb9e884dd6c30320ed17e5c5ffbd0cc918fa14199004a493bea42b3e1c6a0156596e592a56d292688247be1a2f8c9ff8eec22173ef864fa15e8d13dd72cb4";
 
@@ -82,7 +84,7 @@ public class TxRecreateCoinTest extends BaseTxTest {
         assertEquals(nonce, tx.getNonce());
         assertEquals(MinterSDK.DEFAULT_COIN_ID, tx.getGasCoinId());
         assertEquals(OperationType.RecreateCoin, tx.getType());
-        TxCreateCoin data = tx.getData();
+        TxCoinCreate data = tx.getData();
 
         assertNotNull(data);
         assertEquals("SUPER TEST", data.getName());

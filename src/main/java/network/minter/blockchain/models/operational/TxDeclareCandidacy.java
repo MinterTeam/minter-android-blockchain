@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -49,19 +46,6 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxDeclareCandidacy extends Operation {
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxDeclareCandidacy> CREATOR = new Parcelable.Creator<TxDeclareCandidacy>() {
-        @Override
-        public TxDeclareCandidacy createFromParcel(Parcel in) {
-            return new TxDeclareCandidacy(in);
-        }
-
-        @Override
-        public TxDeclareCandidacy[] newArray(int size) {
-            return new TxDeclareCandidacy[size];
-        }
-    };
     private MinterAddress mAddress;
     private MinterPublicKey mPubKey;
     private Integer mCommission;
@@ -73,30 +57,6 @@ public final class TxDeclareCandidacy extends Operation {
 
     public TxDeclareCandidacy(Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxDeclareCandidacy(Parcel in) {
-        super(in);
-        mAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
-        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-        mCommission = in.readByte() == 0x00 ? null : in.readInt();
-        mCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mStake = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mAddress);
-        dest.writeValue(mPubKey);
-        if (mCommission == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeInt(mCommission);
-        }
-        dest.writeValue(mCoinId);
-        dest.writeValue(mStake);
     }
 
     public MinterAddress getAddress() {

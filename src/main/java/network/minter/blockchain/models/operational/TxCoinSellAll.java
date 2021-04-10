@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -44,21 +41,10 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
 
 /**
  * minter-android-blockchain. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public final class TxCoinSellAll extends Operation {
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxCoinSellAll> CREATOR = new Parcelable.Creator<TxCoinSellAll>() {
-        @Override
-        public TxCoinSellAll createFromParcel(Parcel in) {
-            return new TxCoinSellAll(in);
-        }
-
-        @Override
-        public TxCoinSellAll[] newArray(int size) {
-            return new TxCoinSellAll[size];
-        }
-    };
+public class TxCoinSellAll extends Operation {
     private BigInteger mCoinIdToSell;
     private BigInteger mCoinIdToBuy;
     private BigInteger mMinValueToBuy;
@@ -68,21 +54,6 @@ public final class TxCoinSellAll extends Operation {
 
     public TxCoinSellAll(Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxCoinSellAll(Parcel in) {
-        super(in);
-        mCoinIdToSell = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mCoinIdToBuy = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mMinValueToBuy = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mCoinIdToSell);
-        dest.writeValue(mCoinIdToBuy);
-        dest.writeValue(mMinValueToBuy);
     }
 
     public BigInteger getCoinIdToSell() {

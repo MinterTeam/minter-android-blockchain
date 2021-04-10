@@ -15,7 +15,7 @@ root build.gradle
 allprojects {
     repositories {
        // ... some repos
-        maven { url "https://dl.bintray.com/minterteam/android" }
+        maven { url "https://minter.jfrog.io/artifactory/android/" }
     }
 }
 ```
@@ -24,7 +24,7 @@ project build.gradle
 ```groovy
 
 ext {
-    minterBlockchainSDK = "1.0.1"
+    minterBlockchainSDK = "2.0.0"
 }
 
 dependencies {
@@ -179,7 +179,7 @@ cd project_root
 
 ## Changelog
 
-See [Release notes](RELEASE.md)
+See [Release notes](CHANGELOG.md)
 
 
 ## License

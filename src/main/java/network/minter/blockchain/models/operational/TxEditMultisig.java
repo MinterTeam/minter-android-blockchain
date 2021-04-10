@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-
 import javax.annotation.Nonnull;
 
 import network.minter.core.crypto.MinterAddress;
@@ -39,27 +37,11 @@ import network.minter.core.crypto.MinterAddress;
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 public class TxEditMultisig extends TxCreateMultisigAddress {
-    public static final Creator<TxEditMultisig> CREATOR = new Creator<TxEditMultisig>() {
-        @Override
-        public TxEditMultisig createFromParcel(Parcel in) {
-            return new TxEditMultisig(in);
-        }
-
-        @Override
-        public TxEditMultisig[] newArray(int size) {
-            return new TxEditMultisig[size];
-        }
-    };
-
     public TxEditMultisig() {
     }
 
     public TxEditMultisig(@Nonnull Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxEditMultisig(Parcel in) {
-        super(in);
     }
 
     @Override
@@ -90,11 +72,6 @@ public class TxEditMultisig extends TxCreateMultisigAddress {
     public TxEditMultisig addAddress(MinterAddress address, long weight) {
         super.addAddress(address, weight);
         return this;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
     }
 
     @Override

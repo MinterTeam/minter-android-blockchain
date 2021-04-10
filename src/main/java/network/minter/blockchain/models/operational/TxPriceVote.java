@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-
 import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
@@ -43,19 +41,6 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
 public class TxPriceVote extends Operation {
-
-    public static final Creator<TxPriceVote> CREATOR = new Creator<TxPriceVote>() {
-        @Override
-        public TxPriceVote createFromParcel(Parcel in) {
-            return new TxPriceVote(in);
-        }
-
-        @Override
-        public TxPriceVote[] newArray(int size) {
-            return new TxPriceVote[size];
-        }
-    };
-
     private BigInteger mPrice;
 
     public TxPriceVote() {
@@ -65,16 +50,6 @@ public class TxPriceVote extends Operation {
         super(rawTx);
     }
 
-    public TxPriceVote(Parcel in) {
-        super(in);
-        mPrice = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mPrice);
-    }
 
     @Override
     public OperationType getType() {

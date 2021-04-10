@@ -28,8 +28,6 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -42,7 +40,7 @@ import network.minter.core.crypto.MinterPublicKey;
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-@Parcel
+
 public class Genesis extends NodeResult {
 
     @SerializedName("genesis_time")
@@ -54,7 +52,7 @@ public class Genesis extends NodeResult {
     @SerializedName("app_hash")
     public String appHash;
 
-    @Parcel
+
     public static class AppState {
         public List<AppStateAccount> accounts;
         public List<AppStateCandidate> candidates;
@@ -65,21 +63,21 @@ public class Genesis extends NodeResult {
 
     }
 
-    @Parcel
+
     public static class AppStateCoin extends Coin {
         @SerializedName("reserve")
         public BigInteger reserveBalance;
         public long version;
     }
 
-    @Parcel
+
     public static class AppStateAccount {
         public MinterAddress address;
         public AppStateAccountBalance balance;
         public BigInteger nonce;
     }
 
-    @Parcel
+
     public static class AppStateAccountBalance {
         @SerializedName("coin")
         public BigInteger coinId;
@@ -90,7 +88,7 @@ public class Genesis extends NodeResult {
         }
     }
 
-    @Parcel
+
     public static class AppStateCandidate {
         public long id;
         @SerializedName("control_address")
@@ -105,7 +103,7 @@ public class Genesis extends NodeResult {
         public List<AppStateCandidateStake> stakes;
     }
 
-    @Parcel
+
     public static class AppStateCandidateStake {
         @SerializedName("coin")
         public BigInteger coinId;
@@ -115,14 +113,14 @@ public class Genesis extends NodeResult {
         public MinterAddress owner;
     }
 
-    @Parcel
+
     public static class ConsensusParams {
         public ConsensusParamsBlock block;
         public ConsensusParamsEvidence evidence;
         public ConsensusParamsValidator validator;
     }
 
-    @Parcel
+
     public static class ConsensusParamsBlock {
         @SerializedName("max_bytes")
         public BigInteger maxBytes;
@@ -132,7 +130,7 @@ public class Genesis extends NodeResult {
         public BigInteger timeIotaMs;
     }
 
-    @Parcel
+
     public static class ConsensusParamsEvidence {
         @SerializedName("max_age_num_blocks")
         public BigInteger maxAgeNumBlocks;
@@ -140,7 +138,7 @@ public class Genesis extends NodeResult {
         public BigInteger maxAgeDuration;
     }
 
-    @Parcel
+
     public static class ConsensusParamsValidator {
         @SerializedName("public_key_types")
         public List<String> publicKeyTypes;

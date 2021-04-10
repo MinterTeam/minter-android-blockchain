@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import network.minter.blockchain.models.operational.OperationType;
-import network.minter.blockchain.models.operational.TxCreateCoin;
+import network.minter.blockchain.models.operational.TxCoinCreate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -58,19 +58,19 @@ public class OperationTypeTest {
     @Test
     public void calculateCreateCoinFee() {
         final Map<String, Double> coinCosts = new HashMap<String, Double>() {{
-            put("AAA", 1000000D);
-            put("BBBB", 100000D);
-            put("CCCCC", 10000D);
-            put("DDDDDD", 1000D);
-            put("EEEEEEE", 100D);
-            put("FFFFFFFF", 100D);
-            put("GGGGGGGGG", 100D);
-            put("HHHHHHHHHH", 100D);
+            put("AAA", 100000000D);
+            put("BBBB", 10000000D);
+            put("CCCCC", 1000000D);
+            put("DDDDDD", 100000D);
+            put("EEEEEEE", 10000D);
+            put("FFFFFFFF", 10000D);
+            put("GGGGGGGGG", 10000D);
+            put("HHHHHHHHHH", 10000D);
         }};
 
         for (Map.Entry<String, Double> entry : coinCosts.entrySet()) {
             final BigDecimal res = new BigDecimal(String.valueOf(entry.getValue()));
-            BigDecimal result = TxCreateCoin.calculateCreatingCost(entry.getKey());
+            BigDecimal result = TxCoinCreate.calculateCreatingCost(entry.getKey());
             if (!res.setScale(4, BigDecimal.ROUND_DOWN).equals(result.setScale(4, BigDecimal.ROUND_DOWN))) {
                 System.err.println("Invalid fee in coin name: " + entry.getKey());
             }

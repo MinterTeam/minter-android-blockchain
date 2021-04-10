@@ -28,8 +28,6 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -44,7 +42,6 @@ import network.minter.core.crypto.MinterPublicKey;
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-@Parcel
 public class BlockInfo extends NodeResult {
     @SerializedName("hash")
     public BytesData hash;
@@ -79,14 +76,12 @@ public class BlockInfo extends NodeResult {
         return Transaction.humanizeValue(blockReward);
     }
 
-    @Parcel
     public static class BlockInfoValidator {
         @SerializedName("public_key")
         public MinterPublicKey publicKey;
         public boolean signed;
     }
 
-    @Parcel
     public static class BlockInfoEvidence {
         public BigInteger height;
         public String time;
@@ -94,7 +89,6 @@ public class BlockInfo extends NodeResult {
         public String hash;
     }
 
-    @Parcel
     public static class BlockInfoEvidenceList {
         @SerializedName("evidence")
         public List<BlockInfoEvidence> items;

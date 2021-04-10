@@ -64,6 +64,18 @@ public enum BlockchainStatus {
     WrongChainId(115),
     @SerializedName("116")
     CoinReserveUnderflow(116),
+    @SerializedName("117")
+    WrongHaltHeight(117),
+    @SerializedName("118")
+    HaltAlreadyExists(118),
+    @SerializedName("119")
+    CommissionCoinNotSufficient(119),
+    @SerializedName("120")
+    VoiceExpired(120),
+    @SerializedName("121")
+    VoiceAlreadyExists(121),
+    @SerializedName("122")
+    WrongUpdateVersionName(122),
 
     // coin creation
     @SerializedName("201")
@@ -76,6 +88,10 @@ public enum BlockchainStatus {
     InvalidCoinName(204),
     @SerializedName("204")
     WrongCoinSupply(205),
+    @SerializedName("206")
+    WrongCoinEmission(206),
+    // recreate coin
+    IsNotOwnerOfCoin(206),
 
     // convert
     @SerializedName("301")
@@ -104,6 +120,14 @@ public enum BlockchainStatus {
     StakeShouldBePositive(408),
     @SerializedName("409")
     TooLowStake(409),
+    @SerializedName("410")
+    PublicKeyInBlockList(410),
+    @SerializedName("411")
+    NewPublicKeyIsBad(411),
+    @SerializedName("412")
+    InsufficientWaitList(412),
+    @SerializedName("413")
+    PeriodLimitReached(413),
 
     // check
     @SerializedName("501")
@@ -131,6 +155,41 @@ public enum BlockchainStatus {
     TooLargeOwnersList(605),
     @SerializedName("606")
     DuplicatedAddresses(606),
+    @SerializedName("607")
+    DifferentCountAddressesAndWeights(607),
+    @SerializedName("608")
+    IncorrectTotalWeights(608),
+    @SerializedName("609")
+    NotEnoughMultisigVotes(609),
+
+
+    @SerializedName("700")
+    SwapPoolUnknown(700),
+    @SerializedName("701")
+    PairNotExists(701),
+    @SerializedName("702")
+    InsufficientInputAmount(702),
+    @SerializedName("703")
+    InsufficientLiquidity(703),
+    @SerializedName("704")
+    InsufficientLiquidityMinted(704),
+    @SerializedName("705")
+    InsufficientLiquidityBurned(705),
+    @SerializedName("706")
+    InsufficientLiquidityBalance(706),
+    @SerializedName("707")
+    InsufficientOutputAmount(707),
+    @SerializedName("708")
+    PairAlreadyExists(708),
+    @SerializedName("709")
+    TooLongSwapRoute(709),
+
+    @SerializedName("800")
+    CoinIsNotToken(800),
+    @SerializedName("801")
+    CoinNotMintable(801),
+    @SerializedName("802")
+    CoinNotBurnable(802),
     ;
 
     final int resVal;

@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
@@ -47,21 +44,10 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
 
 /**
  * minter-android-blockchain. 2019
+ *
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public class ExternalTransaction implements Parcelable {
-
-    public static final Creator<ExternalTransaction> CREATOR = new Creator<ExternalTransaction>() {
-        @Override
-        public ExternalTransaction createFromParcel(Parcel in) {
-            return new ExternalTransaction(in);
-        }
-
-        @Override
-        public ExternalTransaction[] newArray(int size) {
-            return new ExternalTransaction[size];
-        }
-    };
+public class ExternalTransaction {
 
     OperationType mType = OperationType.SendCoin;
     Operation mOperationData;
@@ -80,14 +66,6 @@ public class ExternalTransaction implements Parcelable {
         mPayload = transaction.mPayload;
     }
 
-    protected ExternalTransaction(Parcel in) {
-        mType = (OperationType) in.readValue(OperationType.class.getClassLoader());
-        mOperationData = (Operation) in.readValue(Operation.class.getClassLoader());
-        mPayload = (BytesData) in.readValue(BytesData.class.getClassLoader());
-        mNonce = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mGasPrice = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mGasCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-    }
 
     protected ExternalTransaction() {
     }
@@ -236,21 +214,6 @@ public class ExternalTransaction implements Parcelable {
         if (dataValidation != null) {
             checkArgument(dataValidation.isValid(), dataValidation.getInvalidFieldsMessages());
         }
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mType);
-        dest.writeValue(mOperationData);
-        dest.writeValue(mPayload);
-        dest.writeValue(mNonce);
-        dest.writeValue(mGasPrice);
-        dest.writeValue(mGasCoinId);
     }
 
     char[] fromRawRlp(int idx, Object[] raw) {

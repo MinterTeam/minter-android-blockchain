@@ -28,8 +28,6 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -41,7 +39,6 @@ import static network.minter.blockchain.models.operational.Transaction.humanizeV
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@Parcel
 public class AddressInfo extends NodeResult {
     // contains each coin balance
     public List<CoinBalance> balance = Collections.emptyList();
@@ -55,7 +52,6 @@ public class AddressInfo extends NodeResult {
         return humanizeValue(bipValue);
     }
 
-    @Parcel
     public static class CoinBalance {
         // This object will contains only ID and SYMBOL values, as "/address" result does not results nothing else
         public Coin coin;

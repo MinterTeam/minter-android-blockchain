@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -41,18 +38,6 @@ import network.minter.core.util.RLPBoxed;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxSetCandidateOffline extends Operation {
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxSetCandidateOffline> CREATOR = new Parcelable.Creator<TxSetCandidateOffline>() {
-        @Override
-        public TxSetCandidateOffline createFromParcel(Parcel in) {
-            return new TxSetCandidateOffline(in);
-        }
-
-        @Override
-        public TxSetCandidateOffline[] newArray(int size) {
-            return new TxSetCandidateOffline[size];
-        }
-    };
     private MinterPublicKey mPubKey;
 
     public TxSetCandidateOffline() {
@@ -60,11 +45,6 @@ public final class TxSetCandidateOffline extends Operation {
 
     public TxSetCandidateOffline(Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxSetCandidateOffline(Parcel in) {
-        super(in);
-        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
     }
 
     public MinterPublicKey getPublicKey() {
@@ -84,12 +64,6 @@ public final class TxSetCandidateOffline extends Operation {
     public TxSetCandidateOffline setPublicKey(String hexPubKey) {
         mPubKey = new MinterPublicKey(hexPubKey);
         return this;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mPubKey);
     }
 
     @Override

@@ -26,7 +26,6 @@
 
 package network.minter.blockchain.models;
 
-import org.parceler.Parcel;
 
 import java.math.BigInteger;
 
@@ -34,7 +33,7 @@ import java.math.BigInteger;
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@Parcel
+
 public class CountableData {
     public BigInteger count;
 }

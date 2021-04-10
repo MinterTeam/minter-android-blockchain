@@ -26,13 +26,9 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,19 +46,6 @@ import network.minter.core.util.RLPBoxed;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class TxMultisend extends Operation {
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxMultisend> CREATOR = new Parcelable.Creator<TxMultisend>() {
-        @Override
-        public TxMultisend createFromParcel(Parcel in) {
-            return new TxMultisend(in);
-        }
-
-        @Override
-        public TxMultisend[] newArray(int size) {
-            return new TxMultisend[size];
-        }
-    };
     private List<TxSendCoin> mItems = new ArrayList<>();
 
     public TxMultisend() {
@@ -70,16 +53,6 @@ public class TxMultisend extends Operation {
 
     public TxMultisend(@Nonnull Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxMultisend(Parcel in) {
-        super(in);
-        if (in.readByte() == 0x01) {
-            mItems = new ArrayList<>();
-            in.readList(mItems, TxSendCoin.class.getClassLoader());
-        } else {
-            mItems = Collections.emptyList();
-        }
     }
 
     public List<TxSendCoin> getItems() {
@@ -166,17 +139,6 @@ public class TxMultisend extends Operation {
         return OperationType.Multisend;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        if (mItems == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(mItems);
-        }
-    }
-
     @Nullable
     @Override
     protected FieldsValidationResult validate() {
@@ -186,7 +148,7 @@ public class TxMultisend extends Operation {
 
     @Override
     protected void decodeRLP(@Nonnull char[] rlpEncodedData) {
-	    final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
+        final DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
         final Object[] decoded = (Object[]) rlp.getDecoded();
 
         Object[] items = (Object[]) decoded[0];
@@ -207,7 +169,7 @@ public class TxMultisend extends Operation {
             items[i] = new Object[]{mItems.get(i).getCoinId(), mItems.get(i).getTo(), mItems.get(i).getValueBigInteger()};
         }
 
-	    return RLPBoxed.encode(new Object[]{items});
+        return RLPBoxed.encode(new Object[]{items});
 
     }
 }

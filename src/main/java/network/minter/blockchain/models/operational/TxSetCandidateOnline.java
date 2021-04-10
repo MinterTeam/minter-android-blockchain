@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -41,18 +38,6 @@ import network.minter.core.util.RLPBoxed;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxSetCandidateOnline extends Operation {
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxSetCandidateOnline> CREATOR = new Parcelable.Creator<TxSetCandidateOnline>() {
-        @Override
-        public TxSetCandidateOnline createFromParcel(Parcel in) {
-            return new TxSetCandidateOnline(in);
-        }
-
-        @Override
-        public TxSetCandidateOnline[] newArray(int size) {
-            return new TxSetCandidateOnline[size];
-        }
-    };
     private MinterPublicKey mPubKey;
 
     public TxSetCandidateOnline() {
@@ -62,10 +47,6 @@ public final class TxSetCandidateOnline extends Operation {
         super(rawTx);
     }
 
-    protected TxSetCandidateOnline(Parcel in) {
-        super(in);
-        mPubKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-    }
 
     public MinterPublicKey getPublicKey() {
         return mPubKey;
@@ -84,12 +65,6 @@ public final class TxSetCandidateOnline extends Operation {
     public TxSetCandidateOnline setPublicKey(String hexPubKey) {
         mPubKey = new MinterPublicKey(hexPubKey);
         return this;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mPubKey);
     }
 
     @Override

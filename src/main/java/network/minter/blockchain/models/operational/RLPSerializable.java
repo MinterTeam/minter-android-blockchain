@@ -26,22 +26,36 @@
 
 package network.minter.blockchain.models.operational;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nonnull;
+
+import network.minter.core.crypto.BytesData;
+import network.minter.core.crypto.MinterAddress;
+import network.minter.core.crypto.MinterPublicKey;
+import network.minter.core.util.DecodeResult;
+import network.minter.core.util.RLPBoxed;
+
+import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedByte;
+import static network.minter.core.internal.helpers.StringHelper.charsToString;
 
 /**
  * minter-android-blockchain. 2018
+ *
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public abstract class RLPSerializable {
     /**
      * Decode data from encoded RLP
-     * @param rlpEncodedData
+     * @param rlpEncodedData raw rlp
      */
     protected abstract void decodeRLP(@Nonnull char[] rlpEncodedData);
     /**
      * Encodes all create fields via RLP
      * @return encoded byte[]
-     * @see RLP
+     * @see RLPBoxed
      */
     @Nonnull
     protected abstract char[] encodeRLP();
@@ -69,5 +83,56 @@ public abstract class RLPSerializable {
 
     protected char[] fromRawRlp(int idx, char[][] raw) {
         return raw[idx];
+    }
+
+    protected RLPValues decodeValues(char[] rlpEncodedData) {
+        return new RLPValues(rlpEncodedData);
+    }
+
+    class RLPValues {
+        private final Object[] decoded;
+        protected RLPValues(char[] rlpEncodedData) {
+            DecodeResult rlp = RLPBoxed.decode(rlpEncodedData, 0);
+            decoded = (Object[]) rlp.getDecoded();
+        }
+
+        protected MinterPublicKey asPublicKey(int idx) {
+            return new MinterPublicKey(fromRawRlp(idx, decoded));
+        }
+
+        protected MinterAddress asAddress(int idx) {
+            return new MinterAddress(fromRawRlp(idx, decoded));
+        }
+
+        protected String asString(int idx) {
+            return charsToString(fromRawRlp(idx, decoded));
+        }
+
+        protected BytesData asBytesData(int idx) {
+            return new BytesData(fromRawRlp(idx, decoded));
+        }
+
+        protected BigInteger asBigInt(int idx) {
+            return fixBigintSignedByte(fromRawRlp(idx, decoded));
+        }
+
+        protected Integer asInt(int idx) {
+            return fixBigintSignedByte(fromRawRlp(idx, decoded)).intValue();
+        }
+
+        protected Boolean asBool(int idx) {
+            return asInt(idx) == 1;
+        }
+
+        protected List<BigInteger> asBigIntList(int idx) {
+            Object[] values = (Object[]) decoded[idx];
+            List<BigInteger> decodedData = new ArrayList<>(values.length);
+            for (int i = 0; i < values.length; i++) {
+                decodedData.add(
+                        fixBigintSignedByte(values[i])
+                );
+            }
+            return decodedData;
+        }
     }
 }

@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.models;
 
-import org.parceler.Parcel;
-
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +35,6 @@ import network.minter.core.crypto.MinterAddress;
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-@Parcel
 public class AddressInfoList extends NodeResult {
     public Map<MinterAddress, List<AddressInfo.CoinBalance>> addresses;
 }

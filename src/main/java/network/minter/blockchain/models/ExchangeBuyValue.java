@@ -28,23 +28,25 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import network.minter.blockchain.api.EstimateSwapFrom;
 import network.minter.blockchain.models.operational.Transaction;
 
 /**
  * minter-android-blockchain. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  * @link <a href="https://github.com/edwardstock">Github</a>
  */
-@Parcel
+
 public class ExchangeBuyValue extends NodeResult {
     @SerializedName("will_pay")
     public BigInteger willPay;
     public BigInteger commission;
+    @SerializedName("swap_from")
+    public EstimateSwapFrom swapFrom;
 
     public BigDecimal getAmount() {
         return Transaction.humanizeValue(willPay);

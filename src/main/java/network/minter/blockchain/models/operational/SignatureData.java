@@ -27,12 +27,11 @@
 package network.minter.blockchain.models.operational;
 
 
-import android.os.Parcelable;
-
 /**
  * minter-android-blockchain. 2018
+ *
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-public abstract class SignatureData extends RLPSerializable implements Parcelable {
+public abstract class SignatureData extends RLPSerializable {
 
 }

@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -47,18 +44,6 @@ import static network.minter.core.internal.common.Preconditions.checkArgument;
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
 public final class TxRedeemCheck extends Operation {
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<TxRedeemCheck> CREATOR = new Parcelable.Creator<TxRedeemCheck>() {
-        @Override
-        public TxRedeemCheck createFromParcel(Parcel in) {
-            return new TxRedeemCheck(in);
-        }
-
-        @Override
-        public TxRedeemCheck[] newArray(int size) {
-            return new TxRedeemCheck[size];
-        }
-    };
     private final static int PROOF_LENGTH = 65;
     private MinterCheck mRawCheck;
     private BytesData mProof = new BytesData(new char[0]);
@@ -68,19 +53,6 @@ public final class TxRedeemCheck extends Operation {
 
     public TxRedeemCheck(Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxRedeemCheck(Parcel in) {
-        super(in);
-        mRawCheck = (MinterCheck) in.readValue(BytesData.class.getClassLoader());
-        mProof = (BytesData) in.readValue(BytesData.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mRawCheck);
-        dest.writeValue(mProof);
     }
 
     public MinterCheck getRawCheck() {

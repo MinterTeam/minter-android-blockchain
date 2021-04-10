@@ -91,7 +91,7 @@ public class TransactionsRepositoryTest {
             assertNotNull(tx.nonce);
             assertNotNull(tx.gas);
             assertNotNull(tx.gasPrice);
-            assertNotNull(tx.gasCoinId);
+            assertNotNull(tx.gasCoin.id);
             assertNotNull(tx.type);
             assertNotNull(tx.data);
             assertNotNull(tx.payload);

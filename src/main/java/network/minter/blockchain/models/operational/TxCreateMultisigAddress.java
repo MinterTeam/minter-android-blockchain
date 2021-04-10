@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -49,19 +47,6 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class TxCreateMultisigAddress extends Operation {
-
-    @SuppressWarnings("unused")
-    public static final Creator<TxCreateMultisigAddress> CREATOR = new Creator<TxCreateMultisigAddress>() {
-        @Override
-        public TxCreateMultisigAddress createFromParcel(Parcel in) {
-            return new TxCreateMultisigAddress(in);
-        }
-
-        @Override
-        public TxCreateMultisigAddress[] newArray(int size) {
-            return new TxCreateMultisigAddress[size];
-        }
-    };
     protected BigInteger mThreshold;
     protected List<BigInteger> mWeights = new LinkedList<>();
     protected List<MinterAddress> mAddresses = new LinkedList<>();
@@ -71,21 +56,6 @@ public class TxCreateMultisigAddress extends Operation {
 
     public TxCreateMultisigAddress(@Nonnull Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxCreateMultisigAddress(Parcel in) {
-        super(in);
-        mThreshold = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        in.readList(mWeights, BigInteger.class.getClassLoader());
-        in.readList(mAddresses, MinterAddress.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mThreshold);
-        dest.writeList(mWeights);
-        dest.writeList(mAddresses);
     }
 
     public TxCreateMultisigAddress addWeight(long... weight) {

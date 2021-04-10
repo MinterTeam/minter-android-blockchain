@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -37,37 +35,17 @@ import static network.minter.blockchain.models.operational.Transaction.normalize
 
 /**
  * minter-android-blockchain. 2020
+ *
  * @author Eduard Maximovich (edward.vstock@gmail.com)
+ * @deprecated Use {@link TxCoinRecreate} instead for unified class naming
  */
-
-public class TxRecreateCoin extends TxCreateCoin {
-
-    public static final Creator<TxRecreateCoin> CREATOR = new Creator<TxRecreateCoin>() {
-        @Override
-        public TxRecreateCoin createFromParcel(Parcel in) {
-            return new TxRecreateCoin(in);
-        }
-
-        @Override
-        public TxRecreateCoin[] newArray(int size) {
-            return new TxRecreateCoin[size];
-        }
-    };
-
+@Deprecated
+public class TxRecreateCoin extends TxCoinRecreate {
     public TxRecreateCoin() {
     }
 
     public TxRecreateCoin(@Nonnull Transaction rawTx) {
         super(rawTx);
-    }
-
-    public TxRecreateCoin(Parcel in) {
-        super(in);
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
     }
 
     @Override

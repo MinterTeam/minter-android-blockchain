@@ -28,8 +28,6 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import java.math.BigInteger;
 
 import network.minter.core.crypto.MinterPublicKey;
@@ -38,7 +36,7 @@ import network.minter.core.crypto.MinterPublicKey;
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-@Parcel
+
 public class ValidatorItem extends NodeResult {
     @SerializedName("public_key")
     public MinterPublicKey pubKey;

@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -42,17 +39,6 @@ import network.minter.core.util.RLPBoxed;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public class TxEditCandidate extends Operation {
-    public static final Parcelable.Creator<TxEditCandidate> CREATOR = new Parcelable.Creator<TxEditCandidate>() {
-        @Override
-        public TxEditCandidate createFromParcel(Parcel in) {
-            return new TxEditCandidate(in);
-        }
-
-        @Override
-        public TxEditCandidate[] newArray(int size) {
-            return new TxEditCandidate[size];
-        }
-    };
     private MinterPublicKey mPublicKey;
     private MinterAddress mRewardAddress;
     private MinterAddress mOwnerAddress;
@@ -63,14 +49,6 @@ public class TxEditCandidate extends Operation {
 
     public TxEditCandidate(@Nonnull Transaction rawTx) {
         super(rawTx);
-    }
-
-    protected TxEditCandidate(Parcel in) {
-        super(in);
-        mPublicKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-        mRewardAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
-        mOwnerAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
-        mControlAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
     }
 
     public MinterPublicKey getPublicKey() {
@@ -109,19 +87,6 @@ public class TxEditCandidate extends Operation {
         return this;
     }
 
-    @Override
-    public int describeContents() {
-        return super.describeContents();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mPublicKey);
-        dest.writeValue(mRewardAddress);
-        dest.writeValue(mOwnerAddress);
-        dest.writeValue(mControlAddress);
-    }
 
     @Override
     public OperationType getType() {

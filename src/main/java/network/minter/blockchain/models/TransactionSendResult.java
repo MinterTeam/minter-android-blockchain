@@ -28,15 +28,13 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import network.minter.core.crypto.MinterHash;
 
 /**
  * minter-android-blockchain. 2018
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@Parcel
+
 public class TransactionSendResult extends NodeResult {
     @SerializedName("hash")
     public MinterHash txHash;

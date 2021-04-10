@@ -28,8 +28,6 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -42,7 +40,6 @@ import network.minter.core.crypto.MinterPublicKey;
  * minter-android-blockchain. 2019
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
-@Parcel
 public class CandidateItem extends NodeResult {
     @SerializedName("reward_address")
     public MinterAddress rewardAddress;
@@ -89,13 +86,11 @@ public class CandidateItem extends NodeResult {
         return Transaction.humanizeValue(totalStake);
     }
 
-    @Parcel
     public static class StakeCoin {
         public BigInteger id;
         public String symbol;
     }
 
-    @Parcel
     public static class StakeInfo {
         public MinterAddress owner;
         public StakeCoin coin;

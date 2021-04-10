@@ -38,9 +38,9 @@ import network.minter.blockchain.models.operational.OperationInvalidDataExceptio
 import network.minter.blockchain.models.operational.Transaction;
 import network.minter.blockchain.models.operational.TransactionSign;
 import network.minter.blockchain.models.operational.TxCoinBuy;
+import network.minter.blockchain.models.operational.TxCoinCreate;
 import network.minter.blockchain.models.operational.TxCoinSell;
 import network.minter.blockchain.models.operational.TxCoinSellAll;
-import network.minter.blockchain.models.operational.TxCreateCoin;
 import network.minter.blockchain.models.operational.TxDeclareCandidacy;
 import network.minter.blockchain.models.operational.TxDelegate;
 import network.minter.blockchain.models.operational.TxEditCandidate;
@@ -354,7 +354,7 @@ public class ExternalTransactionTest extends BaseTxTest {
 
     @Test
     public void testCreateCoinEncodeDecode() {
-        TxCreateCoin txData = new TxCreateCoin()
+        TxCoinCreate txData = new TxCoinCreate()
                 .setName("SUPER TEST")
                 .setSymbol("SPRTEST000")
                 .setInitialAmount("1000")
@@ -375,7 +375,7 @@ public class ExternalTransactionTest extends BaseTxTest {
         assertTrue(decoded.getPayload().equals(tx.getPayload()));
         assertEquals(decoded.getType(), tx.getType());
         assertEquals(DEFAULT_COIN_ID, tx.getGasCoinId());
-        TxCreateCoin op = decoded.getData(TxCreateCoin.class);
+        TxCoinCreate op = decoded.getData(TxCoinCreate.class);
         assertNotNull(op);
 
         assertEquals("SUPER TEST", op.getName());

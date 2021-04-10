@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.util.Collections;
 
 import javax.annotation.Nonnull;
@@ -41,7 +38,7 @@ import static network.minter.core.internal.common.Preconditions.firstNonNull;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public abstract class Operation extends RLPSerializable implements Parcelable {
+public abstract class Operation extends RLPSerializable {
     private final Transaction mTx;
 
     public Operation() {
@@ -50,10 +47,6 @@ public abstract class Operation extends RLPSerializable implements Parcelable {
 
     public Operation(@Nonnull Transaction rawTx) {
         mTx = rawTx;
-    }
-
-    protected Operation(Parcel in) {
-        mTx = (Transaction) in.readValue(Transaction.class.getClassLoader());
     }
 
     public Transaction build() throws OperationInvalidDataException {
@@ -85,17 +78,6 @@ public abstract class Operation extends RLPSerializable implements Parcelable {
     }
 
     public abstract OperationType getType();
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mTx);
-    }
 
     @Nullable
     protected abstract FieldsValidationResult validate();

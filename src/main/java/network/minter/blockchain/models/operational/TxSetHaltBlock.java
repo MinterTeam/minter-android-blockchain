@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-
 import java.math.BigInteger;
 
 import javax.annotation.Nonnull;
@@ -45,18 +43,6 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
  */
 
 public class TxSetHaltBlock extends Operation {
-    public static final Creator<TxSetHaltBlock> CREATOR = new Creator<TxSetHaltBlock>() {
-        @Override
-        public TxSetHaltBlock createFromParcel(Parcel in) {
-            return new TxSetHaltBlock(in);
-        }
-
-        @Override
-        public TxSetHaltBlock[] newArray(int size) {
-            return new TxSetHaltBlock[size];
-        }
-    };
-
     private MinterPublicKey mPublicKey;
     private BigInteger mHeight;
 
@@ -65,18 +51,6 @@ public class TxSetHaltBlock extends Operation {
 
     public TxSetHaltBlock(@Nonnull Transaction rawTx) {
         super(rawTx);
-    }
-
-    public TxSetHaltBlock(Parcel in) {
-        mPublicKey = (MinterPublicKey) in.readValue(MinterPublicKey.class.getClassLoader());
-        mHeight = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeValue(mPublicKey);
-        dest.writeValue(mHeight);
     }
 
     @Override

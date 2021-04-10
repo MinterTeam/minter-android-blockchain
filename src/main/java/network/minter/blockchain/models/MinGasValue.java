@@ -28,15 +28,13 @@ package network.minter.blockchain.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 import java.math.BigInteger;
 
 /**
  * minter-android-blockchain. 2020
  * @author Eduard Maximovich (edward.vstock@gmail.com)
  */
-@Parcel
+
 public class MinGasValue extends NodeResult {
     @SerializedName("min_gas_price")
     public BigInteger value;

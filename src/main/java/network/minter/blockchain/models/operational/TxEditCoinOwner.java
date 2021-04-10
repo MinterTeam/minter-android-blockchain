@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -46,20 +43,6 @@ import static network.minter.core.internal.helpers.StringHelper.charsToString;
  */
 
 public class TxEditCoinOwner extends Operation {
-
-
-    public static final Parcelable.Creator<TxEditCoinOwner> CREATOR = new Parcelable.Creator<TxEditCoinOwner>() {
-        @Override
-        public TxEditCoinOwner createFromParcel(Parcel in) {
-            return new TxEditCoinOwner(in);
-        }
-
-        @Override
-        public TxEditCoinOwner[] newArray(int size) {
-            return new TxEditCoinOwner[size];
-        }
-    };
-
     private String mSymbol;
     private MinterAddress mNewOwner;
 
@@ -68,18 +51,6 @@ public class TxEditCoinOwner extends Operation {
 
     public TxEditCoinOwner(@Nonnull Transaction rawTx) {
         super(rawTx);
-    }
-
-    public TxEditCoinOwner(Parcel in) {
-        mSymbol = in.readString();
-        mNewOwner = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
-        dest.writeString(mSymbol);
-        dest.writeValue(mNewOwner);
     }
 
     @Override

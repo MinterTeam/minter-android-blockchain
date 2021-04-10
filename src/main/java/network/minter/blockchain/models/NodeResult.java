@@ -26,7 +26,6 @@
 
 package network.minter.blockchain.models;
 
-import org.parceler.Parcel;
 
 import java.util.Map;
 
@@ -77,7 +76,7 @@ public class NodeResult {
         );
     }
 
-    @Parcel
+
     public static class Error {
         public Integer code;
         public String message;

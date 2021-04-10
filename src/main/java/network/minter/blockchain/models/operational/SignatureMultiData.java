@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,32 +43,10 @@ import static network.minter.core.internal.helpers.BytesHelper.addLeadingZeroes;
  * @author Eduard Maximovich [edward.vstock@gmail.com]
  */
 public final class SignatureMultiData extends SignatureData {
-    @SuppressWarnings("unused")
-    public static final Creator<network.minter.blockchain.models.operational.SignatureMultiData> CREATOR = new Creator<network.minter.blockchain.models.operational.SignatureMultiData>() {
-        @Override
-        public network.minter.blockchain.models.operational.SignatureMultiData createFromParcel(Parcel in) {
-            return new network.minter.blockchain.models.operational.SignatureMultiData(in);
-        }
-
-        @Override
-        public network.minter.blockchain.models.operational.SignatureMultiData[] newArray(int size) {
-            return new network.minter.blockchain.models.operational.SignatureMultiData[size];
-        }
-    };
     private MinterAddress mSignatureAddress;
     private List<SignatureSingleData> mSignatures;
 
     public SignatureMultiData() {
-    }
-
-    protected SignatureMultiData(Parcel in) {
-        mSignatureAddress = (MinterAddress) in.readValue(MinterAddress.class.getClassLoader());
-        if (in.readByte() == 0x01) {
-            mSignatures = new ArrayList<>();
-            in.readList(mSignatures, SignatureSingleData.class.getClassLoader());
-        } else {
-            mSignatures = null;
-        }
     }
 
     public MinterAddress getSignatureAddress() {
@@ -83,19 +58,20 @@ public final class SignatureMultiData extends SignatureData {
     }
 
     @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mSignatureAddress);
-        if (mSignatures == null) {
-            dest.writeByte((byte) (0x00));
-        } else {
-            dest.writeByte((byte) (0x01));
-            dest.writeList(mSignatures);
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SignatureMultiData)) {
+            return false;
         }
+
+        SignatureMultiData md = ((SignatureMultiData) obj);
+
+        if (md.mSignatureAddress != mSignatureAddress) {
+            return false;
+        }
+
+        // this case does not check null values, is it possible?
+        // @todo make test for this
+        return mSignatures.equals(md.mSignatures);
     }
 
     protected void setSigns(MinterAddress signatureAddress, List<SignatureSingleData> signatures) {
@@ -121,23 +97,6 @@ public final class SignatureMultiData extends SignatureData {
         }
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof SignatureMultiData)) {
-            return false;
-        }
-
-        SignatureMultiData md = ((SignatureMultiData) obj);
-
-        if (md.mSignatureAddress != mSignatureAddress) {
-            return false;
-        }
-
-        // this case does not check null values, is it possible?
-        // @todo make test for this
-        return mSignatures.equals(md.mSignatures);
-    }
-
     @Nonnull
     @Override
     protected char[] encodeRLP() {
@@ -150,7 +109,7 @@ public final class SignatureMultiData extends SignatureData {
             };
         }
 
-	    return RLPBoxed.encode(new Object[]{
+        return RLPBoxed.encode(new Object[]{
                 mSignatureAddress,
                 signatures
         });

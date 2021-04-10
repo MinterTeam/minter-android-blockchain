@@ -68,7 +68,8 @@ public interface NodeCoinEndpoint {
     Observable<ExchangeSellValue> getCoinExchangeCurrencyToSellById(
             @Query("coin_id_to_sell") String coinIdToSell,
             @Query("value_to_sell") String valueToSell,
-            @Query("coin_id_to_buy") String coinIdToBuy
+            @Query("coin_id_to_buy") String coinIdToBuy,
+            @Query("swap_from") EstimateSwapFrom swapFrom
     );
 
     /**
@@ -82,7 +83,8 @@ public interface NodeCoinEndpoint {
     Observable<ExchangeSellValue> getCoinExchangeCurrencyToSell(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_sell") String valueToSell,
-            @Query("coin_to_buy") String coinToBuy
+            @Query("coin_to_buy") String coinToBuy,
+            @Query("swap_from") EstimateSwapFrom swapFrom
     );
 
     /**
@@ -100,7 +102,8 @@ public interface NodeCoinEndpoint {
             @Query("value_to_sell") String valueToSell,
             @Query("coin_to_buy") String coinToBuy,
             @Query("gas_price") String gasPrice,
-            @Query("height") String height
+            @Query("height") String height,
+            @Query("swap_from") EstimateSwapFrom swapFrom
     );
 
     /**
@@ -118,7 +121,8 @@ public interface NodeCoinEndpoint {
             @Query("value_to_sell") String valueToSell,
             @Query("coin_id_to_buy") String coinIdToBuy,
             @Query("gas_price") String gasPrice,
-            @Query("height") String height
+            @Query("height") String height,
+            @Query("swap_from") EstimateSwapFrom swapFrom
     );
 
     /**
@@ -132,7 +136,8 @@ public interface NodeCoinEndpoint {
     Observable<ExchangeBuyValue> getCoinExchangeCurrencyToBuy(
             @Query("coin_to_sell") String coinToSell,
             @Query("value_to_buy") String valueToBuy,
-            @Query("coin_to_buy") String coinToBuy
+            @Query("coin_to_buy") String coinToBuy,
+            @Query("swap_from") EstimateSwapFrom swapFrom
     );
 
     /**
@@ -146,7 +151,8 @@ public interface NodeCoinEndpoint {
     Observable<ExchangeBuyValue> getCoinExchangeCurrencyToBuyById(
             @Query("coin_id_to_sell") String coinIdToSell,
             @Query("value_to_buy") String valueToBuy,
-            @Query("coin_id_to_buy") String coinIdToBuy
+            @Query("coin_id_to_buy") String coinIdToBuy,
+            @Query("swap_from") EstimateSwapFrom swapFrom
     );
 
 }

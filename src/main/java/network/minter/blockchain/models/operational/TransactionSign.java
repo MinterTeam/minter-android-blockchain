@@ -26,8 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import org.parceler.Parcel;
-
 import network.minter.core.crypto.BytesData;
 
 /**
@@ -35,7 +33,6 @@ import network.minter.core.crypto.BytesData;
  *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-@Parcel
 public final class TransactionSign {
     String mSign;
 

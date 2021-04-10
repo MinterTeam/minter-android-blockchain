@@ -26,9 +26,6 @@
 
 package network.minter.blockchain.models.operational;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.edwardstock.secp256k1.NativeSecp256k1;
 
 import java.lang.reflect.InvocationTargetException;
@@ -60,31 +57,21 @@ import static network.minter.core.internal.helpers.BytesHelper.fixBigintSignedBy
 
 /**
  * minter-android-blockchain. 2018
+ *
  * @author Eduard Maximovich <edward.vstock@gmail.com>
  */
-public class Transaction implements Parcelable {
-    private final static Object sNativeLock = new Object();
+public class Transaction {
     public final static BigInteger VALUE_MUL = new BigInteger("1000000000000000000", 10);
     public final static BigDecimal VALUE_MUL_DEC = new BigDecimal("1000000000000000000");
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Transaction> CREATOR = new Parcelable.Creator<Transaction>() {
-        @Override
-        public Transaction createFromParcel(Parcel in) {
-            return new Transaction(in);
-        }
-
-        @Override
-        public Transaction[] newArray(int size) {
-            return new Transaction[size];
-        }
-    };
+    public final static int MAX_PAYLOAD_LENGTH = 10000;
+    private final static Object sNativeLock = new Object();
     BigInteger mNonce;
     BlockchainID mChainId;
     BigInteger mGasPrice = BigInteger.ONE;
     BigInteger mGasCoinId = MinterSDK.DEFAULT_COIN_ID;
     OperationType mType;
     Operation mOperationData;
-    // max - 1024 bytes (1 kilobyte)
+    // max - 10000 bytes
     BytesData mPayload = new BytesData(new char[0]);
     BytesData mServiceData = new BytesData(new char[0]);
     SignatureType mSignatureType = Single;
@@ -126,19 +113,6 @@ public class Transaction implements Parcelable {
     }
 
     protected Transaction() {
-    }
-
-    protected Transaction(Parcel in) {
-        mNonce = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mChainId = (BlockchainID) in.readValue(BlockchainID.class.getClassLoader());
-        mGasPrice = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mGasCoinId = (BigInteger) in.readValue(BigInteger.class.getClassLoader());
-        mType = (OperationType) in.readValue(OperationType.class.getClassLoader());
-        mOperationData = (Operation) in.readValue(Operation.class.getClassLoader());
-        mPayload = (BytesData) in.readValue(BytesData.class.getClassLoader());
-        mServiceData = (BytesData) in.readValue(BytesData.class.getClassLoader());
-        mSignatureType = (SignatureType) in.readValue(SignatureType.class.getClassLoader());
-        mSignatureData = (SignatureData) in.readValue(mSignatureType.mTypeClass.getClassLoader());
     }
 
     public static BigDecimal humanizeValue(BigInteger in) {
@@ -489,25 +463,6 @@ public class Transaction implements Parcelable {
         return new String(getPayload().getData());
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mNonce);
-        dest.writeValue(mChainId);
-        dest.writeValue(mGasPrice);
-        dest.writeValue(mGasCoinId);
-        dest.writeValue(mType);
-        dest.writeValue(mOperationData);
-        dest.writeValue(mPayload);
-        dest.writeValue(mServiceData);
-        dest.writeValue(mSignatureType);
-        dest.writeValue(mSignatureType);
-    }
-
     char[] fromRawRlp(int idx, Object[] raw) {
         if (raw[idx] instanceof String) {
             return ((String) raw[idx]).toCharArray();
@@ -525,17 +480,9 @@ public class Transaction implements Parcelable {
         mGasPrice = fixBigintSignedByte((raw[2]));
         mGasCoinId = fixBigintSignedByte((raw[3]));
         mType = OperationType.findByValue(new BigInteger(charsToBytes(fromRawRlp(4, raw))));
-        /**
-         * ha, where is the 5th index?
-         * see here: {@link #fromEncoded(String)}
-         */
         mPayload = new BytesData(fromRawRlp(6, raw));
         mServiceData = new BytesData(fromRawRlp(7, raw));
         mSignatureType = SignatureType.findByValue(new BigInteger(charsToBytes(fromRawRlp(8, raw))));
-        /**
-         * And there's no 9 index, it's signature data
-         * decoded here: {@link #fromEncoded(String)}
-         */
     }
 
     char[] encode(boolean excludeSignature) {
@@ -663,7 +610,7 @@ public class Transaction implements Parcelable {
 
         /**
          * Set arbitrary user-defined bytes
-         * @param data max size: 1024 bytes
+         * @param data max size: 10000 bytes
          * @return {@link Builder}
          */
         public Builder setPayload(byte[] data) {
@@ -685,7 +632,7 @@ public class Transaction implements Parcelable {
 
         /**
          * Set arbitrary user-defined bytes
-         * @param data max size: 1024 bytes
+         * @param data max size: 10000 bytes
          * @return {@link Builder}
          */
         public Builder setPayload(BytesData data) {
@@ -693,14 +640,14 @@ public class Transaction implements Parcelable {
                 mTx.mPayload = new BytesData(new char[0]);
                 return this;
             }
-            checkArgument(data.size() <= 1024, "Payload maximum size: 1024 bytes");
+            checkArgument(data.size() <= MAX_PAYLOAD_LENGTH, "Payload maximum size: 10000 bytes");
             mTx.mPayload = new BytesData(data.getData(), true);
             return this;
         }
 
         /**
          * Set arbitrary user-defined bytes
-         * @param hexString max decoded size: 1024 bytes, means max string length should be 2048
+         * @param hexString max decoded size: 10000 bytes, means max string length should be 20000
          * @return {@link Builder}
          */
         public Builder setPayload(String hexString) {
@@ -708,14 +655,15 @@ public class Transaction implements Parcelable {
                 mTx.mPayload = new BytesData(new char[0]);
                 return this;
             }
-            checkArgument(hexString.length() <= 2048, "Payload maximum size: 1024 bytes (2048 in hex string)");
+            checkArgument(hexString.length() <= MAX_PAYLOAD_LENGTH *
+                    2, "Payload maximum size: 10000 bytes (20000 in hex string)");
             mTx.mPayload = new BytesData(hexString);
             return this;
         }
 
         /**
          * Set arbitrary user-defined bytes
-         * @param byteBuffer max size: 1024 bytes
+         * @param byteBuffer max size: 10000 bytes
          * @return {@link Builder}
          */
         public Builder setPayload(ByteBuffer byteBuffer) {
@@ -788,18 +736,20 @@ public class Transaction implements Parcelable {
 
         /**
          * Create "Create coin" transaction builder
-         * @return {@link TxCreateCoin}
+         *
+         * @return {@link TxCoinCreate}
          */
-        public TxCreateCoin createCoin() {
-            return new TxCreateCoin(mTx);
+        public TxCoinCreate createCoin() {
+            return new TxCoinCreate(mTx);
         }
 
         /**
          * Recreate coin with new parameters
-         * @return {@link TxRecreateCoin}
+         *
+         * @return {@link TxCoinRecreate}
          */
-        public TxRecreateCoin recreateCoin() {
-            return new TxRecreateCoin(mTx);
+        public TxCoinRecreate recreateCoin() {
+            return new TxCoinRecreate(mTx);
         }
 
         /**
@@ -908,6 +858,7 @@ public class Transaction implements Parcelable {
 
         /**
          * Create transaction that planning to stop network (by validator votes)
+         *
          * @return {@link TxSetHaltBlock}
          */
         public TxSetHaltBlock setHaltBlock() {
@@ -916,6 +867,128 @@ public class Transaction implements Parcelable {
 
         public TxPriceVote priceVote() {
             return new TxPriceVote(mTx);
+        }
+
+        /**
+         * Transaction for add liquidity to pool
+         *
+         * @return {@link TxAddLiquidity}
+         */
+        public TxAddLiquidity addLiquidity() {
+            return new TxAddLiquidity(mTx);
+        }
+
+        /**
+         * Transaction for reduce liquidity from pool
+         *
+         * @return {@link TxRemoveLiquidity}
+         */
+        public TxRemoveLiquidity removeLiquidity() {
+            return new TxRemoveLiquidity(mTx);
+        }
+
+        /**
+         * Buy coins from pool
+         *
+         * @return {@link TxSwapPoolBuy}
+         */
+        public TxSwapPoolBuy buySwapPool() {
+            return new TxSwapPoolBuy(mTx);
+        }
+
+        /**
+         * Sell coins from pool
+         *
+         * @return {@link TxSwapPoolSell}
+         */
+        public TxSwapPoolSell sellSwapPool() {
+            return new TxSwapPoolSell(mTx);
+        }
+
+        /**
+         * Sell all coins from pool
+         *
+         * @return {@link TxSwapPoolSellAll}
+         */
+        public TxSwapPoolSellAll sellAllSwapPool() {
+            return new TxSwapPoolSellAll(mTx);
+        }
+
+        /**
+         * Create liquidity pool
+         *
+         * @return {@link TxSwapPoolCreate}
+         */
+        public TxSwapPoolCreate createSwapPool() {
+            return new TxSwapPoolCreate(mTx);
+        }
+
+        /**
+         * Change validator commission
+         *
+         * @return {@link TxEditCandidateCommission}
+         */
+        public TxEditCandidateCommission editCandidateCommission() {
+            return new TxEditCandidateCommission(mTx);
+        }
+
+
+        /**
+         * Move stake from one to another validator (works like sequence of unbond-delegate with the same freeze time)
+         * @return {@link TxMoveStake}
+         */
+        /* not ready yet
+        public TxMoveStake moveStake() {
+            return new TxMoveStake(mTx);
+        }
+         */
+
+        /**
+         * Mint token
+         *
+         * @return {@link TxTokenMint}
+         */
+        public TxTokenMint mintToken() {
+            return new TxTokenMint(mTx);
+        }
+
+        /**
+         * @return {@link TxTokenCreate}
+         */
+        public TxTokenCreate createToken() {
+            return new TxTokenCreate(mTx);
+        }
+
+        /**
+         * @return {@link TxTokenRecreate}
+         */
+        public TxTokenRecreate recreateToken() {
+            return new TxTokenRecreate(mTx);
+        }
+
+        /**
+         * @return {@link TxTokenRecreate}
+         */
+        public TxTokenBurn burnToken() {
+            return new TxTokenBurn(mTx);
+        }
+
+        /**
+         * Vote for network commissions
+         *
+         * @return {@link TxVoteCommission}
+         */
+        public TxVoteCommission voteCommission() {
+            return new TxVoteCommission(mTx);
+        }
+
+        /**
+         * Vote for update network
+         *
+         * @return {@link TxVoteUpdate}
+         */
+        public TxVoteUpdate voteUpdate() {
+            return new TxVoteUpdate(mTx);
         }
     }
 
